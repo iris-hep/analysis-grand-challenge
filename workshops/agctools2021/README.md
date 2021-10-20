@@ -13,6 +13,7 @@ The following libraries and tools are included in tutorials:
 * awkward-array
 * vector
 * hist
+* mplhep
 * coffea
 * cabinetry
 * pyhf
