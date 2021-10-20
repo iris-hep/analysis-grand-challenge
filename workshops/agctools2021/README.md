@@ -4,7 +4,7 @@ The IRIS-HEP AGC Tools 2021 Workshop is dedicated to showcasing tools and workfl
 
 The [agenda](https://indico.cern.ch/event/1076231/) is composed of hands-on tutorials based on various tools and services developed in the Python ecosystem by and for the particle physics community.
 
-Following libraries and tools are included in tutorials:
+The following libraries and tools are included in tutorials:
 * coffea-casa
 * ServiceX
 * func_adl
