@@ -1,0 +1,11 @@
+__pycache__
+*.pyc
+.vscode
+*.swp
+venv/
+.env/
+.ipynb_checkpoints
+
+analyses/**/*.root
+analyses/**/*.pdf
+analyses/**/*.npz
