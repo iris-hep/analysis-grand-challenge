@@ -1,0 +1,28 @@
+General:
+  Measurement: "CabinetryHZZAnalysis"
+  POI: "Signal_norm"
+  HistogramFolder: "histograms/"
+  InputPath: "histograms.root:{SamplePath}"
+
+Regions:
+  - Name: Signal_region
+
+Samples:
+  - Name: "Data"
+    SamplePath: "data"
+    Data: True
+
+  - Name: "Signal"
+    SamplePath: "signal"
+
+  - Name: "ZZ"
+    SamplePath: "ZZ"
+
+  - Name: "Z, tt"
+    SamplePath: "Z_tt"
+
+NormFactors:
+  - Name: Signal_norm
+    Samples: Signal
+    Nominal: 1.0
+    Bounds: [0, 10]
