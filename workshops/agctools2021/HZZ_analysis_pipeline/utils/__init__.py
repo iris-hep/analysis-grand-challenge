@@ -46,3 +46,15 @@ def plot_errorband(bin_edge_low, bin_edge_high, num_bins, histograms):
     main_axes.set_ylim(bottom=0, top=np.amax(histograms["data"].values()) * 1.6)
     main_axes.set_ylabel("Events / " + str(step_size) + " GeV")
     main_axes.legend(frameon=False)
+
+
+def save_figure(figname: str):
+    """Takes the current figure and saves it in .pdf and .png formats under figures/."""
+    fig = plt.gcf()
+    fig.set_facecolor("white")
+
+    if not os.path.exists("figures/"):
+        os.mkdir("figures/")
+
+    for filetype in ["pdf", "png"]:
+        fig.savefig(f"figures/{figname}.{filetype}")
