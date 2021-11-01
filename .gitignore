@@ -9,3 +9,7 @@ venv/
 analyses/**/*.root
 analyses/**/*.pdf
 analyses/**/*.npz
+
+workshops/agctools2021/HZZ_analysis_pipeline/**/*.root
+workshops/agctools2021/HZZ_analysis_pipeline/*/*.pdf
+workshops/agctools2021/HZZ_analysis_pipeline/*/*.npz
