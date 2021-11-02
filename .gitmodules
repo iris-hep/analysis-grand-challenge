@@ -1,0 +1,9 @@
+[submodule "workshops/agctools2021/uproot-awkward-vector-demo"]
+	path = workshops/agctools2021/uproot-awkward-vector-demo
+	url = git@github.com:masonproffitt/uproot-awkward-vector-demo.git
+[submodule "workshops/agctools2021/func-adl-demo"]
+	path = workshops/agctools2021/func-adl-demo
+	url = git@github.com:masonproffitt/func-adl-demo.git
+[submodule "workshops/agctools2021/ServiceX-at-IRIS-HEP-ACG-workshop-2021"]
+	path = workshops/agctools2021/ServiceX-at-IRIS-HEP-ACG-workshop-2021
+	url = git@github.com:kyungeonchoi/ServiceX-at-IRIS-HEP-ACG-workshop-2021.git
