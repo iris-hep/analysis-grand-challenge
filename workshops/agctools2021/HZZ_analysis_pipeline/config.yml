@@ -19,7 +19,7 @@ Samples:
   - Name: "Background ZZ*"
     SamplePath: "ZZ"
 
-  - Name: "Background Z, tt"
+  - Name: "Background Z, ttbar"
     SamplePath: "Z_tt"
 
 Systematics:
