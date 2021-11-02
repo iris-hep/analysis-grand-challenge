@@ -16,10 +16,10 @@ Samples:
   - Name: "Signal"
     SamplePath: "signal"
 
-  - Name: "ZZ"
+  - Name: "Background ZZ*"
     SamplePath: "ZZ"
 
-  - Name: "Z, tt"
+  - Name: "Background Z, tt"
     SamplePath: "Z_tt"
 
 Systematics:
@@ -43,7 +43,7 @@ Systematics:
       Normalization: 0.1
     Down:
       Normalization: -0.1
-    Samples: "ZZ"
+    Samples: "Background ZZ*"
 
 NormFactors:
   - Name: Signal_norm
