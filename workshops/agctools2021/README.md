@@ -19,5 +19,8 @@ The following libraries and tools are included in tutorials:
 * pyhf
 
 
-Material contained in this folder:
+Material contained in this folder (some parts are submodules, so run `git submodule update --init` to populate the folders if needed):
+- `uproot-awkward-vector-demo`: data handling with uproot, awkward & vector
+- `func-adl-demo`: queries with func_adl
+- `ServiceX-at-IRIS-HEP-ACG-workshop-2021`: data delivery with ServiceX
 - `HZZ_analysis_pipeline`: analysis pipeline demonstration featuring ServiceX, coffea, cabinetry & pyhf
