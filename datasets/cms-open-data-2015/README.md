@@ -9,6 +9,7 @@ Metadata can be extracted via `get-metadata`.
 `datasets.txt` contains a list of folders to help identify relevant physics processes (`list-directory` with `cernopendata-client`).
 Relevant records can be found on the [Open Data portal](https://opendata.cern.ch/).
 
+`create_file_list.sh` is a helper script to more conveniently create file lists for a list of records.
 
 ## Samples categorized by process
 
