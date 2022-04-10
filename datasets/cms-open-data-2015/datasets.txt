@@ -6654,4 +6654,4 @@
 /eos/opendata/cms/mc/RunIIFall15MiniAODv2//ttH_M70_13TeV_powheg_pythia8
 /eos/opendata/cms/mc/RunIIFall15MiniAODv2//ttWJets_13TeV_madgraphMLM
 /eos/opendata/cms/mc/RunIIFall15MiniAODv2//ttZJets_13TeV_madgraphMLM
-/eos/opendata/cms/mc/RunIIFall15MiniAODv2//ttbb_4FS_ckm_amcatnlo_madspin_pythia8[0m
+/eos/opendata/cms/mc/RunIIFall15MiniAODv2//ttbb_4FS_ckm_amcatnlo_madspin_pythia8
