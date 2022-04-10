@@ -34,3 +34,18 @@ Relevant records can be found on the [Open Data portal](https://opendata.cern.ch
   - t-channel:
     - [19406](https://opendata.cern.ch/record/19406): Powheg + Pythia 8 (antitop), 935 files, 1.1 TB
     - [19408](https://opendata.cern.ch/record/19408): Powheg + Pythia 8 (top), 1571 files, 1.8 TB
+  - tW:
+    - nominal:
+      - [19412](https://opendata.cern.ch/record/19412): Powheg + Pythia 8 (antitop), 27 files, 30 GB
+      - [19419](https://opendata.cern.ch/record/19419): Powheg + Pythia 8 (top), 23 files, 30 GB
+    - DS:
+      - [19410](https://opendata.cern.ch/record/19410): Powheg + Pythia 8 DS (antitop), 13 files, 15 GB
+      - [19417](https://opendata.cern.ch/record/19417): Powheg + Pythia 8 DS (top), 13 files, 14 GB
+    - scale variations:
+      - [19415](https://opendata.cern.ch/record/19415): Powheg + Pythia 8 "scaledown" (antitop), 11 files, 15 GB
+      - [19422](https://opendata.cern.ch/record/19422): Powheg + Pythia 8 "scaledown" (top), 13 files, 15 GB
+      - [19416](https://opendata.cern.ch/record/19416): Powheg + Pythia 8 "scaleup" (antitop), 12 files, 14 GB
+      - [19423](https://opendata.cern.ch/record/19423): Powheg + Pythia 8 "scaleup" (top), 13 files, 14 GB
+
+    - there are also larger `NoFullyHadronicDecays` samples: [19411](https://opendata.cern.ch/record/19411), [19418](https://opendata.cern.ch/record/19418)
+  - tZ / tWZ: potentially missing in inputs, not included in `/ST_*`
