@@ -11,6 +11,10 @@ Relevant records can be found on the [Open Data portal](https://opendata.cern.ch
 
 `create_file_list.sh` is a helper script to more conveniently create file lists for a list of records.
 
+`branches.txt` contains the branches in the converted ntuples.
+
+The `ntuples` folder contains paths to converted files.
+
 ## Samples categorized by process
 
 - **ttbar**:
@@ -19,25 +23,25 @@ Relevant records can be found on the [Open Data portal](https://opendata.cern.ch
     - [19981](https://opendata.cern.ch/record/19981): Powheg + Pythia 8 (ext4), 4653 files, 6.4 TB -> converted
   - scale variation:
     - [19982](https://opendata.cern.ch/record/19982): same as below, unclear if overlap
-    - [19983](https://opendata.cern.ch/record/19983): Powheg + Pythia 8 "scaledown" (ext3), 902 files, 1.4 TB -> submitted
+    - [19983](https://opendata.cern.ch/record/19983): Powheg + Pythia 8 "scaledown" (ext3), 902 files, 1.4 TB -> converted
     - [19984](https://opendata.cern.ch/record/19984): same as below, unclear if overlap
-    - [19985](https://opendata.cern.ch/record/19985): Powheg + Pythia 8 "scaleup" (ext3), 917 files, 1.3 TB -> submitted
+    - [19985](https://opendata.cern.ch/record/19985): Powheg + Pythia 8 "scaleup" (ext3), 917 files, 1.3 TB -> converted
   - ME variation:
     - [19977](https://opendata.cern.ch/record/19977): same as below, unclear if overlap
-    - [19978](https://opendata.cern.ch/record/19978): aMC@NLO + Pythia 8 (ext1), 438 files, 647 GB -> submitted
+    - [19978](https://opendata.cern.ch/record/19978): aMC@NLO + Pythia 8 (ext1), 438 files, 647 GB -> converted
   - PS variation:
-    - [19999](https://opendata.cern.ch/record/19999): Powheg + Herwig++, 443 files, 810 GB -> submitted
+    - [19999](https://opendata.cern.ch/record/19999): Powheg + Herwig++, 443 files, 810 GB -> converted
 
 - **single top**:
   - s-channel:
-    - [19394](https://opendata.cern.ch/record/19394): aMC@NLO + Pythia 8, 114 files, 76 GB
+    - [19394](https://opendata.cern.ch/record/19394): aMC@NLO + Pythia 8, 114 files, 76 GB -> converted
   - t-channel:
-    - [19406](https://opendata.cern.ch/record/19406): Powheg + Pythia 8 (antitop), 935 files, 1.1 TB
-    - [19408](https://opendata.cern.ch/record/19408): Powheg + Pythia 8 (top), 1571 files, 1.8 TB
+    - [19406](https://opendata.cern.ch/record/19406): Powheg + Pythia 8 (antitop), 935 files, 1.1 TB -> converted
+    - [19408](https://opendata.cern.ch/record/19408): Powheg + Pythia 8 (top), 1571 files, 1.8 TB -> converted
   - tW:
     - nominal:
-      - [19412](https://opendata.cern.ch/record/19412): Powheg + Pythia 8 (antitop), 27 files, 30 GB
-      - [19419](https://opendata.cern.ch/record/19419): Powheg + Pythia 8 (top), 23 files, 30 GB
+      - [19412](https://opendata.cern.ch/record/19412): Powheg + Pythia 8 (antitop), 27 files, 30 GB -> converted
+      - [19419](https://opendata.cern.ch/record/19419): Powheg + Pythia 8 (top), 23 files, 30 GB -> converted
     - DS:
       - [19410](https://opendata.cern.ch/record/19410): Powheg + Pythia 8 DS (antitop), 13 files, 15 GB
       - [19417](https://opendata.cern.ch/record/19417): Powheg + Pythia 8 DS (top), 13 files, 14 GB
@@ -49,3 +53,9 @@ Relevant records can be found on the [Open Data portal](https://opendata.cern.ch
 
     - there are also larger `NoFullyHadronicDecays` samples: [19411](https://opendata.cern.ch/record/19411), [19418](https://opendata.cern.ch/record/19418)
   - tZ / tWZ: potentially missing in inputs, not included in `/ST_*`
+
+- **W+jets**:
+  - nominal (with 1l filter):
+    - [20546](https://opendata.cern.ch/record/20546): same as below, unclear if overlap
+    - [20547](https://opendata.cern.ch/record/20547): aMC@NLO + Pythia 8 (ext2), 5601 files, 4.5 TB -> submitted
+    - [20548](https://opendata.cern.ch/record/20548): aMC@NLO + Pythia 8 (ext4), 4598 files, 3.8 TB
