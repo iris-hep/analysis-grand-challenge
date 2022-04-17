@@ -13,7 +13,7 @@ Relevant records can be found on the [Open Data portal](https://opendata.cern.ch
 
 `branches.txt` contains the branches in the converted ntuples.
 
-The `ntuples` folder contains paths to converted files.
+`build_ntuple_json` creates a JSON file containing the converted ntuples, sorted by process / systematic variation.
 
 ## Samples categorized by process
 
