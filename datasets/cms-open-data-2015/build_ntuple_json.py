@@ -10,7 +10,10 @@ def get_paths(process, recids):
     for recid in recids:
         with open(f"{process}/{str(recid)}.txt") as f:
             files = f.readlines()
-        prefix_eos = "root://eospublic.cern.ch//eos/opendata/cms/mc/"
+        if process == "data":
+            prefix_eos = "root://eospublic.cern.ch//eos/opendata/cms/"
+        else:
+            prefix_eos = "root://eospublic.cern.ch//eos/opendata/cms/mc/"
         prefix_unl = "root://xrootd-local.unl.edu:1094//store/user/AGC/datasets/"
         all_files += [f.strip().replace(prefix_eos, prefix_unl) for f in files]
 
@@ -46,5 +49,8 @@ if __name__ == "__main__":
 
     # W+jets
     update_dict(file_dict, "wjets", "nominal", 20547)  # can also add 20548
+
+    # data
+    update_dict(file_dict, "data", "nominal", [24119, 24120])
 
     write_to_file(file_dict, "ntuples.json")
