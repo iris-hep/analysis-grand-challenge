@@ -1,5 +1,6 @@
 from collections import defaultdict
 import json
+import time
 
 import uproot
 
@@ -26,9 +27,10 @@ def get_paths(process, recids):
 
 def num_events(files):
     num_events_total = 0
+    t0 = time.time()
     for i, filename in enumerate(files):
         if i % 10 == 0 or i == len(files) - 1:
-            print(f"{i+1} / {len(files)}")
+            print(f"{i+1} / {len(files)} in {time.time() - t0:.0f} s")
         if RUN_AT_UNL:
             # read locally at UNL Tier-3
             filename = filename.replace(
