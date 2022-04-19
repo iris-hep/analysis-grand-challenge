@@ -51,11 +51,12 @@ def update_dict(file_dict, process, variation, recid):
     print(f"process: {process}")
     files = get_paths(process, recid)
     nevts_list = num_events_list(files)
-    file_dict[process].append(
+    file_dict[process].update(
         {
-            "variation": variation,
-            "files": [{"path": f, "nevts": n} for f, n in zip(files, nevts_list)],
-            "nevts_total": sum(nevts_list),
+            variation: {
+                "files": [{"path": f, "nevts": n} for f, n in zip(files, nevts_list)],
+                "nevts_total": sum(nevts_list),
+            }
         }
     )
 
@@ -72,7 +73,7 @@ def write_to_file(file_dict, path):
 
 
 if __name__ == "__main__":
-    file_dict = defaultdict(list)
+    file_dict = defaultdict(dict)
 
     # ttbar
     update_dict(file_dict, "ttbar", "nominal", [19980, 19981])
