@@ -1,0 +1,124 @@
+{
+    "ttbar": {
+        "nominal": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM//PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/00000/00DF0A73-17C2-E511-B086-E41D2D08DE30.root",
+                    "nevts": 41812
+                },
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM//PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1//00000/0007DBD0-2ED2-E511-AD0D-20CF3019DEF5.root",
+                    "nevts": 36800
+                }
+            ],
+            "nevts_total": 78612
+        },
+        "scaledown": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-scaledown-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/00000/00D45978-82D1-E511-9406-00237DF27440.root",
+                    "nevts": 48800
+                }
+            ],
+            "nevts_total": 48800
+        },
+        "scaleup": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/TT_TuneCUETP8M1_13TeV-powheg-scaleup-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1/10000/002A13F7-B8CB-E511-A112-003048CB7B30.root",
+                    "nevts": 48153
+                }
+            ],
+            "nevts_total": 48153
+        },
+        "ME_var": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/60000/00F8750A-D4CB-E511-A1D1-00215E2EAD28.root",
+                    "nevts": 43800
+                }
+            ],
+            "nevts_total": 43800
+        },
+        "PS_var": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/TT_TuneEE5C_13TeV-powheg-herwigpp/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/10000/00284D8E-E8DB-E511-A462-02163E012D21.root",
+                    "nevts": 47898
+                }
+            ],
+            "nevts_total": 47898
+        }
+    },
+    "single_top_s_chan": {
+        "nominal": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/ST_s-channel_4f_InclusiveDecays_13TeV-amcatnlo-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/0EB5E88C-FE0D-E611-915D-003048FFD76C.root",
+                    "nevts": 38400
+                }
+            ],
+            "nevts_total": 38400
+        }
+    },
+    "single_top_t_chan": {
+        "nominal": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/00004F9A-E3D2-E511-ABEC-0CC47A78A478.root",
+                    "nevts": 46237
+                },
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/006321E1-86E0-E511-9BF1-441EA161DC02.root",
+                    "nevts": 33260
+                }
+            ],
+            "nevts_total": 79497
+        }
+    },
+    "single_top_tW": {
+        "nominal": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/00D0925F-56B9-E511-8A71-0025907FD2B2.root",
+                    "nevts": 38400
+                },
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/0CAE8121-20B9-E511-A86F-002590D9D822.root",
+                    "nevts": 43200
+                }
+            ],
+            "nevts_total": 81600
+        }
+    },
+    "wjets": {
+        "nominal": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext2-v1/10000/002B75B9-10DB-E511-915B-02163E017888.root",
+                    "nevts": 38412
+                },
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/RunIIFall15MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext4-v1/00000/003C3C2D-06EA-E511-8381-0023AEEEB799.root",
+                    "nevts": 49882
+                }
+            ],
+            "nevts_total": 88294
+        }
+    },
+    "data": {
+        "nominal": {
+            "files": [
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root",
+                    "nevts": 48582
+                },
+                {
+                    "path": "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/Run2015D/SingleElectron/MINIAOD/08Jun2016-v1/10000/001A703B-B52E-E611-BA13-0025905A60B6.root",
+                    "nevts": 49871
+                }
+            ],
+            "nevts_total": 98453
+        }
+    }
+}
