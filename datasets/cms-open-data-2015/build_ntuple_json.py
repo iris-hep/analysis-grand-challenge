@@ -3,6 +3,8 @@ import json
 
 import uproot
 
+RUN_AT_UNL = False
+
 
 def get_paths(process, recids):
     if not isinstance(recids, list):
@@ -13,10 +15,10 @@ def get_paths(process, recids):
         with open(f"{process}/{str(recid)}.txt") as f:
             files = f.readlines()
         if process == "data":
-            prefix_eos = "http://eospublic.cern.ch//eos/opendata/cms/"
+            prefix_eos = "root://eospublic.cern.ch//eos/opendata/cms/"
         else:
-            prefix_eos = "http://eospublic.cern.ch//eos/opendata/cms/mc/"
-        prefix_unl = "root://xrootd-local.unl.edu:1094//store/user/AGC/datasets/"
+            prefix_eos = "root://eospublic.cern.ch//eos/opendata/cms/mc/"
+        prefix_unl = "http://xrootd-local.unl.edu:1094//store/user/AGC/datasets/"
         all_files += [f.strip().replace(prefix_eos, prefix_unl) for f in files]
 
     return all_files
@@ -27,10 +29,15 @@ def num_events(files):
     for i, filename in enumerate(files):
         if i % 10 == 0 or i == len(files) - 1:
             print(f"{i+1} / {len(files)}")
-        # read locally at UNL Tier-3
-        filename = filename.replace(
-            "root://xrootd-local.unl.edu:1094/", "/mnt/t2ceph/cms"
-        )
+        if RUN_AT_UNL:
+            # read locally at UNL Tier-3
+            filename = filename.replace(
+                "http://xrootd-local.unl.edu:1094/", "/mnt/t2ceph/cms"
+            )
+        else:
+            print(
+                "WARNING: event counting over http, this may be slow (set RUN_AT_UNL)"
+            )
         with uproot.open(filename) as f:
             num_events_total += f["events"].num_entries
     return num_events_total
