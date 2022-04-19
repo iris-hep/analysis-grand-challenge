@@ -65,7 +65,7 @@ See the [luminosity doc page](http://opendata.cern.ch/docs/cms-guide-luminosity-
   - nominal (with 1l filter):
     - [20546](https://opendata.cern.ch/record/20546): same as below, unclear if overlap
     - [20547](https://opendata.cern.ch/record/20547): aMC@NLO + Pythia 8 (ext2), 5601 files, 4.5 TB -> converted
-    - [20548](https://opendata.cern.ch/record/20548): aMC@NLO + Pythia 8 (ext4), 4598 files, 3.8 TB
+    - [20548](https://opendata.cern.ch/record/20548): aMC@NLO + Pythia 8 (ext4), 4598 files, 3.8 TB -> converted
 
 - **data**:
   - single muon:
