@@ -30,7 +30,7 @@ def num_events_list(files):
     t0 = time.time()
     warned = False
     for i, filename in enumerate(files):
-        if i % 1000 == 0 or i == len(files) - 1:
+        if i % 10 == 0 or i == len(files) - 1:
             print(f"{i+1} / {len(files)} in {time.time() - t0:.0f} s")
         if RUN_AT_UNL:
             # read locally at UNL Tier-3
