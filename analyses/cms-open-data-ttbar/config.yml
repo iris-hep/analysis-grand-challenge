@@ -1,0 +1,67 @@
+General:
+  Measurement: "CMS_ttbar"
+  POI: "ttbar_norm"
+  HistogramFolder: "histograms/"
+  InputPath: "histograms.root:{SamplePath}{VariationPath}"
+  VariationPath: ""
+
+Regions:
+  - Name: Signal_region
+
+Samples:
+  - Name: "Data"
+    SamplePath: "ttbar"
+    Data: True
+
+  - Name: "ttbar"
+    SamplePath: "ttbar"
+
+  - Name: "W+jets"
+    SamplePath: "wjets"
+
+  - Name: "single top, s-channel"
+    SamplePath: "single_top_s_chan"
+
+  - Name: "single top, t-channel"
+    SamplePath: "single_top_s_chan"
+
+  - Name: "tW"
+    SamplePath: "single_top_tW"
+
+Systematics:
+  - Name: "ME variation"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_ME_var"
+    Down:
+      Symmetrize: True
+    Samples: ttbar
+
+  - Name: "PS variation"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_PS_var"
+    Down:
+      Symmetrize: True
+    Samples: ttbar
+
+  - Name: "scale variation"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_scaleup"
+    Down:
+      VariationPath: "_scaledown"
+    Samples: ttbar
+
+  - Name: "Luminosity"
+    Type: "Normalization"
+    Up:
+      Normalization: 0.05
+    Down:
+      Normalization: 0.05
+
+NormFactors:
+  - Name: ttbar_norm
+    Samples: ttbar
+    Nominal: 1.0
+    Bounds: [0, 10]
