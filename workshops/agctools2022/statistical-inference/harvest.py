@@ -62,45 +62,5 @@ def main(target_file="results.json"):
         json.dump(harvests, write_file, sort_keys=True, indent=2)
 
 
-# @click.command()
-# @click.argument("master_input_dir", default="data/inputs")
-# @click.argument("master_output_dir", default="data/outputs")
-# def main(master_input_dir, master_output_dir):
-#     pattern = re.compile("sbottom_(\d+)_(\d+)_(\d+)")
-#     os.makedirs(os.path.join(master_output_dir, "harvest"), exist_ok=True)
-#     for region in ["A", "B", "C"]:
-#         harvest = []
-
-#         thedir = os.path.join(
-#             master_output_dir,
-#             f"results/Region{region}",
-#         )
-
-#         files = f"{thedir}/result_sbottom_*_*_*.json"
-#         print(files)
-#         for fname in glob.glob(files):
-#             # print(fname)
-#             result = json.load(open(fname))
-#             m = pattern.search(fname)
-#             masses = list(map(int, m.groups()))
-#             # only use 60 GeV
-#             if masses[2] != 60:
-#                 continue
-#             harvest.append(make_harvest_from_result(result, masses))
-#         json.dump(
-#             harvest,
-#             open(
-#                 os.path.join(
-#                     master_output_dir,
-#                     "harvest",
-#                     f"Region{region}.json",
-#                 ),
-#                 "w+",
-#             ),
-#             sort_keys=True,
-#             indent=2,
-#         )
-
-
 if __name__ == "__main__":
     main()
