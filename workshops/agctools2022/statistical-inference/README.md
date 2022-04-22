@@ -51,6 +51,13 @@ optional arguments:
                         pyhf backend str alias
 ```
 
+The output of this will be a JSON file `results.json` that contains the inference results for the mass hypotheses used (125 hypotheses in the case of the 1Lbb analysis).
+
+```console
+$ jq length results.json
+125
+```
+
 For more information see https://github.com/matthewfeickert/distributed-inference-with-pyhf-and-funcX
 
 ## cabinetry overview
