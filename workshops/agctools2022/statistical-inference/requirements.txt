@@ -1,0 +1,13 @@
+# pyhf
+pyhf[contrib]==0.6.3
+# cabinetry
+cabinetry==0.4.1
+# funcx
+funcx==0.3.9
+funcx-endpoint==0.3.9
+# jax
+jax==0.3.7
+# Place --find-links _before_ jaxlib to satisfy Conda
+--find-links https://storage.googleapis.com/jax-releases/jax_releases.html
+jaxlib==0.3.7
+
