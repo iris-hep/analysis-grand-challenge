@@ -58,7 +58,7 @@ $ jq length results.json
 125
 ```
 
-For more information see https://github.com/matthewfeickert/distributed-inference-with-pyhf-and-funcX
+For more information see the [funcX docs][funcx docs] and the [example code][pyhf funcx example code] for the vCHEP 2021 paper "Distributed statistical inference with pyhf enabled through funcX".
 
 ## cabinetry overview
 
@@ -69,4 +69,6 @@ For more information, check out the [cabinetry tutorials][cabinetry tutorial].
 [tutorial indico]: https://indico.cern.ch/event/1126109/contributions/4780155/
 [1Lbb HEPData]: https://www.hepdata.net/record/ins1755298
 [pyhf tutorial]: https://pyhf.github.io/pyhf-tutorial/
+[funcx docs]: https://funcx.readthedocs.io/en/stable/
+[pyhf funcx example code]: https://github.com/matthewfeickert/distributed-inference-with-pyhf-and-funcX
 [cabinetry tutorial]: https://github.com/cabinetry/cabinetry-tutorials
