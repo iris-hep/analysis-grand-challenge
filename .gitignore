@@ -14,3 +14,8 @@ workshops/agctools2021/HZZ_analysis_pipeline/**/*.root
 workshops/agctools2021/HZZ_analysis_pipeline/*/*.pdf
 workshops/agctools2021/HZZ_analysis_pipeline/*/*.png
 workshops/agctools2021/HZZ_analysis_pipeline/*/*.npz
+
+# funcX endpoint id
+endpoint_id.txt
+# downloaded pyhf pallets from HEPData
+workshops/agctools2022/statistical-inference/input
