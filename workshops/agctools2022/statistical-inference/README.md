@@ -1,8 +1,12 @@
 # [Statistical inference with pyhf and cabinetry][tutorial indico]
 
+## pyhf overview
+
+TBD
+
 ## Distributed inference with pyhf and funcX
 
-## Setup
+### Setup
 
 Create a Python virtual environment and install the dependencies defined in `requirements.txt`
 
@@ -12,7 +16,7 @@ $ python -m pip install --upgrade pip setuptools wheel
 $ python -m pip install -r requirements.txt
 ```
 
-## Run
+### Run
 
 Create a file named `endpoint_id.txt` in the top level of this repository and save your funcX endpoint ID into the file.
 
@@ -43,5 +47,7 @@ optional arguments:
 ```
 
 For more information see https://github.com/matthewfeickert/distributed-inference-with-pyhf-and-funcX
+
+## cabinetry overview
 
 [tutorial indico]: https://indico.cern.ch/event/1126109/contributions/4780155/
