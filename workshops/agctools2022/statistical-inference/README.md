@@ -4,6 +4,8 @@
 
 TBD
 
+For more information, check out the [pyhf user's guide and tutorial][pyhf tutorial].
+
 ## Distributed inference with pyhf and funcX
 
 Use pyhf and funcX to perform distributed statistical inference on the probability models of the ATLAS Run 2 search for direct production of electroweakinos [DOI: [10.1140/epjc/s10052-020-8050-3](https://doi.org/10.1140/epjc/s10052-020-8050-3)] [published on HEPData][1Lbb HEPData].
@@ -53,5 +55,11 @@ For more information see https://github.com/matthewfeickert/distributed-inferenc
 
 ## cabinetry overview
 
+TBD
+
+For more information, check out the [cabinetry tutorials][cabinetry tutorial].
+
 [tutorial indico]: https://indico.cern.ch/event/1126109/contributions/4780155/
 [1Lbb HEPData]: https://www.hepdata.net/record/ins1755298
+[pyhf tutorial]: https://pyhf.github.io/pyhf-tutorial/
+[cabinetry tutorial]: https://github.com/cabinetry/cabinetry-tutorials
