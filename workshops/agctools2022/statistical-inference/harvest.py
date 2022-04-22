@@ -32,7 +32,6 @@ def make_harvest_from_result(result):
         "mn1": result["mass_hypotheses"][0],
         "mn2": result["mass_hypotheses"][1],
         "mode": -1,
-        "msb": 60,  # Is this right? Check with Giordon
         "nexp": -1,
         "nofit": 0,
         "p0": 0,
