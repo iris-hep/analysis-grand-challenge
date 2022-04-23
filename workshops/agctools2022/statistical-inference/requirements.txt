@@ -11,5 +11,6 @@ jax==0.3.7
 --find-links https://storage.googleapis.com/jax-releases/jax_releases.html
 jaxlib==0.3.7
 # visualization
+mplhep==0.3.23
 Shapely==1.8.1.post1
 descartes==1.1.0
