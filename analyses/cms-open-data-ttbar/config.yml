@@ -7,10 +7,10 @@ General:
 
 Regions:
   - Name: Control_region
-    RegionPath: "CR"
+    RegionPath: "4j1b"
 
   - Name: Signal_region
-    RegionPath: "SR"
+    RegionPath: "4j2b"
 
 Samples:
   - Name: "Data"
