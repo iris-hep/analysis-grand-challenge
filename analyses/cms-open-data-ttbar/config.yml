@@ -6,15 +6,15 @@ General:
   VariationPath: ""
 
 Regions:
-  - Name: Control_region
+  - Name: "4j1b CR"
     RegionPath: "4j1b"
 
-  - Name: Signal_region
+  - Name: "4j2b SR"
     RegionPath: "4j2b"
 
 Samples:
-  - Name: "Data"
-    SamplePath: "ttbar"
+  - Name: "Pseudodata"
+    SamplePath: "pseudodata"
     Data: True
 
   - Name: "ttbar"
@@ -39,7 +39,7 @@ Systematics:
       VariationPath: "_ME_var"
     Down:
       Symmetrize: True
-    Samples: ttbar
+    Samples: "ttbar"
 
   - Name: "PS variation"
     Type: "NormPlusShape"
@@ -47,25 +47,75 @@ Systematics:
       VariationPath: "_PS_var"
     Down:
       Symmetrize: True
-    Samples: ttbar
+    Samples: "ttbar"
 
-  - Name: "scale variation"
+  - Name: "ttbar scale variations"
     Type: "NormPlusShape"
     Up:
       VariationPath: "_scaleup"
     Down:
       VariationPath: "_scaledown"
-    Samples: ttbar
+    Samples: "ttbar"
+
+  - Name: "Jet energy scale"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_pt_scale_up"
+    Down:
+      Symmetrize: True
+
+  - Name: "Jet energy resolution"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_pt_res_up"
+    Down:
+      Symmetrize: True
+
+  - Name: "b-tag NP 1"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_btag_var_0_up"
+    Down:
+      VariationPath: "_btag_var_0_down"
+
+  - Name: "b-tag NP 2"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_btag_var_1_up"
+    Down:
+      VariationPath: "_btag_var_1_down"
+
+  - Name: "b-tag NP 3"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_btag_var_2_up"
+    Down:
+      VariationPath: "_btag_var_2_down"
+
+  - Name: "b-tag NP 4"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_btag_var_3_up"
+    Down:
+      VariationPath: "_btag_var_3_down"
+
+  - Name: "W+jets scale variations"
+    Type: "NormPlusShape"
+    Up:
+      VariationPath: "_scaleup"
+    Down:
+      VariationPath: "_scaledown"
+    Samples: "W+jets"
 
   - Name: "Luminosity"
     Type: "Normalization"
     Up:
-      Normalization: 0.05
+      Normalization: 0.03
     Down:
-      Normalization: 0.05
+      Normalization: 0.03
 
 NormFactors:
-  - Name: ttbar_norm
-    Samples: ttbar
+  - Name: "ttbar_norm"
+    Samples: "ttbar"
     Nominal: 1.0
     Bounds: [0, 10]

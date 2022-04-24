@@ -1,7 +1,16 @@
+import asyncio
 import json
 
+import hist
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import uproot
+
+from func_adl_servicex import ServiceXSourceUpROOT
+from func_adl import ObjectStream
+from coffea.processor import servicex
+from servicex import ServiceXDataset
+
 
 def get_client(af="coffea_casa"):
     if af == "coffea_casa":
@@ -78,3 +87,89 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False):
             fileset.update({f"{process}__{variation}": {"files": file_paths, "metadata": metadata}})
 
     return fileset
+
+
+def save_histograms(all_histograms, fileset, filename):
+    nominal_samples = [sample for sample in fileset.keys() if "nominal" in sample]
+
+    all_histograms += 1e-6  # add minimal event count to all bins to avoid crashes when processing a small number of samples
+
+    pseudo_data = (all_histograms[:, :, "ttbar", "ME_var"] + all_histograms[:, :, "ttbar", "PS_var"]) / 2  + all_histograms[:, :, "wjets", "nominal"]
+
+    with uproot.recreate(filename) as f:
+        for region in ["4j1b", "4j2b"]:
+            f[f"{region}_pseudodata"] = pseudo_data[120j::hist.rebin(2), region]
+            for sample in nominal_samples:
+                sample_name = sample.split("__")[0]
+                f[f"{region}_{sample_name}"] = all_histograms[120j::hist.rebin(2), region, sample_name, "nominal"]
+
+                # b-tagging variations
+                for i in range(4):
+                    for direction in ["up", "down"]:
+                        variation_name = f"btag_var_{i}_{direction}"
+                        f[f"{region}_{sample_name}_{variation_name}"] = all_histograms[120j::hist.rebin(2), region, sample_name, variation_name]
+
+                # jet energy scale variations
+                for variation_name in ["pt_scale_up", "pt_res_up"]:
+                    f[f"{region}_{sample_name}_{variation_name}"] = all_histograms[120j::hist.rebin(2), region, sample_name, variation_name]
+
+            f[f"{region}_ttbar_ME_var"] = all_histograms[120j::hist.rebin(2), region, "ttbar", "ME_var"]
+            f[f"{region}_ttbar_PS_var"] = all_histograms[120j::hist.rebin(2), region, "ttbar", "PS_var"]
+            for process in ["ttbar", "wjets"]:
+                f[f"{region}_{process}_scaledown"] = all_histograms[120j::hist.rebin(2), region, process, "scaledown"]
+                f[f"{region}_{process}_scaleup"] = all_histograms[120j::hist.rebin(2), region, process, "scaleup"]
+
+
+def make_datasource(fileset:dict, name: str, query: ObjectStream, ignore_cache: bool):
+    """Creates a ServiceX datasource for a particular Open Data file."""
+    datasets = [ServiceXDataset(fileset[name]["files"], backend_name="uproot", ignore_cache=ignore_cache)]
+    return servicex.DataSource(
+        query=query, metadata=fileset[name]["metadata"], datasets=datasets
+    )
+
+
+async def produce_all_histograms(fileset, query, procesor_class, use_dask=False, ignore_cache=False):
+    """Runs the histogram production, processing input files with ServiceX and
+    producing histograms with coffea.
+    """
+    # create the query
+    ds = ServiceXSourceUpROOT("cernopendata://dummy", "events", backend_name="uproot")
+    ds.return_qastle = True
+    data_query = query(ds)
+
+    # executor: local or Dask (Dask is not supported yet)
+    if not use_dask:
+        executor = servicex.LocalExecutor()
+    else:
+        executor = servicex.DaskExecutor(client_addr="tls://localhost:8786")
+
+    datasources = [
+        make_datasource(fileset, ds_name, data_query, ignore_cache=ignore_cache)
+        for ds_name in fileset.keys()
+    ]
+
+    # create the analysis processor
+    analysis_processor = procesor_class()
+
+    async def run_updates_stream(accumulator_stream, name):
+        """Run to get the last item in the stream"""
+        coffea_info = None
+        try:
+            async for coffea_info in accumulator_stream:
+                pass
+        except Exception as e:
+            raise Exception(f"Failure while processing {name}") from e
+        return coffea_info
+
+    all_histogram_dicts = await asyncio.gather(
+        *[
+            run_updates_stream(
+                executor.execute(analysis_processor, source),
+                f"{source.metadata['process']}__{source.metadata['variation']}",
+            )
+            for source in datasources
+        ]
+    )
+    all_histograms = sum([h["hist"] for h in all_histogram_dicts])
+
+    return all_histograms

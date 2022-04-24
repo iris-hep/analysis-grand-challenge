@@ -6,6 +6,8 @@ venv/
 .env/
 .ipynb_checkpoints
 
+servicex.yml
+
 analyses/**/*.root
 analyses/**/*.pdf
 analyses/**/*.npz
