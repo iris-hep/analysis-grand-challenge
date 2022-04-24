@@ -1,7 +1,8 @@
 {
   "input_prefix": "input",
   "pallet_name": "1Lbb-pallet",
-  "pallet_url": "https://www.hepdata.net/record/resource/1408476?view=true",
+  "pallet_url": "https://www.hepdata.net/record/resource/1934827?view=true",
   "analysis_dir": null,
-  "analysis_name": null
+  "analysis_name": null,
+  "analysis_hepdata": "https://www.hepdata.net/record/ins1755298"
 }
