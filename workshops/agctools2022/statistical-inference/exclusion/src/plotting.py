@@ -1,15 +1,10 @@
-import glob
-import json
-import re
-import shlex
-import subprocess
 from collections import namedtuple
 
 import numpy as np
 from descartes import PolygonPatch
 from shapely.geometry.polygon import Polygon
 
-from interpolate import main as interpolate_main
+from exclusion.interpolate import main as interpolate_main
 
 
 def harvest_from_result(results_dict):
