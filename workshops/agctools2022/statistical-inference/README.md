@@ -70,7 +70,9 @@ This will:
 * Dispatch the serialized function to the `funcX` endpoint to be executed as jobs as resources become available.
 * Retrieve function output as the jobs finish.
 
-The output of this will be a JSON file `results.json` that contains the inference results for the mass hypotheses used (125 hypotheses in the case of the 1Lbb analysis).
+Running with `time` shows that the execution wall time to send, receive, execute, and return all the results for the 125 points is under 1 minute.
+
+The output of this run will be a JSON file `results.json` that contains the inference results for the mass hypotheses used (125 hypotheses in the case of the 1Lbb analysis).
 
 ```console
 $ jq length results.json
