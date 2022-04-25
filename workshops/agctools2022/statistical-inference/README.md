@@ -8,11 +8,23 @@ For more information, check out the [pyhf user's guide and tutorial][pyhf tutori
 
 ## Distributed inference with pyhf and funcX
 
-Use pyhf and funcX to perform distributed statistical inference on the probability models of the ATLAS Run 2 search for direct production of electroweakinos [DOI: [10.1140/epjc/s10052-020-8050-3](https://doi.org/10.1140/epjc/s10052-020-8050-3)] [published on HEPData][1Lbb HEPData].
+As pyhf is a Python **library** a user can easily write functions with its [API][pyhf API docs] that allow for specialized operations and inference.
+This allows for pyhf to pair well with tools like [`funcX`][funcX docs] that allow for distributed computation to create a (fitting) Function as a Service workflow for inference.
+
+> funcX is a distributed Function as a Service (FaaS) platform that enables flexible, scalable, and high performance remote function execution. Unlike centralized FaaS platforms, funcX allows users to execute functions on heterogeneous remote computers, from laptops to campus clusters, clouds, and supercomputers.
+
+This workshop demo will show how to use pyhf and funcX to perform distributed statistical inference on the probability models of the ATLAS Run 2 search for direct production of electroweakinos [DOI: [10.1140/epjc/s10052-020-8050-3](https://doi.org/10.1140/epjc/s10052-020-8050-3)] [published on HEPData][1Lbb HEPData].
+
+**N.B.**:
+For simplicity and to focus on the end user experience, this demo will not cover deploying a `funcX` endpoint to an HPC facility (like the [University of Chicago RIVER cluster][RIVER webpage] that will be used today.)
+For demonstrations that include endpoint deployment see the `funcX` resources at the end of this section.
+`funcX` also requires a [Globus](https://www.globus.org/) account for data transfer.
+You probably already have Globus access through your institution, so if you'd like to try this demo for yourself afterwards attempt to [login now to check](https://app.globus.org/).
 
 ### Setup
 
-Create a Python virtual environment and install the dependencies defined in `requirements.txt`
+On the Open Data coffea-casa cluster being used today all the relevant dependencies are available in the default pod environment.
+To **locally** create an environment with the necessary runtime dependencies create a Python virtual environment and install the dependencies defined in `requirements.txt`
 
 ```console
 $ python -m venv venv
@@ -50,6 +62,13 @@ optional arguments:
   -b BACKEND, --backend BACKEND
                         pyhf backend str alias
 ```
+
+This will:
+* Locally download the pyhf pallet for the probability models from HEPData.
+* Initialize the local `funcX` client.
+* Serialize the inference functions.
+* Dispatch the serialized function to the `funcX` endpoint to be executed as jobs as resources become available.
+* Retrieve function output as the jobs finish.
 
 The output of this will be a JSON file `results.json` that contains the inference results for the mass hypotheses used (125 hypotheses in the case of the 1Lbb analysis).
 
@@ -102,10 +121,12 @@ Though to tie into the `pyhf` + `funcX` demonstration, the `cabinetry-HEPData-wo
 For more information on cabinetry, check out the [cabinetry docs][cabinetry docs].
 
 [tutorial indico]: https://indico.cern.ch/event/1126109/contributions/4780155/
+[pyhf API docs]: https://pyhf.readthedocs.io/en/stable/api.html
 [1Lbb HEPData]: https://www.hepdata.net/record/ins1755298
 [pyhf tutorial]: https://pyhf.github.io/pyhf-tutorial/
 [funcx docs]: https://funcx.readthedocs.io/en/stable/
 [ATL-PHYS-PUB-2019-029]: https://inspirehep.net/literature/1795223
+[RIVER webpage]: http://river.cs.uchicago.edu/
 [pyhf funcx example code]: https://github.com/matthewfeickert/distributed-inference-with-pyhf-and-funcX
 [cabinetry tutorial]: https://github.com/cabinetry/cabinetry-tutorials
 [cabinetry docs]: https://cabinetry.readthedocs.io/en/stable/
