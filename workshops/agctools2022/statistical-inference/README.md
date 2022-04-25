@@ -80,7 +80,17 @@ $ python -m pip show exclusion
 
 should show `exclusion` installed in your Python virtual environment.
 
-The inspiration and large parts of the source code come `exclusion`
+##### Acknowledgements
+
+The inspiration and large parts of the source code for `exclusion` come from the following projects and people:
+* The source code for the comparative visualizations in [Reproducing searches for new physics with the ATLAS experiment through publication of full statistical likelihoods][ATL-PHYS-PUB-2019-029].
+* Lukas Heinrich's [`lhoodbinder2` demonstration project](https://github.com/lukasheinrich/lhoodbinder2).
+* Giordon Stark's [Reproducible ATLAS SUSY Summary Plots example GitHub Gist](https://gist.github.com/kratsg/4ff8cb2ded3b25552ff2f51cd6b854dc).
+* [`HistFitter`'s `harvestToContours.py` script](https://github.com/histfitter/histfitter/blob/e85771cbd33b45d00b38326f116cffb3960f347d/scripts/harvestToContours.py), written primarily by Larry Lee.
+
+#### Run notebook
+
+With `exclusion` installed, run the `plot-contour.ipynb` notebook in the same directory as `results.json`.
 
 For more information see the [funcX docs][funcx docs] and the [example code][pyhf funcx example code] for the vCHEP 2021 paper "Distributed statistical inference with pyhf enabled through funcX".
 
@@ -95,6 +105,7 @@ For more information on cabinetry, check out the [cabinetry docs][cabinetry docs
 [1Lbb HEPData]: https://www.hepdata.net/record/ins1755298
 [pyhf tutorial]: https://pyhf.github.io/pyhf-tutorial/
 [funcx docs]: https://funcx.readthedocs.io/en/stable/
+[ATL-PHYS-PUB-2019-029]: https://inspirehep.net/literature/1795223
 [pyhf funcx example code]: https://github.com/matthewfeickert/distributed-inference-with-pyhf-and-funcX
 [cabinetry tutorial]: https://github.com/cabinetry/cabinetry-tutorials
 [cabinetry docs]: https://cabinetry.readthedocs.io/en/stable/
