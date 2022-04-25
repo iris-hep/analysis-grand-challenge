@@ -62,9 +62,10 @@ For more information see the [funcX docs][funcx docs] and the [example code][pyh
 
 ## cabinetry overview
 
-TBD
+Given time, most of the section on cabinetry will be focused on following the [cabinetry tutorials][cabinetry tutorial].
+Though to tie into the `pyhf` + `funcX` demonstration, the `cabinetry-HEPData-workspace.ipynb` notebook will be using the same HEPData workspace.
 
-For more information, check out the [cabinetry tutorials][cabinetry tutorial].
+For more information on cabinetry, check out the [cabinetry docs][cabinetry docs].
 
 [tutorial indico]: https://indico.cern.ch/event/1126109/contributions/4780155/
 [1Lbb HEPData]: https://www.hepdata.net/record/ins1755298
@@ -72,3 +73,4 @@ For more information, check out the [cabinetry tutorials][cabinetry tutorial].
 [funcx docs]: https://funcx.readthedocs.io/en/stable/
 [pyhf funcx example code]: https://github.com/matthewfeickert/distributed-inference-with-pyhf-and-funcX
 [cabinetry tutorial]: https://github.com/cabinetry/cabinetry-tutorials
+[cabinetry docs]: https://cabinetry.readthedocs.io/en/stable/
