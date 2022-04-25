@@ -81,7 +81,7 @@ $ jq length results.json
 
 ### Visualization
 
-To compute the exclusion contours formed from the results of the pyhf + funcX run, execute the `plot-contour.ipynb` notebook which uses the `results.json` file generated to then compute and visualize the contours.
+To compute the exclusion contours formed from the results of the pyhf + funcX run, execute the `plot-contour.ipynb` notebook which uses the `results.json` file generated to then compute and visualize the contours. (A `results.json` has been included in the repository for example purposes for the workshop today.)
 
 #### Install `exclusion` library
 
