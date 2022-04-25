@@ -13,7 +13,7 @@ This allows for pyhf to pair well with tools like [`funcX`][funcX docs] that all
 
 > funcX is a distributed Function as a Service (FaaS) platform that enables flexible, scalable, and high performance remote function execution. Unlike centralized FaaS platforms, funcX allows users to execute functions on heterogeneous remote computers, from laptops to campus clusters, clouds, and supercomputers.
 
-This workshop demo will show how to use pyhf and funcX to perform distributed statistical inference on the probability models of the ATLAS Run 2 search for direct production of electroweakinos [DOI: [10.1140/epjc/s10052-020-8050-3](https://doi.org/10.1140/epjc/s10052-020-8050-3)] [published on HEPData][1Lbb HEPData].
+This workshop demo will show how to use pyhf and funcX to perform distributed statistical inference on the probability models of the [ATLAS Run 2 search for direct production of electroweakinos][1Lbb INSPIRE] [DOI: [10.1140/epjc/s10052-020-8050-3](https://doi.org/10.1140/epjc/s10052-020-8050-3)] [published on HEPData][1Lbb HEPData].
 
 **N.B.**:
 For simplicity and to focus on the end user experience, this demo will not cover deploying a `funcX` endpoint to an HPC facility (like the [University of Chicago RIVER cluster][RIVER webpage] that will be used today.)
@@ -124,6 +124,7 @@ For more information on cabinetry, check out the [cabinetry docs][cabinetry docs
 
 [tutorial indico]: https://indico.cern.ch/event/1126109/contributions/4780155/
 [pyhf API docs]: https://pyhf.readthedocs.io/en/stable/api.html
+[1Lbb INSPIRE]: https://inspirehep.net/literature/1755298
 [1Lbb HEPData]: https://www.hepdata.net/record/ins1755298
 [pyhf tutorial]: https://pyhf.github.io/pyhf-tutorial/
 [funcx docs]: https://funcx.readthedocs.io/en/stable/
