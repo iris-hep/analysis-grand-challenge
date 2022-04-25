@@ -2,7 +2,7 @@
 
 ## pyhf overview
 
-TBD
+To get a very quick overview of `pyhf`s Python API we'll use the first notebook in the `pyhf` user's guide: `pyhf-intro-to-histfactory.ipynb`.
 
 For more information, check out the [pyhf user's guide and tutorial][pyhf tutorial].
 
