@@ -80,13 +80,13 @@ def make_interpolated_results(results):
 
 def plot_contour(ax, results, **kwargs):
 
-    if kwargs.get("showPoints", False):
+    if kwargs.get("show_points", False):
         mass_ranges = np.asarray(
             [values["mass_hypotheses"] for _, values in results.items()]
         ).T
         ax.scatter(*mass_ranges, s=20, alpha=0.2)
 
-    if kwargs.get("showInterPolated", False):
+    if kwargs.get("show_interpolated", False):
         interpolated_bands = make_interpolated_results(results)
         if interpolated_bands is None:
             print("ERROR: interpolation failed")
