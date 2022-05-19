@@ -1,0 +1,19 @@
+name: analysis-grand-challenge
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+      - boto3
+      - aiostream
+      - tenacity
+      - vector
+      - cabinetry
+      - backoff<2.0.0
+      - servicex_clients
+      - coffea
+      - dask[distributed]
+      - mlflow>=1.0
+      - pandas
+      - hyperopt

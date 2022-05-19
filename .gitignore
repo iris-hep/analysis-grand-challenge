@@ -5,8 +5,11 @@ __pycache__
 venv/
 .env/
 .ipynb_checkpoints
+.idea/
 
 servicex.yml
+.servicex
+
 
 analyses/**/*.root
 analyses/**/*.pdf
@@ -24,3 +27,6 @@ workshops/agctools2022/statistical-inference/input
 
 # CMS ttbar
 analyses/cms-open-data-ttbar/workspace.json
+
+# MLFlow
+mlruns/

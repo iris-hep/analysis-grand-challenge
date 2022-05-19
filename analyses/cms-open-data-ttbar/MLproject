@@ -1,0 +1,26 @@
+name: analysis-grand-challenge
+
+conda_env: conda.yaml
+
+entry_points:
+  ttbar:
+    parameters:
+      num-input-files: {type: int, default: 10}
+      num-bins: {type: int, default: 25}
+      bin-low: {type: int, default: 50}
+      bin-high: {type: int, default: 550}
+      pt-threshold: {type: int, default: 25}
+
+    command: "python analysis.py --num-input-files {num-input-files} --num-bins {num-bins} --bin-low {bin-low} --bin-high {bin-high} --pt-threshold {pt-threshold}"
+
+  # Use Hyperopt to optimize hyperparams of the ttbar entry_point.
+  hyperopt:
+    parameters:
+      max_runs: {type: int, default: 12}
+      metric: {type: string, default: "ttbar_norm_bestfit"}
+      algo: {type: string, default: "tpe.suggest"}
+    command: "python -O search_hyperparameter.py
+                                                 --max-runs {max_runs}
+                                                 --metric {metric}
+                                                 --algo {algo}"
+
