@@ -128,7 +128,7 @@ def make_datasource(fileset:dict, name: str, query: ObjectStream, ignore_cache: 
     )
 
 
-async def produce_all_histograms(fileset, query, procesor_class, use_dask=False, ignore_cache=False):
+async def produce_all_histograms(fileset, query, analysis_processor, use_dask=False, ignore_cache=False):
     """Runs the histogram production, processing input files with ServiceX and
     producing histograms with coffea.
     """
@@ -147,9 +147,6 @@ async def produce_all_histograms(fileset, query, procesor_class, use_dask=False,
         make_datasource(fileset, ds_name, data_query, ignore_cache=ignore_cache)
         for ds_name in fileset.keys()
     ]
-
-    # create the analysis processor
-    analysis_processor = procesor_class()
 
     async def run_updates_stream(accumulator_stream, name):
         """Run to get the last item in the stream"""
