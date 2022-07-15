@@ -91,7 +91,6 @@ partd==1.2.0
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==9.2.0
-pkg_resources==0.0.0
 prometheus-client==0.14.1
 prompt-toolkit==3.0.30
 psutil==5.9.1
