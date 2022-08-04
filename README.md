@@ -17,7 +17,7 @@ The AGC has two major pieces:
 
 The physics analysis task is a $t\bar{t}$ cross-section measurement with 2015 CMS Open Data (see `datasets/cms-open-data-2015`).
 The current reference implementation can be found in `analyses/cms-open-data-ttbar`.
-In addition to this, `analyses/atlas-open-data-hzz` contains a smaller-scale $H\rightarrow ZZ^*$ analysis based on ATLAS Open Data.
+In addition to this, `analyses/atlas-open-data-hzz` contains a smaller scale $H\rightarrow ZZ^*$ analysis based on ATLAS Open Data.
 
 See [this talk given at ICHEP 2022](https://agenda.infn.it/event/28874/contributions/169204/attachments/94615/129603/20220709_AGC_ICHEP.pdf) for some more information about the AGC.
 Additional information is available in two workshops focused on the AGC:
