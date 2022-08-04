@@ -1,4 +1,4 @@
-    # Alternative implementations with coffea and cabinetry
+# Alternative implementations with coffea and cabinetry
 
 For more information about these analysis notebooks, their dependencies, and the project they were created as a part of, visit the original repository here:
 https://github.com/stormsomething/CoffeaHZZAnalysis
