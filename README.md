@@ -10,6 +10,8 @@ This includes
 
 all done in a reproducible & preservable way that can scale to HL-LHC requirements.
 
+<div align="center"><img src="docs/pipeline.png" alt="analysis pipeline"></div>
+
 The AGC has two major pieces:
 
 1) **specification of a physics analysis** using Open Data which captures relevant workflow aspects encountered in physics analyses performed at the LHC,
