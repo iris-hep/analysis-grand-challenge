@@ -164,7 +164,7 @@ async def produce_all_histograms(fileset, query, procesor_class, use_dask=False,
     all_histogram_dicts = await asyncio.gather(
         *[
             run_updates_stream(
-                executor.execute(analysis_processor, source),
+                executor.execute(analysis_processor, source, title=source.metadata['process']),
                 f"{source.metadata['process']}__{source.metadata['variation']}",
             )
             for source in datasources
