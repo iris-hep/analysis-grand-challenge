@@ -7,6 +7,7 @@ venv/
 .ipynb_checkpoints
 
 servicex.yml
+servicex.yaml
 
 analyses/**/*.root
 analyses/**/*.pdf
