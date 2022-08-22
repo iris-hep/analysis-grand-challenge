@@ -112,7 +112,7 @@ Systematics:
     Up:
       Normalization: 0.03
     Down:
-      Normalization: 0.03
+      Normalization: -0.03
 
 NormFactors:
   - Name: "ttbar_norm"
