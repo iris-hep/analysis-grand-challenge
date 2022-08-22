@@ -102,9 +102,9 @@ Systematics:
   - Name: "W+jets scale variations"
     Type: "NormPlusShape"
     Up:
-      VariationPath: "_scaleup"
+      VariationPath: "_scale_var_up"
     Down:
-      VariationPath: "_scaledown"
+      VariationPath: "_scale_var_down"
     Samples: "W+jets"
 
   - Name: "Luminosity"
@@ -112,7 +112,7 @@ Systematics:
     Up:
       Normalization: 0.03
     Down:
-      Normalization: 0.03
+      Normalization: -0.03
 
 NormFactors:
   - Name: "ttbar_norm"
