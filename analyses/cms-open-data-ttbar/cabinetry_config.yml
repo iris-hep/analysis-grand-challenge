@@ -102,9 +102,9 @@ Systematics:
   - Name: "W+jets scale variations"
     Type: "NormPlusShape"
     Up:
-      VariationPath: "_scaleup"
+      VariationPath: "_scale_var_up"
     Down:
-      VariationPath: "_scaledown"
+      VariationPath: "_scale_var_down"
     Samples: "W+jets"
 
   - Name: "Luminosity"
