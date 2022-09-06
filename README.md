@@ -58,3 +58,7 @@ There is no need to implement the full analysis task — it splits into pieces (
 Histogramming and summary statistics: Closely tied to the event selection, histogramming tools provide physicists with the ability to summarize the observed quantities in a dataset.  Example software and services: Coffea, func_adl, cabinetry, hist.
 - Statistical model building and fitting: Tools that translate specifications for event selection, summary statistics, and histogramming quantities into statistical models, leveraging the capabilities above, and perform fits and statistical analysis with the resulting models.  Example software and services: cabinetry, pyhf, FuncX+pyhf fitting service
 - Reinterpretation / analysis preservation:  Standards for capturing the entire analysis workflow, and services to reuse the workflow which enables reinterpretation.  Example software and services: REANA, RECAST.
+
+## Acknowledgements
+
+This work was supported by the U.S. National Science Foundation (NSF) cooperative agreement [OAC-1836650 (IRIS-HEP)](https://nsf.gov/awardsearch/showAward?AWD_ID=1836650).
