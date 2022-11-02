@@ -51,7 +51,7 @@ def set_style():
     plt.rcParams['text.color'] = "222222"
 
 
-def construct_fileset(n_files_max_per_sample, use_xcache=False):
+def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name=""):
     # using https://atlas-groupdata.web.cern.ch/atlas-groupdata/dev/AnalysisTop/TopDataPreparation/XSection-MC15-13TeV.data
     # for reference
     # x-secs are in pb
@@ -65,7 +65,7 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False):
     }
 
     # list of files
-    with open("ntuples.json") as f:
+    with open("ntuples_merged.json") as f:
         file_info = json.load(f)
 
     # process into "fileset" summarizing all info
@@ -82,6 +82,9 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False):
             file_paths = [f["path"] for f in file_list]
             if use_xcache:
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094", "root://red-xcache1.unl.edu") for f in file_paths]
+            if af_name == "ssl-dev":
+                # point to local files on /data
+                file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/", "/data/alheld/") for f in file_paths]
             nevts_total = sum([f["nevts"] for f in file_list])
             metadata = {"process": process, "variation": variation, "nevts": nevts_total, "xsec": xsec_info[process]}
             fileset.update({f"{process}__{variation}": {"files": file_paths, "metadata": metadata}})
@@ -133,7 +136,7 @@ def make_datasource(fileset:dict, name: str, query: ObjectStream, ignore_cache: 
     )
 
 
-async def produce_all_histograms(fileset, query, procesor_class, use_dask=False, ignore_cache=False):
+async def produce_all_histograms(fileset, query, analysis_processor, use_dask=False, ignore_cache=False, schema=None):
     """Runs the histogram production, processing input files with ServiceX and
     producing histograms with coffea.
     """
@@ -153,9 +156,6 @@ async def produce_all_histograms(fileset, query, procesor_class, use_dask=False,
         for ds_name in fileset.keys()
     ]
 
-    # create the analysis processor
-    analysis_processor = procesor_class()
-
     async def run_updates_stream(accumulator_stream, name):
         """Run to get the last item in the stream"""
         coffea_info = None
@@ -169,7 +169,7 @@ async def produce_all_histograms(fileset, query, procesor_class, use_dask=False,
     all_histogram_dicts = await asyncio.gather(
         *[
             run_updates_stream(
-                executor.execute(analysis_processor, source, title=f"{source.metadata['process']}__{source.metadata['variation']}"),
+                executor.execute(analysis_processor, source, title=f"{source.metadata['process']}__{source.metadata['variation']}", schema=schema),
                 f"{source.metadata['process']}__{source.metadata['variation']}",
             )
             for source in datasources
