@@ -133,7 +133,7 @@ def make_datasource(fileset:dict, name: str, query: ObjectStream, ignore_cache: 
     )
 
 
-async def produce_all_histograms(fileset, query, procesor_class, use_dask=False, ignore_cache=False):
+async def produce_all_histograms(fileset, query, procesor_class, use_dask=False, ignore_cache=False, schema=None):
     """Runs the histogram production, processing input files with ServiceX and
     producing histograms with coffea.
     """
@@ -169,7 +169,7 @@ async def produce_all_histograms(fileset, query, procesor_class, use_dask=False,
     all_histogram_dicts = await asyncio.gather(
         *[
             run_updates_stream(
-                executor.execute(analysis_processor, source, title=f"{source.metadata['process']}__{source.metadata['variation']}"),
+                executor.execute(analysis_processor, source, title=f"{source.metadata['process']}__{source.metadata['variation']}", schema=schema),
                 f"{source.metadata['process']}__{source.metadata['variation']}",
             )
             for source in datasources
