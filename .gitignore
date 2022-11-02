@@ -25,6 +25,7 @@ workshops/agctools2022/statistical-inference/input
 
 # CMS ttbar
 analyses/cms-open-data-ttbar/workspace.json
+analyses/cms-open-data-ttbar/metrics
 
 # dask
 dask-worker-space/
