@@ -7,6 +7,7 @@ venv/
 .ipynb_checkpoints
 
 servicex.yml
+servicex.yaml
 
 analyses/**/*.root
 analyses/**/*.pdf
@@ -24,4 +25,6 @@ workshops/agctools2022/statistical-inference/input
 
 # CMS ttbar
 analyses/cms-open-data-ttbar/workspace.json
-analyses/cms-open-data-ttbar/dask-worker-space
+
+# dask
+dask-worker-space/
