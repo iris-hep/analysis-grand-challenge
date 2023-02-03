@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.1
+#       jupytext_version: 1.14.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -112,7 +112,7 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 ### GLOBAL CONFIGURATION
 
 # input files per process, set to e.g. 10 (smaller number = faster)
-N_FILES_MAX_PER_SAMPLE = 1
+N_FILES_MAX_PER_SAMPLE = 5
 
 # pipeline to use:
 # - "coffea" for pure coffea setup
@@ -121,7 +121,7 @@ N_FILES_MAX_PER_SAMPLE = 1
 PIPELINE = "coffea"
 
 # enable Dask (may not work yet in combination with ServiceX outside of coffea-casa)
-USE_DASK = False
+USE_DASK = True
 
 # ServiceX behavior: ignore cache with repeated queries
 SERVICEX_IGNORE_CACHE = False
@@ -159,7 +159,7 @@ IO_FILE_PERCENT = 4
 # - filling all the information into histograms that get aggregated and ultimately returned to us by `coffea`.
 
 # %% tags=[]
-processor_base = processor.ProcessorABC# if (PIPELINE != "servicex_processor") else servicex.Analysis
+processor_base = processor.ProcessorABC if (PIPELINE != "servicex_processor") else servicex.Analysis
 
 # functions creating systematic variations
 def flat_variation(ones):
@@ -352,7 +352,15 @@ class TtbarAnalysis(processor_base):
 
     def postprocess(self, accumulator):
         return accumulator
-    
+
+
+# %% [markdown]
+# ### AGC `coffea` schema
+#
+# When using `coffea`, we can benefit from the schema functionality to group columns into convenient objects.
+# This schema is taken from [mat-adamec/agc_coffea](https://github.com/mat-adamec/agc_coffea).
+
+# %% tags=[]
 class AGCSchema(BaseSchema):
     def __init__(self, base_form):
         super().__init__(base_form)
@@ -385,15 +393,6 @@ class AGCSchema(BaseSchema):
         behavior.update(vector.behavior)
         return behavior
 
-
-# %% [markdown]
-# ### AGC `coffea` schema
-#
-# When using `coffea`, we can benefit from the schema functionality to group columns into convenient objects.
-# This schema is taken from [mat-adamec/agc_coffea](https://github.com/mat-adamec/agc_coffea).
-
-# %% tags=[]
-#from utils import AGCSchema
 
 # %% [markdown]
 # ### "Fileset" construction and metadata
@@ -525,11 +524,10 @@ if PIPELINE == "coffea":
 
 elif PIPELINE == "servicex_processor":
     # in a notebook:
-    raise NotImplementedError("further processing of this method is not currently implemented")
-    # t0 = time.monotonic()
-    # all_histograms = await utils.produce_all_histograms(fileset, get_query, TtbarAnalysis(DISABLE_PROCESSING, IO_FILE_PERCENT),
-    #                                                     use_dask=USE_DASK, ignore_cache=SERVICEX_IGNORE_CACHE, schema=AGCSchema)
-    # exec_time = time.monotonic() - t0
+    t0 = time.monotonic()
+    all_histograms = await utils.produce_all_histograms(fileset, get_query, TtbarAnalysis(DISABLE_PROCESSING, IO_FILE_PERCENT),
+                                                        use_dask=USE_DASK, ignore_cache=SERVICEX_IGNORE_CACHE, schema=AGCSchema)
+    exec_time = time.monotonic() - t0
 
     # as a script:
     # async def produce_all_the_histograms():
@@ -641,7 +639,7 @@ cabinetry.workspace.save(ws, "workspace.json")
 # We can inspect the workspace with `pyhf`, or use `pyhf` to perform inference.
 
 # %%
-# #!pyhf inspect workspace.json | head -n 20
+# !pyhf inspect workspace.json | head -n 20
 
 # %% [markdown]
 # Let's try out what we built: the next cell will perform a maximum likelihood fit of our statistical model to the pseudodata we built.
@@ -695,9 +693,5 @@ figs[1]["figure"]
 # Please do not hesitate to get in touch if you would like to join the effort, or are interested in re-implementing (pieces of) the pipeline with different tools!
 #
 # Our mailing list is analysis-grand-challenge@iris-hep.org, sign up via the [Google group](https://groups.google.com/a/iris-hep.org/g/analysis-grand-challenge).
-
-# %%
-
-# %%
 
 # %%
