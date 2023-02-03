@@ -34,6 +34,7 @@ import uproot
 from servicex import ServiceXDataset
 
 from coffea import processor
+from coffea.nanoevents.schemas.base import BaseSchema
 import vector; vector.register_awkward()
 
 import utils
@@ -49,7 +50,10 @@ utils.set_logging()  # configure logging output
 CHUNKSIZE = 500_000
 
 # scaling for local setups with FuturesExecutor
-NUM_CORES = 4
+NUM_CORES = 1
+
+# ServiceX behavior: ignore cache with repeated queries
+IGNORE_CACHE = True
 
 # %% [markdown]
 # ## Introduction
@@ -88,14 +92,8 @@ NUM_CORES = 4
 # If you are running on coffea-casa, you should be good to go: ServiceX credentials are automatically available to you.
 # If not, you will need to set those up.
 # Create a file `servicex.yaml` in your home directory, or the place this notebook is located in.
-# It should contain the following:
-# ```yaml
-# api_endpoints:
-#   - name: uproot_alpha
-#     endpoint: https://servicex-release-int-uproot.servicex.ssl-hep.org/
-#     type: uproot
-# ```
-# See the previous [talk by KyungEon](https://indico.cern.ch/event/1076231/contributions/4560404/) for more information.
+#
+# See this [talk by KyungEon](https://indico.cern.ch/event/1076231/contributions/4560404/) for more information.
 
 # %% [markdown]
 # ## Files to process
@@ -190,7 +188,7 @@ def get_lepton_query(source: ObjectStream) -> ObjectStream:
 
 # %%
 # dummy dataset on which to generate the query
-dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "mini", backend_name="uproot_alpha")
+dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "mini", backend_name="uproot")
 
 # tell low-level infrastructure not to contact ServiceX yet, only to
 # return the qastle string it would have sent
@@ -208,7 +206,7 @@ t0 = time.time()
 fileset = {}
 
 for ds_name in input_files.keys():
-    ds = ServiceXDataset(input_files[ds_name], backend_name="uproot_alpha", ignore_cache=True)
+    ds = ServiceXDataset(input_files[ds_name], backend_name="uproot", ignore_cache=IGNORE_CACHE)
     files = ds.get_data_rootfiles_uri(query, as_signed_url=True)
 
     fileset[ds_name] = {"files": [f.url for f in files],
@@ -216,6 +214,7 @@ for ds_name in input_files.keys():
                        }
 
 print(f"execution took {time.time() - t0:.2f} seconds")
+
 
 # %% [markdown]
 # We now have a fileset dictionary containing the addresses of the queried files, ready to pass to `coffea`:
@@ -269,6 +268,7 @@ class HZZAnalysis(processor.ProcessorABC):
         pass
 
     def process(self, events):
+        vector.register_awkward()
         # type of dataset being processed, provided via metadata (comes originally from fileset)
         dataset_category = events.metadata["dataset"]
 
@@ -382,8 +382,9 @@ class HZZAnalysis(processor.ProcessorABC):
 # %%
 t0 = time.time()
 
-executor = processor.FuturesExecutor()
-run = processor.Runner(executor=executor, savemetrics=True, metadata_cache={}, chunksize=CHUNKSIZE)
+executor = processor.FuturesExecutor(workers=NUM_CORES)
+run = processor.Runner(executor=executor, savemetrics=True, metadata_cache={},
+                       chunksize=CHUNKSIZE, schema=BaseSchema)
 all_histograms, metrics = run(fileset, "servicex", processor_instance=HZZAnalysis())
 
 print(f"execution took {time.time() - t0:.2f} seconds")
