@@ -198,7 +198,7 @@ dummy_ds.return_qastle = True
 lepton_query = get_lepton_query(dummy_ds)
 query = lepton_query.value()
 
-# now we query the files and create a fileset dictionary containing the 
+# now we query the files and create a fileset dictionary containing the
 # URLs pointing to the queried files
 
 t0 = time.time()
@@ -276,7 +276,6 @@ class HZZAnalysis(processor.ProcessorABC):
         events = events[lepton_filter(events.lep_charge, events.lep_typeid)]
 
         # construct lepton four-vectors
-        # TODO: might be able to replace by schema
         leptons = ak.zip(
             {"pt": events.lep_pt,
              "eta": events.lep_eta,
@@ -369,9 +368,6 @@ class HZZAnalysis(processor.ProcessorABC):
             )
 
         return {"data": mllllhist_data, "MC": mllllhist_MC}
-
-    def postprocess(self, accumulator):
-        pass
 
 
 # %% [markdown]
