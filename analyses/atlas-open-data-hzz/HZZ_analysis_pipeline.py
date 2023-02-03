@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.1
+#       jupytext_version: 1.14.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -24,7 +24,6 @@ import time
 
 import awkward as ak
 import cabinetry
-from coffea.processor import servicex
 from func_adl import ObjectStream
 from func_adl_servicex import ServiceXSourceUpROOT
 import hist
@@ -32,12 +31,29 @@ import mplhep
 import numpy as np
 import pyhf
 import uproot
+from servicex import ServiceXDataset
+
+from coffea import processor
+from coffea.nanoevents.schemas.base import BaseSchema
+import vector; vector.register_awkward()
 
 import utils
 from utils import infofile  # contains cross-section information
 
 utils.clean_up()  # delete output from previous runs of notebook (optional)
 utils.set_logging()  # configure logging output
+
+# %%
+# set some global settings
+
+# chunk size to use
+CHUNKSIZE = 500_000
+
+# scaling for local setups with FuturesExecutor
+NUM_CORES = 4
+
+# ServiceX behavior: ignore cache with repeated queries
+IGNORE_CACHE = False
 
 # %% [markdown]
 # ## Introduction
@@ -76,14 +92,8 @@ utils.set_logging()  # configure logging output
 # If you are running on coffea-casa, you should be good to go: ServiceX credentials are automatically available to you.
 # If not, you will need to set those up.
 # Create a file `servicex.yaml` in your home directory, or the place this notebook is located in.
-# It should contain the following:
-# ```yaml
-# api_endpoints:
-#   - name: opendata_uproot_river
-#     endpoint: https://atlasopendata.servicex.ssl-hep.org/
-#     type: uproot
-# ```
-# See the previous [talk by KyungEon](https://indico.cern.ch/event/1076231/contributions/4560404/) for more information.
+#
+# See this [talk by KyungEon](https://indico.cern.ch/event/1076231/contributions/4560404/) for more information.
 
 # %% [markdown]
 # ## Files to process
@@ -93,7 +103,7 @@ utils.set_logging()  # configure logging output
 
 # %%
 prefix = (
-    "root://eospublic.cern.ch//eos/opendata/atlas/OutreachDatasets/2020-01-22/4lep/"
+    "http://xrootd-local.unl.edu:1094//store/user/AGC/ATLAS_HZZ/"
 )
 
 # labels for combinations of datasets
@@ -101,24 +111,24 @@ z_ttbar = r"Background $Z,t\bar{t}$"
 zzstar = r"Background $ZZ^{\star}$"
 signal = r"Signal ($m_H$ = 125 GeV)"
 
-fileset = {
+input_files = {
     "Data": [
-        prefix + "Data/data_A.4lep.root",
-        prefix + "Data/data_B.4lep.root",
-        prefix + "Data/data_C.4lep.root",
-        prefix + "Data/data_D.4lep.root",
+        prefix + "data_A.4lep.root",
+        prefix + "data_B.4lep.root",
+        prefix + "data_C.4lep.root",
+        prefix + "data_D.4lep.root",
     ],
     z_ttbar: [
-        prefix + "MC/mc_361106.Zee.4lep.root",
-        prefix + "MC/mc_361107.Zmumu.4lep.root",
-        prefix + "MC/mc_410000.ttbar_lep.4lep.root",
+        prefix + "mc_361106.Zee.4lep.root",
+        prefix + "mc_361107.Zmumu.4lep.root",
+        prefix + "mc_410000.ttbar_lep.4lep.root",
     ],
-    zzstar: [prefix + "MC/mc_363490.llll.4lep.root"],
+    zzstar: [prefix + "mc_363490.llll.4lep.root"],
     signal: [
-        prefix + "MC/mc_345060.ggH125_ZZ4lep.4lep.root",
-        prefix + "MC/mc_344235.VBFH125_ZZ4lep.4lep.root",
-        prefix + "MC/mc_341964.WH125_ZZ4lep.4lep.root",
-        prefix + "MC/mc_341947.ZH125_ZZ4lep.4lep.root",
+        prefix + "mc_345060.ggH125_ZZ4lep.4lep.root",
+        prefix + "mc_344235.VBFH125_ZZ4lep.4lep.root",
+        prefix + "mc_341964.WH125_ZZ4lep.4lep.root",
+        prefix + "mc_341947.ZH125_ZZ4lep.4lep.root",
     ],
 }
 
@@ -172,6 +182,48 @@ def get_lepton_query(source: ObjectStream) -> ObjectStream:
 
 
 # %% [markdown]
+# # Caching the queried datasets with `ServiceX`
+#
+# Using the queries created with `func_adl`, we are using `ServiceX` to read the ATLAS Open Data files to build cached files with only the specific event information as dictated by the query.
+
+# %%
+# dummy dataset on which to generate the query
+dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "mini", backend_name="uproot")
+
+# tell low-level infrastructure not to contact ServiceX yet, only to
+# return the qastle string it would have sent
+dummy_ds.return_qastle = True
+
+# create the query
+lepton_query = get_lepton_query(dummy_ds)
+query = lepton_query.value()
+
+# now we query the files and create a fileset dictionary containing the
+# URLs pointing to the queried files
+
+t0 = time.time()
+
+fileset = {}
+
+for ds_name in input_files.keys():
+    ds = ServiceXDataset(input_files[ds_name], backend_name="uproot", ignore_cache=IGNORE_CACHE)
+    files = ds.get_data_rootfiles_uri(query, as_signed_url=True)
+
+    fileset[ds_name] = {"files": [f.url for f in files],
+                        "metadata": {"dataset_name": ds_name}
+                       }
+
+print(f"execution took {time.time() - t0:.2f} seconds")
+
+
+# %% [markdown]
+# We now have a fileset dictionary containing the addresses of the queried files, ready to pass to `coffea`:
+
+# %%
+fileset
+
+
+# %% [markdown]
 # ## Processing `ServiceX`-provided data with `coffea`
 #
 # Event weighting: look up cross-section from a provided utility file, and correctly normalize all events.
@@ -209,19 +261,28 @@ def lepton_filter(lep_charge, lep_type):
 # <span style="color:darkgreen">**Systematic uncertainty added:**</span> m4l variation, applied in the processor to remaining events. This might instead for example be the result of applying a tool performing a computationally expensive calculation, which should only be run for events where it is needed.
 
 # %%
-class HZZAnalysis(servicex.Analysis):
+class HZZAnalysis(processor.ProcessorABC):
     """The coffea processor used in this analysis."""
 
-    def process(self, events):
-        # type of dataset being processed, provided via metadata (comes originally from fileset)
-        dataset_category = events.metadata["dataset_category"]
+    def __init__(self):
+        pass
 
-        # get lepton information from events
-        leptons = events.lep
+    def process(self, events):
+        vector.register_awkward()
+        # type of dataset being processed, provided via metadata (comes originally from fileset)
+        dataset_category = events.metadata["dataset_name"]
 
         # apply a cut to events, based on lepton charge and lepton type
-        events = events[lepton_filter(leptons.charge, leptons.typeid)]
-        leptons = events.lep
+        events = events[lepton_filter(events.lep_charge, events.lep_typeid)]
+
+        # construct lepton four-vectors
+        leptons = ak.zip(
+            {"pt": events.lep_pt,
+             "eta": events.lep_eta,
+             "phi": events.lep_phi,
+             "energy": events.lep_energy},
+            with_name="Momentum4D",
+        )
 
         # calculate the 4-lepton invariant mass for each remaining event
         # this could also be an expensive calculation using external tools
@@ -308,74 +369,22 @@ class HZZAnalysis(servicex.Analysis):
 
         return {"data": mllllhist_data, "MC": mllllhist_MC}
 
+    def postprocess(self, accumulator):
+        pass
+
 
 # %% [markdown]
 # ## Producing the desired histograms
 #
-# Putting everything together: query, datasource, processor, this function runs everything so far and collects the produced histograms.
-
-# %%
-async def produce_all_histograms():
-    """Runs the histogram production, processing input files with ServiceX and
-    producing histograms with coffea.
-    """
-    # create the query
-    ds = ServiceXSourceUpROOT("cernopendata://dummy", "mini", backend_name="uproot")
-    ds.return_qastle = True
-    lepton_query = get_lepton_query(ds)
-
-    executor = servicex.LocalExecutor()
-    # to run with the Dask executor on coffea-casa, use the following:
-    # (please note https://github.com/CoffeaTeam/coffea/issues/611)
-    # if os.environ.get("LABEXTENTION_FACTORY_MODULE") == "coffea_casa":
-    #     executor = servicex.DaskExecutor(client_addr="tls://localhost:8786")
-
-    datasources = [
-        utils.make_datasource(fileset, ds_name, lepton_query)
-        for ds_name in fileset.keys()
-    ]
-
-    # create the analysis processor
-    analysis_processor = HZZAnalysis()
-
-    async def run_updates_stream(accumulator_stream, name):
-        """Run to get the last item in the stream"""
-        coffea_info = None
-        try:
-            async for coffea_info in accumulator_stream:
-                pass
-        except Exception as e:
-            raise Exception(f"Failure while processing {name}") from e
-        return coffea_info
-
-    all_histogram_dicts = await asyncio.gather(
-        *[
-            run_updates_stream(
-                executor.execute(analysis_processor, source),
-                source.metadata["dataset_category"],
-            )
-            for source in datasources
-        ]
-    )
-    full_data_histogram = sum([h["data"] for h in all_histogram_dicts])
-    full_mc_histogram = sum([h["MC"] for h in all_histogram_dicts])
-    
-    return {"data": full_data_histogram, "MC": full_mc_histogram}
-
-# %% [markdown]
-# Now run the function just defined: obtain data from ServiceX, run processor, gather output histograms.
+# Run the processor on data previously gathered by ServiceX, then gather output histograms.
 
 # %%
 t0 = time.time()
 
-# in a notebook:
-all_histograms = await produce_all_histograms()
-
-# as a script:
-# async def produce_all_the_histograms():
-#    return await produce_all_histograms()
-#
-# all_histograms = asyncio.run(produce_all_the_histograms())
+executor = processor.FuturesExecutor(workers=NUM_CORES)
+run = processor.Runner(executor=executor, savemetrics=True, metadata_cache={},
+                       chunksize=CHUNKSIZE, schema=BaseSchema)
+all_histograms, metrics = run(fileset, "servicex", processor_instance=HZZAnalysis())
 
 print(f"execution took {time.time() - t0:.2f} seconds")
 
