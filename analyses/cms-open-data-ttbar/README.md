@@ -17,7 +17,7 @@ The `ttbar_analysis_pipeline.ipynb` and `ttbar_analysis_pipeline.py` files shoul
 jupytext --sync ttbar_analysis_pipeline.ipynb
 ```
 
-If you wish to create a new notebook (`notebook.ipynb`) and pair it with a .py file via Jupytext, you can either click View &rarr Activate Command Palettte, then click "Pair Notebook with percent Script", or run the command
+If you wish to create a new notebook (`notebook.ipynb`) and pair it with a .py file via Jupytext, you can either click View &rArr; Activate Command Palettte, then click "Pair Notebook with percent Script", or run the command
 ```
 jupytext --set-formats ipynb,py:percent notebook.ipynb
 ```
