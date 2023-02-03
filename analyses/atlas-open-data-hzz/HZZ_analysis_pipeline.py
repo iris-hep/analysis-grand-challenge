@@ -50,10 +50,10 @@ utils.set_logging()  # configure logging output
 CHUNKSIZE = 500_000
 
 # scaling for local setups with FuturesExecutor
-NUM_CORES = 1
+NUM_CORES = 4
 
 # ServiceX behavior: ignore cache with repeated queries
-IGNORE_CACHE = True
+IGNORE_CACHE = False
 
 # %% [markdown]
 # ## Introduction
@@ -270,7 +270,7 @@ class HZZAnalysis(processor.ProcessorABC):
     def process(self, events):
         vector.register_awkward()
         # type of dataset being processed, provided via metadata (comes originally from fileset)
-        dataset_category = events.metadata["dataset"]
+        dataset_category = events.metadata["dataset_name"]
 
         # apply a cut to events, based on lepton charge and lepton type
         events = events[lepton_filter(events.lep_charge, events.lep_typeid)]
@@ -368,6 +368,9 @@ class HZZAnalysis(processor.ProcessorABC):
             )
 
         return {"data": mllllhist_data, "MC": mllllhist_MC}
+
+    def postprocess(self, accumulator):
+        pass
 
 
 # %% [markdown]
