@@ -65,7 +65,7 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name=""):
     }
 
     # list of files
-    with open("ntuples_merged.json") as f:
+    with open("ntuples_nanoaod.json") as f:
         file_info = json.load(f)
 
     # process into "fileset" summarizing all info
@@ -141,7 +141,7 @@ async def produce_all_histograms(fileset, query, analysis_processor, use_dask=Fa
     producing histograms with coffea.
     """
     # create the query
-    ds = ServiceXSourceUpROOT("cernopendata://dummy", "events", backend_name="uproot")
+    ds = ServiceXSourceUpROOT("cernopendata://dummy", "Events", backend_name="uproot")
     ds.return_qastle = True
     data_query = query(ds)
 
@@ -156,6 +156,7 @@ async def produce_all_histograms(fileset, query, analysis_processor, use_dask=Fa
         for ds_name in fileset.keys()
     ]
 
+    
     async def run_updates_stream(accumulator_stream, name):
         """Run to get the last item in the stream"""
         coffea_info = None

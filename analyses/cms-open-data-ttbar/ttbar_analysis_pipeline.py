@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.14.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -52,6 +52,7 @@ import awkward as ak
 import cabinetry
 from coffea import processor
 from coffea.processor import servicex
+from coffea.nanoevents import NanoAODSchema
 from coffea.nanoevents import transforms
 from coffea.nanoevents.methods import base, vector
 from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
@@ -78,33 +79,17 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 #
 # | setting | number of files | total size |
 # | --- | --- | --- |
-# | `1` | 9 | 16.3 GB |
-# | `5` | 45 | 81.7 GB |
-# | `10` | 86 | 157 GB |
-# | `50` | 357 | 678 GB |
-# | `100` | 590 | 1.09 TB |
-# | `500` | 1542 | 2.58 TB |
-# | `1000` | 2249 | 3.57 TB |
-# | `-1` | 2269 | 3.59 TB |
+# | `1` | 12 | 25.1 GB |
+# | `2` | 24 | 46.5 GB |
+# | `5` | 52 | 110 GB |
+# | `10` | 88 | 205 GB |
+# | `20` | 149 | 364 GB |
+# | `50` | 264 | 636 GB |
+# | `100` | 404 | 965 GB |
+# | `200` | 604 | 1.40 TB |
+# | `-1` | 796 | 1.78 TB |
 #
-# The input files are all in the 1–2 GB range.
-#
-# Some files are also rucio-accessible (with ATLAS credentials):
-#
-# | dataset | number of files | total size |
-# | --- | --- | --- |
-# | `user.ivukotic:user.ivukotic.ttbar__nominal` | 7066 | 1.46 TB |
-# | `user.ivukotic:user.ivukotic.ttbar__scaledown` | 902 | 209 GB |
-# | `user.ivukotic:user.ivukotic.ttbar__scaleup` | 917 | 191 GB |
-# | `user.ivukotic:user.ivukotic.ttbar__ME_var` | 438 | 103 GB |
-# | `user.ivukotic:user.ivukotic.ttbar__PS_var` | 443 | 100 GB |
-# | `user.ivukotic:user.ivukotic.single_top_s_chan__nominal` | 114 | 11 GB |
-# | `user.ivukotic:user.ivukotic.single_top_t_chan__nominal` | 2506 | 392 GB |
-# | `user.ivukotic:user.ivukotic.single_top_tW__nominal` | 50 | 9 GB |
-# | `user.ivukotic:user.ivukotic.wjets__nominal` | 10199 | 1.13 TB |
-# | total | 22635 | 3.61 TB |
-#
-# The difference in total file size is presumably due to the different storages, which report slightly different sizes.
+# The input files are all in the 1–3 GB range.
 #
 # When setting the `PIPELINE` variable below to `"servicex_databinder"`, the `N_FILES_MAX_PER_SAMPLE` variable is ignored and all files are processed.
 
@@ -112,19 +97,19 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 ### GLOBAL CONFIGURATION
 
 # input files per process, set to e.g. 10 (smaller number = faster)
-N_FILES_MAX_PER_SAMPLE = 5
+N_FILES_MAX_PER_SAMPLE = 1
 
 # pipeline to use:
 # - "coffea" for pure coffea setup
 # - "servicex_processor" for coffea with ServiceX processor
 # - "servicex_databinder" for downloading query output and subsequent standalone coffea
-PIPELINE = "coffea"
+PIPELINE = "servicex_processor"
 
 # enable Dask (may not work yet in combination with ServiceX outside of coffea-casa)
-USE_DASK = True
+USE_DASK = False
 
 # ServiceX behavior: ignore cache with repeated queries
-SERVICEX_IGNORE_CACHE = False
+SERVICEX_IGNORE_CACHE = True
 
 # analysis facility: set to "coffea_casa" for coffea-casa environments, "EAF" for FNAL, "local" for local setups
 AF = "coffea_casa"
@@ -146,8 +131,8 @@ NUM_CORES = 4
 DISABLE_PROCESSING = False
 
 # read additional branches (only with DISABLE_PROCESSING = True)
-# acceptable values are 4, 15, 25, 50 (corresponding to % of file read), 4% corresponds to the standard branches used in the notebook
-IO_FILE_PERCENT = 4
+# acceptable values are 2.7, 4, 15, 25, 50 (corresponding to % of file read), 2.7% corresponds to the standard branches used in the notebook
+IO_FILE_PERCENT = 2.7
 
 # %% [markdown]
 # ### Defining our `coffea` Processor
@@ -198,22 +183,45 @@ class TtbarAnalysis(processor_base):
         self.io_file_percent = io_file_percent
 
     def only_do_IO(self, events):
-        # standard AGC branches cover 4% of the data
-            branches_to_read = ["jet_pt", "jet_eta", "jet_phi", "jet_btag", "jet_e", "muon_pt", "electron_pt"]
-            if self.io_file_percent not in [4, 15, 25, 50]:
-                raise NotImplementedError("supported values for I/O percentage are 4, 15, 25, 50")
-            if self.io_file_percent >= 15:
-                branches_to_read += ["trigobj_e"]
-            if self.io_file_percent >= 25:
-                branches_to_read += ["trigobj_pt"]
-            if self.io_file_percent >= 50:
-                branches_to_read += ["trigobj_eta", "trigobj_phi", "jet_px", "jet_py", "jet_pz", "jet_ch"]
-
+        # standard AGC branches cover 2.7% of the data
+            branches_to_read = []
+            if self.io_file_percent >= 2.7:
+                branches_to_read.extend(["Jet_pt", "Jet_eta", "Jet_phi", "Jet_btagCSVV2", "Jet_mass", "Muon_pt", "Electron_pt"])
+            
+            if self.io_file_percent >= 4:
+                branches_to_read.extend(["Electron_phi", "Electron_eta","Electron_mass","Muon_phi","Muon_eta","Muon_mass",
+                                         "Photon_pt","Photon_eta","Photon_mass","Jet_jetId"])
+            
+            if self.io_file_percent>=15:
+                branches_to_read.extend(["Jet_nConstituents","Jet_electronIdx1","Jet_electronIdx2","Jet_muonIdx1","Jet_muonIdx2",
+                                         "Jet_chHEF","Jet_area","Jet_puId","Jet_qgl","Jet_btagDeepB","Jet_btagDeepCvB",
+                                         "Jet_btagDeepCvL","Jet_btagDeepFlavB","Jet_btagDeepFlavCvB","Jet_btagDeepFlavCvL",
+                                         "Jet_btagDeepFlavQG","Jet_chEmEF","Jet_chFPV0EF","Jet_muEF","Jet_muonSubtrFactor",
+                                         "Jet_neEmEF","Jet_neHEF","Jet_puIdDisc"])
+            
+            if self.io_file_percent>=25:
+                branches_to_read.extend(["GenPart_pt","GenPart_eta","GenPart_phi","GenPart_mass","GenPart_genPartIdxMother",
+                                         "GenPart_pdgId","GenPart_status","GenPart_statusFlags"])
+            
+            if self.io_file_percent==50:
+                branches_to_read.extend(["Jet_rawFactor","Jet_bRegCorr","Jet_bRegRes","Jet_cRegCorr","Jet_cRegRes","Jet_nElectrons",
+                                         "Jet_nMuons","GenJet_pt","GenJet_eta","GenJet_phi","GenJet_mass","Tau_pt","Tau_eta","Tau_mass",
+                                         "Tau_phi","Muon_dxy","Muon_dxyErr","Muon_dxybs","Muon_dz","Muon_dzErr","Electron_dxy",
+                                         "Electron_dxyErr","Electron_dz","Electron_dzErr","Electron_eInvMinusPInv","Electron_energyErr",
+                                         "Electron_hoe","Electron_ip3d","Electron_jetPtRelv2","Electron_jetRelIso",
+                                         "Electron_miniPFRelIso_all","Electron_miniPFRelIso_chg","Electron_mvaFall17V2Iso",
+                                         "Electron_mvaFall17V2noIso","Electron_pfRelIso03_all","Electron_pfRelIso03_chg","Electron_r9",
+                                         "Electron_scEtOverPt","Electron_sieie","Electron_sip3d","Electron_mvaTTH","Electron_charge",
+                                         "Electron_cutBased","Electron_jetIdx","Electron_pdgId","Electron_photonIdx","Electron_tightCharge"])
+                
+            if self.io_file_percent not in [2.7, 4, 15, 25, 50]:
+                raise NotImplementedError("supported values for I/O percentage are 2.7, 4, 15, 25, 50")
+            
             for branch in branches_to_read:
                 if "_" in branch:
-                    object_type, property_name = branch.split("_")
-                    if property_name == "e":
-                        property_name = "energy"
+                    split = branch.split("_")
+                    object_type = split[0]
+                    property_name = '_'.join(split[1:])
                     ak.materialized(events[object_type][property_name])
                 else:
                     ak.materialized(events[branch])
@@ -249,7 +257,7 @@ class TtbarAnalysis(processor_base):
         # and subsequently scale pT by these scale factors
         events["pt_nominal"] = 1.0
         events["pt_scale_up"] = 1.03
-        events["pt_res_up"] = jet_pt_resolution(events.jet.pt)
+        events["pt_res_up"] = jet_pt_resolution(events.Jet.pt)
 
         pt_variations = ["pt_nominal", "pt_scale_up", "pt_res_up"] if variation == "nominal" else ["pt_nominal"]
         for pt_var in pt_variations:
@@ -258,10 +266,10 @@ class TtbarAnalysis(processor_base):
             # very very loosely based on https://arxiv.org/abs/2006.13076
 
             # pT > 25 GeV for leptons & jets
-            selected_electrons = events.electron[events.electron.pt > 25]
-            selected_muons = events.muon[events.muon.pt > 25]
-            jet_filter = events.jet.pt * events[pt_var] > 25  # pT > 25 GeV for jets (scaled by systematic variations)
-            selected_jets = events.jet[jet_filter]
+            selected_electrons = events.Electron[(events.Electron.pt>25)]
+            selected_muons = events.Muon[(events.Muon.pt >25)]
+            jet_filter = (events.Jet.pt * events[pt_var]) > 25
+            selected_jets = events.Jet[jet_filter]
 
             # single lepton requirement
             event_filters = ((ak.count(selected_electrons.pt, axis=1) + ak.count(selected_muons.pt, axis=1)) == 1)
@@ -270,7 +278,7 @@ class TtbarAnalysis(processor_base):
             event_filters = event_filters & (ak.count(selected_jets.pt * pt_var_modifier, axis=1) >= 4)
             # at least one b-tagged jet ("tag" means score above threshold)
             B_TAG_THRESHOLD = 0.5
-            event_filters = event_filters & (ak.sum(selected_jets.btag >= B_TAG_THRESHOLD, axis=1) >= 1)
+            event_filters = event_filters & (ak.sum(selected_jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) >= 1)
 
             # apply event filters
             selected_events = events[event_filters]
@@ -281,7 +289,7 @@ class TtbarAnalysis(processor_base):
             for region in ["4j1b", "4j2b"]:
                 # further filtering: 4j1b CR with single b-tag, 4j2b SR with two or more tags
                 if region == "4j1b":
-                    region_filter = ak.sum(selected_jets.btag >= B_TAG_THRESHOLD, axis=1) == 1
+                    region_filter = ak.sum(selected_jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) == 1
                     selected_jets_region = selected_jets[region_filter]
                     # use HT (scalar sum of jet pT) as observable
                     pt_var_modifier = (
@@ -292,14 +300,14 @@ class TtbarAnalysis(processor_base):
                     observable = ak.sum(selected_jets_region.pt * pt_var_modifier, axis=-1)
 
                 elif region == "4j2b":
-                    region_filter = ak.sum(selected_jets.btag > B_TAG_THRESHOLD, axis=1) >= 2
+                    region_filter = ak.sum(selected_jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2
                     selected_jets_region = selected_jets[region_filter]
 
                     # reconstruct hadronic top as bjj system with largest pT
                     # the jet energy scale / resolution effect is not propagated to this observable at the moment
                     trijet = ak.combinations(selected_jets_region, 3, fields=["j1", "j2", "j3"])  # trijet candidates
                     trijet["p4"] = trijet.j1 + trijet.j2 + trijet.j3  # calculate four-momentum of tri-jet system
-                    trijet["max_btag"] = np.maximum(trijet.j1.btag, np.maximum(trijet.j2.btag, trijet.j3.btag))
+                    trijet["max_btag"] = np.maximum(trijet.j1.btagCSVV2, np.maximum(trijet.j2.btagCSVV2, trijet.j3.btagCSVV2))
                     trijet = trijet[trijet.max_btag > B_TAG_THRESHOLD]  # at least one-btag in trijet candidates
                     # pick trijet candidate with largest pT and calculate mass of system
                     trijet_mass = trijet["p4"][ak.argmax(trijet.p4.pt, axis=1, keepdims=True)].mass
@@ -355,46 +363,6 @@ class TtbarAnalysis(processor_base):
 
 
 # %% [markdown]
-# ### AGC `coffea` schema
-#
-# When using `coffea`, we can benefit from the schema functionality to group columns into convenient objects.
-# This schema is taken from [mat-adamec/agc_coffea](https://github.com/mat-adamec/agc_coffea).
-
-# %% tags=[]
-class AGCSchema(BaseSchema):
-    def __init__(self, base_form):
-        super().__init__(base_form)
-        self._form["contents"] = self._build_collections(self._form["contents"])
-
-    def _build_collections(self, branch_forms):
-        names = set([k.split('_')[0] for k in branch_forms.keys() if not (k.startswith('number'))])
-        # Remove n(names) from consideration. It's safe to just remove names that start with n, as nothing else begins with n in our fields.
-        # Also remove GenPart, PV and MET because they deviate from the pattern of having a 'number' field.
-        names = [k for k in names if not (k.startswith('n') | k.startswith('met') | k.startswith('GenPart') | k.startswith('PV'))]
-        output = {}
-        for name in names:
-            offsets = transforms.counts2offsets_form(branch_forms['number' + name])
-            content = {k[len(name)+1:]: branch_forms[k] for k in branch_forms if (k.startswith(name + "_") & (k[len(name)+1:] != 'e'))}
-            # Add energy separately so its treated correctly by the p4 vector.
-            content['energy'] = branch_forms[name+'_e']
-            # Check for LorentzVector
-            output[name] = zip_forms(content, name, 'PtEtaPhiELorentzVector', offsets=offsets)
-
-        # Handle GenPart, PV, MET. Note that all the nPV_*'s should be the same. We just use one.
-        #output['met'] = zip_forms({k[len('met')+1:]: branch_forms[k] for k in branch_forms if k.startswith('met_')}, 'met')
-        #output['GenPart'] = zip_forms({k[len('GenPart')+1:]: branch_forms[k] for k in branch_forms if k.startswith('GenPart_')}, 'GenPart', offsets=transforms.counts2offsets_form(branch_forms['numGenPart']))
-        #output['PV'] = zip_forms({k[len('PV')+1:]: branch_forms[k] for k in branch_forms if (k.startswith('PV_') & ('npvs' not in k))}, 'PV', offsets=transforms.counts2offsets_form(branch_forms['nPV_x']))
-        return output
-
-    @property
-    def behavior(self):
-        behavior = {}
-        behavior.update(base.behavior)
-        behavior.update(vector.behavior)
-        return behavior
-
-
-# %% [markdown]
 # ### "Fileset" construction and metadata
 #
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
@@ -416,35 +384,23 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 def get_query(source: ObjectStream) -> ObjectStream:
     """Query for event / column selection: >=4j >=1b, ==1 lep with pT>25 GeV, return relevant columns
     """
-    return source.Where(lambda e:
-        # == 1 lep
-        e.electron_pt.Where(lambda pT: pT > 25).Count() + e.muon_pt.Where(lambda pT: pT > 25).Count()== 1
-        )\
-        .Where(lambda e:\
-            # >= 4 jets
-            e.jet_pt.Where(lambda pT: pT > 25).Count() >= 4
-        )\
-        .Where(lambda e:\
-            # >= 1 jet with pT > 25 GeV and b-tag >= 0.5
-            {"pT": e.jet_pt, "btag": e.jet_btag}.Zip().Where(lambda jet: jet.btag >= 0.5 and jet.pT > 25).Count() >= 1
-        )\
-        .Select(lambda e:\
-            # return columns
-            {
-                "electron_e": e.electron_e,
-                "electron_pt": e.electron_pt,
-                "muon_e": e.muon_e,
-                "muon_pt": e.muon_pt,
-                "jet_e": e.jet_e,
-                "jet_pt": e.jet_pt,
-                "jet_eta": e.jet_eta,
-                "jet_phi": e.jet_phi,
-                "jet_btag": e.jet_btag,
-                "numbermuon": e.numbermuon,
-                "numberelectron": e.numberelectron,
-                "numberjet": e.numberjet,
-            }
-        )
+    return source.Where(lambda e: e.Electron_pt.Where(lambda pt: pt > 25).Count() 
+                        + e.Muon_pt.Where(lambda pt: pt > 25).Count() == 1)\
+                 .Where(lambda e: e.Jet_pt.Where(lambda pt: pt > 25).Count() >= 4)\
+                 .Where(lambda g: {"pt": g.Jet_pt, 
+                                   "btagCSVV2": g.Jet_btagCSVV2}.Zip().Where(lambda jet: 
+                                                                             jet.btagCSVV2 >= 0.5 
+                                                                             and jet.pt > 25).Count() >= 1)\
+                 .Select(lambda f: {"Electron_pt": f.Electron_pt,
+                                    "Electron_mass": f.Electron_mass,
+                                    "Muon_pt": f.Muon_pt,
+                                    "Muon_mass": f.Muon_mass,
+                                    "Jet_mass": f.Jet_mass,
+                                    "Jet_pt": f.Jet_pt,
+                                    "Jet_eta": f.Jet_eta,
+                                    "Jet_phi": f.Jet_phi,
+                                    "Jet_btagCSVV2": f.Jet_btagCSVV2,
+                                   })
 
 
 # %% [markdown]
@@ -507,18 +463,20 @@ if PIPELINE == "servicex_databinder":
 # - if `PIPELINE` was set to `servicex_databinder`, the input data has already been pre-processed and will be processed further with `coffea`.
 
 # %%
+NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
+
 if PIPELINE == "coffea":
     if USE_DASK:
         executor = processor.DaskExecutor(client=utils.get_client(AF))
     else:
         executor = processor.FuturesExecutor(workers=NUM_CORES)
 
-    run = processor.Runner(executor=executor, schema=AGCSchema, savemetrics=True, metadata_cache={}, chunksize=CHUNKSIZE)
+    run = processor.Runner(executor=executor, schema=NanoAODSchema, savemetrics=True, metadata_cache={}, chunksize=CHUNKSIZE)
 
-    filemeta = run.preprocess(fileset, treename="events")  # pre-processing
+    filemeta = run.preprocess(fileset, treename="Events")  # pre-processing
 
     t0 = time.monotonic()
-    all_histograms, metrics = run(fileset, "events", processor_instance=TtbarAnalysis(DISABLE_PROCESSING, IO_FILE_PERCENT))  # processing
+    all_histograms, metrics = run(fileset, "Events", processor_instance=TtbarAnalysis(DISABLE_PROCESSING, IO_FILE_PERCENT))  # processing
     exec_time = time.monotonic() - t0
     all_histograms = all_histograms["hist"]
 
@@ -526,13 +484,13 @@ elif PIPELINE == "servicex_processor":
     # in a notebook:
     t0 = time.monotonic()
     all_histograms = await utils.produce_all_histograms(fileset, get_query, TtbarAnalysis(DISABLE_PROCESSING, IO_FILE_PERCENT),
-                                                        use_dask=USE_DASK, ignore_cache=SERVICEX_IGNORE_CACHE, schema=AGCSchema)
+                                                        use_dask=USE_DASK, ignore_cache=SERVICEX_IGNORE_CACHE, schema=NanoAODSchema)
     exec_time = time.monotonic() - t0
 
     # as a script:
     # async def produce_all_the_histograms():
     #     return await utils.produce_all_histograms(fileset, get_query, TtbarAnalysis(DISABLE_PROCESSING, IO_FILE_PERCENT),
-    #                                               use_dask=USE_DASK, ignore_cache=SERVICEX_IGNORE_CACHE, schema=AGCSchema)
+    #                                               use_dask=USE_DASK, ignore_cache=SERVICEX_IGNORE_CACHE, schema=NanoAODSchema)
     #
     # all_histograms = asyncio.run(produce_all_the_histograms())
 
@@ -693,5 +651,3 @@ figs[1]["figure"]
 # Please do not hesitate to get in touch if you would like to join the effort, or are interested in re-implementing (pieces of) the pipeline with different tools!
 #
 # Our mailing list is analysis-grand-challenge@iris-hep.org, sign up via the [Google group](https://groups.google.com/a/iris-hep.org/g/analysis-grand-challenge).
-
-# %%
