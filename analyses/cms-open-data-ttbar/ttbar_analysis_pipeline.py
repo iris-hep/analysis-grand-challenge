@@ -46,16 +46,11 @@ import logging
 import os
 import time
 
-import vector; vector.register_awkward()
-
 import awkward as ak
 import cabinetry
 from coffea import processor
 from coffea.processor import servicex
 from coffea.nanoevents import NanoAODSchema
-from coffea.nanoevents import transforms
-from coffea.nanoevents.methods import base, vector
-from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
 from func_adl import ObjectStream
 import hist
 import json
@@ -392,9 +387,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
                                                                              jet.btagCSVV2 >= 0.5 
                                                                              and jet.pt > 25).Count() >= 1)\
                  .Select(lambda f: {"Electron_pt": f.Electron_pt,
-                                    "Electron_mass": f.Electron_mass,
                                     "Muon_pt": f.Muon_pt,
-                                    "Muon_mass": f.Muon_mass,
                                     "Jet_mass": f.Jet_mass,
                                     "Jet_pt": f.Jet_pt,
                                     "Jet_eta": f.Jet_eta,
