@@ -65,7 +65,7 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name=""):
     }
 
     # list of files
-    with open("ntuples_nanoaod.json") as f:
+    with open("nanoaod_inputs.json") as f:
         file_info = json.load(f)
 
     # process into "fileset" summarizing all info
