@@ -97,19 +97,19 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 ### GLOBAL CONFIGURATION
 
 # input files per process, set to e.g. 10 (smaller number = faster)
-N_FILES_MAX_PER_SAMPLE = 1
+N_FILES_MAX_PER_SAMPLE = 5
 
 # pipeline to use:
 # - "coffea" for pure coffea setup
 # - "servicex_processor" for coffea with ServiceX processor
 # - "servicex_databinder" for downloading query output and subsequent standalone coffea
-PIPELINE = "servicex_processor"
+PIPELINE = "coffea"
 
 # enable Dask (may not work yet in combination with ServiceX outside of coffea-casa)
-USE_DASK = False
+USE_DASK = True
 
 # ServiceX behavior: ignore cache with repeated queries
-SERVICEX_IGNORE_CACHE = True
+SERVICEX_IGNORE_CACHE = False
 
 # analysis facility: set to "coffea_casa" for coffea-casa environments, "EAF" for FNAL, "local" for local setups
 AF = "coffea_casa"
@@ -651,3 +651,5 @@ figs[1]["figure"]
 # Please do not hesitate to get in touch if you would like to join the effort, or are interested in re-implementing (pieces of) the pipeline with different tools!
 #
 # Our mailing list is analysis-grand-challenge@iris-hep.org, sign up via the [Google group](https://groups.google.com/a/iris-hep.org/g/analysis-grand-challenge).
+
+# %%
