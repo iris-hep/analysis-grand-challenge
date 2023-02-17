@@ -6,12 +6,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import uproot
 
-from func_adl_servicex import ServiceXSourceUpROOT
-from func_adl import ObjectStream
-from coffea.processor import servicex
-from servicex import ServiceXDataset
-
-
 def get_client(af="coffea_casa"):
     if af == "coffea_casa":
         from dask.distributed import Client

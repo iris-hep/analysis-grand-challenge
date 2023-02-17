@@ -49,7 +49,6 @@ import time
 import awkward as ak
 import cabinetry
 from coffea import processor
-from coffea.processor import servicex
 from coffea.nanoevents import transforms
 from coffea.nanoevents.methods import base, vector
 from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
