@@ -34,7 +34,7 @@
 # %% [markdown]
 # ### Data pipelines
 #
-# To be a bit more precise, we are going to be looking at three different data pipelines:
+# There are two possible pipelines: one with `ServiceX` enabled, and one using only `coffea` for processing.
 # ![processing pipelines](utils/processing_pipelines.png)
 
 # %% [markdown]
