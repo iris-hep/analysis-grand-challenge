@@ -440,8 +440,7 @@ if USE_SERVICEX:
     dummy_ds.return_qastle = True
 
     # create the query
-    query = get_query(dummy_ds)
-    query = query.value()
+    query = get_query(dummy_ds).value()
 
     # now we query the files and create a fileset dictionary containing the
     # URLs pointing to the queried files
