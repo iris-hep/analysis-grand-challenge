@@ -427,7 +427,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
 # %% [markdown]
 # ### Caching the queried datasets with `ServiceX`
 #
-# Using the queries created with `func_adl`, we are using `ServiceX` to read the ATLAS Open Data files to build cached files with only the specific event information as dictated by the query.
+# Using the queries created with `func_adl`, we are using `ServiceX` to read the CMS Open Data files to build cached files with only the specific event information as dictated by the query.
 
 # %%
 if USE_SERVICEX:
