@@ -94,13 +94,13 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 # input files per process, set to e.g. 10 (smaller number = faster)
 N_FILES_MAX_PER_SAMPLE = 5
 
-# enable ServiceX
-USE_SERVICEX = False
-
 # enable Dask
 USE_DASK = True
 
-# ServiceX behavior: ignore cache with repeated queries
+# enable ServiceX
+USE_SERVICEX = False
+
+# ServiceX: ignore cache with repeated queries
 SERVICEX_IGNORE_CACHE = False
 
 # analysis facility: set to "coffea_casa" for coffea-casa environments, "EAF" for FNAL, "local" for local setups
@@ -372,6 +372,19 @@ class AGCSchema(BaseSchema):
 
 
 # %% [markdown]
+# ### "Fileset" construction and metadata
+#
+# Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
+
+# %% tags=[]
+fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False, af_name=AF_NAME)  # local files on /data for ssl-dev
+
+print(f"processes in fileset: {list(fileset.keys())}")
+print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files'][0]}, ...],")
+print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
+
+
+# %% [markdown]
 # ### ServiceX-specific functionality: query setup
 #
 # Define the func_adl query to be used for the purpose of extracting columns and filtering.
@@ -412,18 +425,6 @@ def get_query(source: ObjectStream) -> ObjectStream:
 
 
 # %% [markdown]
-# ### "Fileset" construction and metadata
-#
-# Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
-
-# %% tags=[]
-fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False, af_name=AF_NAME)  # local files on /data for ssl-dev
-
-print(f"processes in fileset: {list(fileset.keys())}")
-print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files'][0]}, ...],")
-print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
-
-# %% [markdown]
 # ### Caching the queried datasets with `ServiceX`
 #
 # Using the queries created with `func_adl`, we are using `ServiceX` to read the ATLAS Open Data files to build cached files with only the specific event information as dictated by the query.
@@ -446,16 +447,12 @@ if USE_SERVICEX:
     # URLs pointing to the queried files
 
     t0 = time.time()
-
-    fileset_queried = {}
-
     for process in fileset.keys():
         ds = ServiceXDataset(fileset[process]['files'], backend_name="uproot", ignore_cache=SERVICEX_IGNORE_CACHE)
         files = ds.get_data_rootfiles_uri(query, as_signed_url=True)
 
-        fileset_queried[process] = {"files": [f.url for f in files],
-                                    "metadata": fileset[process]['metadata']
-                                   }
+        
+        fileset[process]["files"] = [f.url for f in files]
 
     print(f"execution took {time.time() - t0:.2f} seconds")
 
@@ -476,7 +473,6 @@ run = processor.Runner(executor=executor, schema=AGCSchema, savemetrics=True, me
 
 if USE_SERVICEX:
     treename = "servicex"
-    fileset = fileset_queried
     
 else:
     treename = "events"
