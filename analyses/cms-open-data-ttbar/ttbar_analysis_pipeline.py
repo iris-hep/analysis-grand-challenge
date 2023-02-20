@@ -454,7 +454,7 @@ if USE_SERVICEX:
         
         fileset[process]["files"] = [f.url for f in files]
 
-    print(f"execution took {time.time() - t0:.2f} seconds")
+    print(f"ServiceX data delivery took {time.time() - t0:.2f} seconds")
 
 # %% [markdown]
 # ### Execute the data delivery pipeline
