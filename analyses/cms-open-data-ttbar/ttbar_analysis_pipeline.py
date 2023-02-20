@@ -459,7 +459,7 @@ if USE_SERVICEX:
 # %% [markdown]
 # ### Execute the data delivery pipeline
 #
-# What happens here depends on the flag `USE_SERVICEX`. If set to true, the processor is run on the data previously gathered by  ServiceX, then will gather output histograms.
+# What happens here depends on the flag `USE_SERVICEX`. If set to true, the processor is run on the data previously gathered by ServiceX, then will gather output histograms.
 #
 # When `USE_SERVICEX` is false, the input files need to be processed during this step as well.
 
