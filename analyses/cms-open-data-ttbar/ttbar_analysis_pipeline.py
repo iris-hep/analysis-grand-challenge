@@ -447,8 +447,12 @@ if USE_SERVICEX:
 
     t0 = time.time()
     for process in fileset.keys():
-        ds = ServiceXDataset(fileset[process]['files'], backend_name="uproot", ignore_cache=SERVICEX_IGNORE_CACHE)
-        files = ds.get_data_rootfiles_uri(query, as_signed_url=True)
+        ds = ServiceXDataset(fileset[process]['files'], 
+                             backend_name="uproot", 
+                             ignore_cache=SERVICEX_IGNORE_CACHE)
+        files = ds.get_data_rootfiles_uri(query, 
+                                          as_signed_url=True,
+                                          title=process)
 
         
         fileset[process]["files"] = [f.url for f in files]
