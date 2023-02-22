@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.14.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -207,7 +207,7 @@ fileset = {}
 
 for ds_name in input_files.keys():
     ds = ServiceXDataset(input_files[ds_name], backend_name="uproot", ignore_cache=IGNORE_CACHE)
-    files = ds.get_data_rootfiles_uri(query, as_signed_url=True)
+    files = ds.get_data_rootfiles_uri(query, as_signed_url=True, title=ds_name)
 
     fileset[ds_name] = {"files": [f.url for f in files],
                         "metadata": {"dataset_name": ds_name}
