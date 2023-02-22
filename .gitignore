@@ -23,6 +23,9 @@ endpoint_id.txt
 # downloaded pyhf pallets from HEPData
 workshops/agctools2022/statistical-inference/input
 
+# ATLAS H>ZZ
+analyses/atlas-open-data-hzz/figures
+
 # CMS ttbar
 analyses/cms-open-data-ttbar/workspace.json
 analyses/cms-open-data-ttbar/metrics
