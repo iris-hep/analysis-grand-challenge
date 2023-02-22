@@ -153,7 +153,7 @@ def get_lepton_query(source: ObjectStream) -> ObjectStream:
     Also select all columns needed further downstream for processing &
     histogram filling.
     """
-    return source.Where(lambda e: e.lep_n == 4).Select(
+    return source.Where(lambda event: event.lep_n == 4).Select(
         lambda e: {
             "lep_pt": e.lep_pt,
             "lep_eta": e.lep_eta,
