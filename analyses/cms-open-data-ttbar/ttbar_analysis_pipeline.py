@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.1
+#       jupytext_version: 1.14.4
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -52,7 +52,6 @@ from coffea import processor
 from coffea.nanoevents import transforms
 from coffea.nanoevents.methods import base, vector
 from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
-from servicex import ServiceXDataset
 from func_adl import ObjectStream
 from func_adl_servicex import ServiceXSourceUpROOT
 import hist
@@ -431,7 +430,6 @@ def get_query(source: ObjectStream) -> ObjectStream:
 
 # %%
 if USE_SERVICEX:
-    
     # dummy dataset on which to generate the query
     dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "events", backend_name="uproot")
 
@@ -442,22 +440,16 @@ if USE_SERVICEX:
     # create the query
     query = get_query(dummy_ds).value()
 
-    # now we query the files and create a fileset dictionary containing the
-    # URLs pointing to the queried files
-
+    # now we query the files using a wrapper around ServiceXDataset to transform all processes at once
     t0 = time.time()
-    for process in fileset.keys():
-        ds = ServiceXDataset(fileset[process]['files'], 
-                             backend_name="uproot", 
-                             ignore_cache=SERVICEX_IGNORE_CACHE)
-        files = ds.get_data_rootfiles_uri(query, 
-                                          as_signed_url=True,
-                                          title=process)
-
-        
-        fileset[process]["files"] = [f.url for f in files]
+    ds = utils.ServiceXDatasetGroup(fileset, backend_name="uproot", ignore_cache=SERVICEX_IGNORE_CACHE)
+    files_per_process = ds.get_data_rootfiles_uri(query, as_signed_url=True, title="CMS ttbar")
 
     print(f"ServiceX data delivery took {time.time() - t0:.2f} seconds")
+
+    # update fileset to point to ServiceX-transformed files
+    for process in fileset.keys():
+        fileset[process]["files"] = [f.url for f in files_per_process[process]]
 
 # %% [markdown]
 # ### Execute the data delivery pipeline

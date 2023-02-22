@@ -5,6 +5,7 @@ import hist
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import uproot
+from servicex import ServiceXDataset
 
 def get_client(af="coffea_casa"):
     if af == "coffea_casa":
@@ -120,3 +121,28 @@ def save_histograms(all_histograms, fileset, filename):
             # W+jets scale
             f[f"{region}_wjets_scale_var_down"] = all_histograms[120j :: hist.rebin(2), region, "wjets", "scale_var_down"]
             f[f"{region}_wjets_scale_var_up"] = all_histograms[120j :: hist.rebin(2), region, "wjets", "scale_var_up"]
+
+
+class ServiceXDatasetGroup():
+    def __init__(self, fileset, backend_name="uproot", ignore_cache=False):
+        self.fileset = fileset
+
+        # create flat list of files and dictionary of filenames -> processes
+        filelist = []
+        self.filename_to_process = {}
+        for process in fileset:
+            # extract all unique identifiers for file names (including top and antitop split for some single top samples)
+            input_file_stubs = set([f.split("/")[-2] for f in fileset[process]["files"]])
+            for file_stub in input_file_stubs:
+                self.filename_to_process.update({file_stub: process})
+            filelist += fileset[process]["files"]  # add all files together into list for processing
+
+        self.ds = ServiceXDataset(filelist, backend_name=backend_name, ignore_cache=ignore_cache)
+
+    def get_data_rootfiles_uri(self, query, as_signed_url=True, title="Untitled"):
+        all_files = self.ds.get_data_rootfiles_uri(query, as_signed_url=as_signed_url, title=title)
+        files_per_process = {}
+        for process in self.fileset:
+            # processdict for translation using file name of parent
+            files_per_process.update({process: [f for f in all_files if self.filename_to_process[f.file.split(":")[-2]] == process]})
+        return files_per_process
