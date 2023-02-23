@@ -402,7 +402,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
 if USE_SERVICEX:
     
     # dummy dataset on which to generate the query
-    dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "events", backend_name="uproot")
+    dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "Events", backend_name="uproot")
 
     # tell low-level infrastructure not to contact ServiceX yet, only to
     # return the qastle string it would have sent
@@ -442,7 +442,7 @@ if USE_DASK:
 else:
     executor = processor.FuturesExecutor(workers=NUM_CORES)
         
-run = processor.Runner(executor=executor, schema=AGCSchema, savemetrics=True, metadata_cache={}, chunksize=CHUNKSIZE)
+run = processor.Runner(executor=executor, schema=NanoAODSchema, savemetrics=True, metadata_cache={}, chunksize=CHUNKSIZE)
 
 if USE_SERVICEX:
     treename = "servicex"
