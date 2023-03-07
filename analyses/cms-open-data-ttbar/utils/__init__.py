@@ -128,7 +128,7 @@ class ServiceXDatasetGroup():
     def __init__(self, fileset, backend_name="uproot", ignore_cache=False):
         self.fileset = fileset
 
-        # create flat list of files and keep track of counts
+        # create list of files (& associated processes)
         filelist = []
         for i, process in enumerate(fileset):
             filelist += [[filename, process] for filename in fileset[process]["files"]]
@@ -149,6 +149,7 @@ class ServiceXDatasetGroup():
         
         files_per_process = {}
         for i, process in enumerate(self.fileset):
+            # update files for each process
             files_per_process.update({process: all_files[parent_key[self.filelist[:,1]==process]]})
             
         return files_per_process
