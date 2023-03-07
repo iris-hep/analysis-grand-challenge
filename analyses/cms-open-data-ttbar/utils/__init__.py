@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import uproot
 from servicex import ServiceXDataset
 import numpy as np
-import awkward as ak
 
 def get_client(af="coffea_casa"):
     if af == "coffea_casa":
