@@ -48,9 +48,11 @@ import time
 
 import awkward as ak
 import cabinetry
+import correctionlib
 from coffea import processor
 from coffea.nanoevents import NanoAODSchema
-
+from coffea.analysis_tools import PackedSelection
+from servicex import ServiceXDataset
 from func_adl import ObjectStream
 from func_adl_servicex import ServiceXSourceUpROOT
 
@@ -125,14 +127,12 @@ def btag_weight_variation(i_jet, jet_pt):
     # weight variation depending on i-th jet pT (7.5% as default value, multiplied by i-th jet pT / 50 GeV)
     return 1 + np.array([0.075, -0.075]) * (ak.singletons(jet_pt[:, i_jet]) / 50).to_numpy()
 
-
 def jet_pt_resolution(pt):
     # normal distribution with 5% variations, shape matches jets
     counts = ak.num(pt)
     pt_flat = ak.flatten(pt)
     resolution_variation = np.random.normal(np.ones_like(pt_flat), 0.05)
     return ak.unflatten(resolution_variation, counts)
-
 
 class TtbarAnalysis(processor.ProcessorABC):
     def __init__(self, disable_processing, io_branches):
@@ -190,56 +190,66 @@ class TtbarAnalysis(processor.ProcessorABC):
         # need to adjust schema to instead use coffea add_systematic feature, especially for ServiceX
         # cannot attach pT variations to events.jet, so attach to events directly
         # and subsequently scale pT by these scale factors
-        events["pt_nominal"] = 1.0
         events["pt_scale_up"] = 1.03
         events["pt_res_up"] = jet_pt_resolution(events.Jet.pt)
 
-        pt_variations = ["pt_nominal", "pt_scale_up", "pt_res_up"] if variation == "nominal" else ["pt_nominal"]
-        for pt_var in pt_variations:
+        syst_variations = ["nominal"]
+        jet_kinematic_systs = ["pt_scale_up", "pt_res_up"]
+        event_systs = [f"btag_var_{i}" for i in range(4)] + events.systematics.fields
+
+        # Only do systematics for nominal samples, e.g. ttbar__nominal
+        if variation == "nominal":
+            syst_variations.extend(jet_kinematic_systs)
+            syst_variations.extend(event_systs)
+
+        # for pt_var in pt_variations:
+        for syst_var in syst_variations:
 
             ### event selection
             # very very loosely based on https://arxiv.org/abs/2006.13076
 
-            selected_electrons = events.Electron[(events.Electron.pt > 25)] # require pt > 25 GeV for electrons
-            selected_muons = events.Muon[(events.Muon.pt > 25)] # require pt > 25 GeV for muons
-            jet_filter = (events.Jet.pt * events[pt_var]) > 25 # pT > 25 GeV for jets (scaled by systematic variations)
-            selected_jets = events.Jet[jet_filter]
+            # Note: This creates new objects, distinct from those in the 'events' object
+            elecs = events.Electron
+            muons = events.Muon
+            jets = events.Jet
+            if syst_var in jet_kinematic_systs:
+                # Replace jet.pt with the adjusted values
+                jets["pt"] = jets.pt * events[syst_var]
 
-            # single lepton requirement
-            event_filters = ((ak.count(selected_electrons.pt, axis=1) + ak.count(selected_muons.pt, axis=1)) == 1)
-            # at least four jets
-            pt_var_modifier = events[pt_var] if "res" not in pt_var else events[pt_var][jet_filter]
-            event_filters = event_filters & (ak.count(selected_jets.pt * pt_var_modifier, axis=1) >= 4)
-            # at least one b-tagged jet ("tag" means score above threshold)
+            electron_reqs = (elecs.pt > 25)
+            muon_reqs = (muons.pt > 25)
+            jet_reqs = (jets.pt > 25)
+
+            # Only keep objects that pass our requirements
+            elecs = elecs[electron_reqs]
+            muons = muons[muon_reqs]
+            jets = jets[jet_reqs]
+
             B_TAG_THRESHOLD = 0.5
-            event_filters = event_filters & (ak.sum(selected_jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) >= 1)
 
-            # apply event filters
-            selected_events = events[event_filters]
-            selected_electrons = selected_electrons[event_filters]
-            selected_muons = selected_muons[event_filters]
-            selected_jets = selected_jets[event_filters]
+            ######### Store boolean masks with PackedSelection ##########
+
+            selections = PackedSelection(dtype='uint64')
+
+            # Basic selection criteria
+            selections.add("exactly_1l",(ak.num(elecs) + ak.num(muons)) == 1)
+            selections.add("atleast_4j",ak.num(jets) >= 4)
+            selections.add("exactly_1b",ak.sum(jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) == 1)
+            selections.add("atleast_2b",ak.sum(jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2)
+            # Complex selection criteria
+            selections.add("4j1b",selections.all("exactly_1l", "atleast_4j", "exactly_1b"))
+            selections.add("4j2b",selections.all("exactly_1l", "atleast_4j", "atleast_2b"))
 
             for region in ["4j1b", "4j2b"]:
-                # further filtering: 4j1b CR with single b-tag, 4j2b SR with two or more tags
+                region_selection = selections.all(region)
+                region_jets = jets[region_selection]
+                region_weights = np.ones(len(region_jets)) * xsec_weight
                 if region == "4j1b":
-                    region_filter = ak.sum(selected_jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) == 1
-                    selected_jets_region = selected_jets[region_filter]
-                    # use HT (scalar sum of jet pT) as observable
-                    pt_var_modifier = (
-                        events[event_filters][region_filter][pt_var]
-                        if "res" not in pt_var
-                        else events[pt_var][jet_filter][event_filters][region_filter]
-                    )
-                    observable = ak.sum(selected_jets_region.pt * pt_var_modifier, axis=-1)
-
+                    observable = ak.sum(region_jets.pt,axis=-1)
                 elif region == "4j2b":
-                    region_filter = ak.sum(selected_jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2
-                    selected_jets_region = selected_jets[region_filter]
-
                     # reconstruct hadronic top as bjj system with largest pT
                     # the jet energy scale / resolution effect is not propagated to this observable at the moment
-                    trijet = ak.combinations(selected_jets_region, 3, fields=["j1", "j2", "j3"])  # trijet candidates
+                    trijet = ak.combinations(region_jets, 3, fields=["j1", "j2", "j3"])  # trijet candidates
                     trijet["p4"] = trijet.j1 + trijet.j2 + trijet.j3  # calculate four-momentum of tri-jet system
                     trijet["max_btag"] = np.maximum(trijet.j1.btagCSVV2, np.maximum(trijet.j2.btagCSVV2, trijet.j3.btagCSVV2))
                     trijet = trijet[trijet.max_btag > B_TAG_THRESHOLD]  # at least one-btag in trijet candidates
@@ -247,47 +257,36 @@ class TtbarAnalysis(processor.ProcessorABC):
                     trijet_mass = trijet["p4"][ak.argmax(trijet.p4.pt, axis=1, keepdims=True)].mass
                     observable = ak.flatten(trijet_mass)
 
-                ### histogram filling
-                if pt_var == "pt_nominal":
-                    # nominal pT, but including 2-point systematics
-                    histogram.fill(
+                syst_var_name = f"{syst_var}"
+
+                # Note: Not sure if I like this approach or not
+
+                # Break up the filling into event weight systematics and object variation systematics
+                if syst_var in event_systs:
+                    # Should be an event weight systematic with an up/down variation
+                    if syst_var.startswith("btag_var"):
+                        btag_idx = int(syst_var.rsplit("_",1)[-1])   # Kind of fragile
+                        wgt_variations = btag_weight_variation(btag_idx, region_jets.pt)
+                    else:
+                        sys_up = events.systematics[syst_var]["up"][f"weight_{syst_var}"][region_selection]
+                        sys_down = events.systematics[syst_var]["down"][f"weight_{syst_var}"][region_selection]
+                        # There is probably a better way to do this
+                        wgt_variations = ak.concatenate([ak.singletons(sys_up),ak.singletons(sys_down)],axis=-1).to_numpy()
+                    for i_dir,direction in enumerate(["up", "down"]):
+                        syst_var_name = f"{syst_var}_{direction}"
+                        histogram.fill(
                             observable=observable, region=region, process=process,
-                            variation=variation, weight=xsec_weight
+                            variation=syst_var_name, weight=region_weights * wgt_variations[:,i_dir]
                         )
-
-                    if variation == "nominal":
-                        # also fill weight-based variations for all nominal samples
-                        for weight_name in events.systematics.fields:
-                            for direction in ["up", "down"]:
-                                # extract the weight variations and apply all event & region filters
-                                weight_variation = events.systematics[weight_name][direction][
-                                    f"weight_{weight_name}"][event_filters][region_filter]
-                                # fill histograms
-                                histogram.fill(
-                                    observable=observable, region=region, process=process,
-                                    variation=f"{weight_name}_{direction}", weight=xsec_weight*weight_variation
-                                )
-
-                        # calculate additional systematics: b-tagging variations
-                        for i_var, weight_name in enumerate([f"btag_var_{i}" for i in range(4)]):
-                            for i_dir, direction in enumerate(["up", "down"]):
-                                # create systematic variations that depend on object properties (here: jet pT)
-                                if len(observable):
-                                    weight_variation = btag_weight_variation(i_var, selected_jets_region.pt)[:, i_dir]
-                                else:
-                                    weight_variation = 1 # no events selected
-                                histogram.fill(
-                                    observable=observable, region=region, process=process,
-                                    variation=f"{weight_name}_{direction}", weight=xsec_weight*weight_variation
-                                )
-
-                elif variation == "nominal":
-                    # pT variations for nominal samples
+                else:
+                    # Should either be 'nominal' or an object variation systematic
+                    if variation != "nominal":
+                        # This is a 2-point systematic, e.g. ttbar__scaledown, ttbar__ME_var, etc.
+                        syst_var_name = variation
                     histogram.fill(
-                            observable=observable, region=region, process=process,
-                            variation=pt_var, weight=xsec_weight
-                        )
-
+                        observable=observable, region=region, process=process,
+                        variation=syst_var_name, weight=region_weights
+                    )
         output = {"nevents": {events.metadata["dataset"]: len(events)}, "hist": histogram}
 
         return output
