@@ -118,15 +118,6 @@ with open("config.yaml") as config_file:
 
 # %% tags=[]
 # functions creating systematic variations
-def flat_variation(ones):
-    # 2.5% weight variations
-    return (1.0 + np.array([0.025, -0.025], dtype=np.float32)) * ones[:, None]
-
-
-def btag_weight_variation(i_jet, jet_pt):
-    # weight variation depending on i-th jet pT (7.5% as default value, multiplied by i-th jet pT / 50 GeV)
-    return 1 + np.array([0.075, -0.075]) * (ak.singletons(jet_pt[:, i_jet]) / 50).to_numpy()
-
 def jet_pt_resolution(pt):
     # normal distribution with 5% variations, shape matches jets
     counts = ak.num(pt)
@@ -183,10 +174,6 @@ class TtbarAnalysis(processor.ProcessorABC):
             xsec_weight = 1
 
         #### systematics
-        # example of a simple flat weight variation, using the coffea nanoevents systematics feature
-        if process == "wjets":
-            events.add_systematic("scale_var", "UpDownSystematic", "weight", flat_variation)
-
         # jet energy scale / resolution systematics
         # need to adjust schema to instead use coffea add_systematic feature, especially for ServiceX
         # cannot attach pT variations to events.jet, so attach to events directly
@@ -251,7 +238,6 @@ class TtbarAnalysis(processor.ProcessorABC):
                     observable = ak.sum(region_jets.pt,axis=-1)
                 elif region == "4j2b":
                     # reconstruct hadronic top as bjj system with largest pT
-                    # the jet energy scale / resolution effect is not propagated to this observable at the moment
                     trijet = ak.combinations(region_jets, 3, fields=["j1", "j2", "j3"])  # trijet candidates
                     trijet["p4"] = trijet.j1 + trijet.j2 + trijet.j3  # calculate four-momentum of tri-jet system
                     trijet["max_btag"] = np.maximum(trijet.j1.btagCSVV2, np.maximum(trijet.j2.btagCSVV2, trijet.j3.btagCSVV2))
