@@ -150,6 +150,7 @@ class TtbarAnalysis(processor.ProcessorABC):
         )
         self.disable_processing = disable_processing
         self.io_branches = io_branches
+        self.cset = correctionlib.CorrectionSet.from_file("corrections.json")
 
     def only_do_IO(self, events):
             for branch in self.io_branches:
@@ -195,7 +196,9 @@ class TtbarAnalysis(processor.ProcessorABC):
 
         syst_variations = ["nominal"]
         jet_kinematic_systs = ["pt_scale_up", "pt_res_up"]
-        event_systs = [f"btag_var_{i}" for i in range(4)] + events.systematics.fields
+        event_systs = [f"btag_var_{i}" for i in range(4)]
+        if process == "wjets":
+            event_systs.append("scale_var")
 
         # Only do systematics for nominal samples, e.g. ttbar__nominal
         if variation == "nominal":
@@ -263,20 +266,18 @@ class TtbarAnalysis(processor.ProcessorABC):
 
                 # Break up the filling into event weight systematics and object variation systematics
                 if syst_var in event_systs:
-                    # Should be an event weight systematic with an up/down variation
-                    if syst_var.startswith("btag_var"):
-                        btag_idx = int(syst_var.rsplit("_",1)[-1])   # Kind of fragile
-                        wgt_variations = btag_weight_variation(btag_idx, region_jets.pt)
-                    else:
-                        sys_up = events.systematics[syst_var]["up"][f"weight_{syst_var}"][region_selection]
-                        sys_down = events.systematics[syst_var]["down"][f"weight_{syst_var}"][region_selection]
-                        # There is probably a better way to do this
-                        wgt_variations = ak.concatenate([ak.singletons(sys_up),ak.singletons(sys_down)],axis=-1).to_numpy()
-                    for i_dir,direction in enumerate(["up", "down"]):
+                    for i_dir,direction in enumerate(["up","down"]):
+                        # Should be an event weight systematic with an up/down variation
+                        if syst_var.startswith("btag_var"):
+                            i_jet = int(syst_var.rsplit("_",1)[-1])   # Kind of fragile
+                            wgt_variation = self.cset["event_systematics"].evaluate("btag_var",direction,region_jets.pt[:,i_jet])
+                        elif syst_var == "scale_var":
+                            # The pt array is only used to make sure the output array has the correct shape
+                            wgt_variation = self.cset["event_systematics"].evaluate("scale_var",direction,region_jets.pt[:,0])
                         syst_var_name = f"{syst_var}_{direction}"
                         histogram.fill(
                             observable=observable, region=region, process=process,
-                            variation=syst_var_name, weight=region_weights * wgt_variations[:,i_dir]
+                            variation=syst_var_name, weight=region_weights * wgt_variation
                         )
                 else:
                     # Should either be 'nominal' or an object variation systematic
