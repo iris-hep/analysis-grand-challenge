@@ -136,20 +136,20 @@ class ServiceXDatasetGroup():
         filelist = np.array(filelist)
         self.filelist = filelist
         self.ds = ServiceXDataset(filelist[:,0].tolist(), backend_name=backend_name, ignore_cache=ignore_cache)
-        
+
     def get_data_rootfiles_uri(self, query, as_signed_url=True, title="Untitled"):
-        
+
         all_files = np.array(self.ds.get_data_rootfiles_uri(query, as_signed_url=as_signed_url, title=title))
         parent_file_urls = np.array([f.file for f in all_files])
-        
+
         # order is not retained after transform, so we can match files to their parent files using the filename
         # (replacing / with : to mitigate servicex filename convention )
-        parent_key = np.array([np.where(parent_file_urls==self.filelist[i][0].replace("/",":"))[0][0] 
+        parent_key = np.array([np.where(parent_file_urls==self.filelist[i][0].replace("/",":"))[0][0]
                                for i in range(len(self.filelist))])
-        
+
         files_per_process = {}
         for i, process in enumerate(self.fileset):
             # update files for each process
             files_per_process.update({process: all_files[parent_key[self.filelist[:,1]==process]]})
-            
+
         return files_per_process
