@@ -6,6 +6,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import uproot
 from servicex import ServiceXDataset
+import numpy as np
 
 def get_client(af="coffea_casa"):
     if af == "coffea_casa":
@@ -127,22 +128,28 @@ class ServiceXDatasetGroup():
     def __init__(self, fileset, backend_name="uproot", ignore_cache=False):
         self.fileset = fileset
 
-        # create flat list of files and dictionary of filenames -> processes
+        # create list of files (& associated processes)
         filelist = []
-        self.filename_to_process = {}
-        for process in fileset:
-            # extract all unique identifiers for file names (including top and antitop split for some single top samples)
-            input_file_stubs = set([f.split("/")[-2] for f in fileset[process]["files"]])
-            for file_stub in input_file_stubs:
-                self.filename_to_process.update({file_stub: process})
-            filelist += fileset[process]["files"]  # add all files together into list for processing
+        for i, process in enumerate(fileset):
+            filelist += [[filename, process] for filename in fileset[process]["files"]]
 
-        self.ds = ServiceXDataset(filelist, backend_name=backend_name, ignore_cache=ignore_cache)
-
+        filelist = np.array(filelist)
+        self.filelist = filelist
+        self.ds = ServiceXDataset(filelist[:,0].tolist(), backend_name=backend_name, ignore_cache=ignore_cache)
+        
     def get_data_rootfiles_uri(self, query, as_signed_url=True, title="Untitled"):
-        all_files = self.ds.get_data_rootfiles_uri(query, as_signed_url=as_signed_url, title=title)
+        
+        all_files = np.array(self.ds.get_data_rootfiles_uri(query, as_signed_url=as_signed_url, title=title))
+        parent_file_urls = np.array([f.file for f in all_files])
+        
+        # order is not retained after transform, so we can match files to their parent files using the filename
+        # (replacing / with : to mitigate servicex filename convention )
+        parent_key = np.array([np.where(parent_file_urls==self.filelist[i][0].replace("/",":"))[0][0] 
+                               for i in range(len(self.filelist))])
+        
         files_per_process = {}
-        for process in self.fileset:
-            # processdict for translation using file name of parent
-            files_per_process.update({process: [f for f in all_files if self.filename_to_process[f.file.split(":")[-2]] == process]})
+        for i, process in enumerate(self.fileset):
+            # update files for each process
+            files_per_process.update({process: all_files[parent_key[self.filelist[:,1]==process]]})
+            
         return files_per_process
