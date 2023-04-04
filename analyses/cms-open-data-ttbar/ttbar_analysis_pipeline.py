@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -47,13 +47,13 @@ import os
 import time
 
 import awkward as ak
-import cabinetry
+#import cabinetry
 from coffea import processor
 from coffea.nanoevents import transforms
 from coffea.nanoevents.methods import base, vector
 from coffea.nanoevents.schemas.base import BaseSchema, zip_forms
-from func_adl import ObjectStream
-from func_adl_servicex import ServiceXSourceUpROOT
+#from func_adl import ObjectStream
+#from func_adl_servicex import ServiceXSourceUpROOT
 import hist
 import json
 import matplotlib.pyplot as plt
@@ -91,10 +91,10 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 ### GLOBAL CONFIGURATION
 
 # input files per process, set to e.g. 10 (smaller number = faster)
-N_FILES_MAX_PER_SAMPLE = 5
+N_FILES_MAX_PER_SAMPLE = 1
 
 # enable Dask
-USE_DASK = True
+USE_DASK = False
 
 # enable ServiceX
 USE_SERVICEX = False
@@ -136,7 +136,7 @@ IO_FILE_PERCENT = 4
 # - calculating systematic uncertainties at the event and object level,
 # - filling all the information into histograms that get aggregated and ultimately returned to us by `coffea`.
 
-# %% tags=[]
+# %%
 # functions creating systematic variations
 def flat_variation(ones):
     # 2.5% weight variations
@@ -216,8 +216,8 @@ class TtbarAnalysis(processor.ProcessorABC):
 
         #### systematics
         # example of a simple flat weight variation, using the coffea nanoevents systematics feature
-        if process == "wjets":
-            events.add_systematic("scale_var", "UpDownSystematic", "weight", flat_variation)
+#         if process == "wjets":
+#             events.add_systematic("scale_var", "UpDownSystematic", "weight", flat_variation)
 
         # jet energy scale / resolution systematics
         # need to adjust schema to instead use coffea add_systematic feature, especially for ServiceX
@@ -227,7 +227,8 @@ class TtbarAnalysis(processor.ProcessorABC):
         events["pt_scale_up"] = 1.03
         events["pt_res_up"] = jet_pt_resolution(events.jet.pt)
 
-        pt_variations = ["pt_nominal", "pt_scale_up", "pt_res_up"] if variation == "nominal" else ["pt_nominal"]
+#        pt_variations = ["pt_nominal", "pt_scale_up", "pt_res_up"] if variation == "nominal" else ["pt_nominal"]
+        pt_variations ["pt_nominal"]
         for pt_var in pt_variations:
 
             ### event selection
@@ -336,7 +337,7 @@ class TtbarAnalysis(processor.ProcessorABC):
 # When using `coffea`, we can benefit from the schema functionality to group columns into convenient objects.
 # This schema is taken from [mat-adamec/agc_coffea](https://github.com/mat-adamec/agc_coffea).
 
-# %% tags=[]
+# %%
 class AGCSchema(BaseSchema):
     def __init__(self, base_form):
         super().__init__(base_form)
@@ -375,13 +376,15 @@ class AGCSchema(BaseSchema):
 #
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
-# %% tags=[]
+# %%
 fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False, af_name=AF_NAME)  # local files on /data for ssl-dev
 
 print(f"processes in fileset: {list(fileset.keys())}")
 print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files'][0]}, ...],")
 print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 
+# %%
+fileset = {"ttbar__nominal": fileset["ttbar__nominal"]}
 
 # %% [markdown]
 # ### ServiceX-specific functionality: query setup
@@ -389,39 +392,38 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 # Define the func_adl query to be used for the purpose of extracting columns and filtering.
 
 # %%
-def get_query(source: ObjectStream) -> ObjectStream:
-    """Query for event / column selection: >=4j >=1b, ==1 lep with pT>25 GeV, return relevant columns
-    """
-    return source.Where(lambda e:
-        # == 1 lep
-        e.electron_pt.Where(lambda pT: pT > 25).Count() + e.muon_pt.Where(lambda pT: pT > 25).Count()== 1
-        )\
-        .Where(lambda e:\
-            # >= 4 jets
-            e.jet_pt.Where(lambda pT: pT > 25).Count() >= 4
-        )\
-        .Where(lambda e:\
-            # >= 1 jet with pT > 25 GeV and b-tag >= 0.5
-            {"pT": e.jet_pt, "btag": e.jet_btag}.Zip().Where(lambda jet: jet.btag >= 0.5 and jet.pT > 25).Count() >= 1
-        )\
-        .Select(lambda e:\
-            # return columns
-            {
-                "electron_e": e.electron_e,
-                "electron_pt": e.electron_pt,
-                "muon_e": e.muon_e,
-                "muon_pt": e.muon_pt,
-                "jet_e": e.jet_e,
-                "jet_pt": e.jet_pt,
-                "jet_eta": e.jet_eta,
-                "jet_phi": e.jet_phi,
-                "jet_btag": e.jet_btag,
-                "numbermuon": e.numbermuon,
-                "numberelectron": e.numberelectron,
-                "numberjet": e.numberjet,
-            }
-        )
-
+# def get_query(source: ObjectStream) -> ObjectStream:
+#     """Query for event / column selection: >=4j >=1b, ==1 lep with pT>25 GeV, return relevant columns
+#     """
+#     return source.Where(lambda e:
+#         # == 1 lep
+#         e.electron_pt.Where(lambda pT: pT > 25).Count() + e.muon_pt.Where(lambda pT: pT > 25).Count()== 1
+#         )\
+#         .Where(lambda e:\
+#             # >= 4 jets
+#             e.jet_pt.Where(lambda pT: pT > 25).Count() >= 4
+#         )\
+#         .Where(lambda e:\
+#             # >= 1 jet with pT > 25 GeV and b-tag >= 0.5
+#             {"pT": e.jet_pt, "btag": e.jet_btag}.Zip().Where(lambda jet: jet.btag >= 0.5 and jet.pT > 25).Count() >= 1
+#         )\
+#         .Select(lambda e:\
+#             # return columns
+#             {
+#                 "electron_e": e.electron_e,
+#                 "electron_pt": e.electron_pt,
+#                 "muon_e": e.muon_e,
+#                 "muon_pt": e.muon_pt,
+#                 "jet_e": e.jet_e,
+#                 "jet_pt": e.jet_pt,
+#                 "jet_eta": e.jet_eta,
+#                 "jet_phi": e.jet_phi,
+#                 "jet_btag": e.jet_btag,
+#                 "numbermuon": e.numbermuon,
+#                 "numberelectron": e.numberelectron,
+#                 "numberjet": e.numberjet,
+#             }
+#         )
 
 # %% [markdown]
 # ### Caching the queried datasets with `ServiceX`
@@ -462,7 +464,8 @@ if USE_SERVICEX:
 if USE_DASK:
     executor = processor.DaskExecutor(client=utils.get_client(AF))
 else:
-    executor = processor.FuturesExecutor(workers=NUM_CORES)
+#     executor = processor.FuturesExecutor(workers=NUM_CORES)
+    executor = processor.IterativeExecutor(workers=NUM_CORES)
         
 run = processor.Runner(executor=executor, schema=AGCSchema, savemetrics=True, metadata_cache={}, chunksize=CHUNKSIZE)
 
