@@ -13,7 +13,7 @@ The jets are illustrated in purple. These are collimated showers of hadrons resu
 
 Here is an example of the above signature in CMS Open Data. Since this is Monte Carlo simulated data, we can look at the particles that the jets originate from. The jets are plotted as circles in the :math:`\eta`-:math:`\phi` plane, and color-coordinated with the truth particles they are matched to. Note that :math:`\phi` is a circular variable, so the top of the graph matches to the bottom. The jets that are outlined in solid black are b-tagged, which means that they have properties which strongly indicate that they originate from bottom quarks.
 
-To look at more events, take a look at the notebook ``docs/event-plotting/plotEvents.ipynb``.
+To look at more events, take a look at **Plot :math:`t\bar{t}` Events**.
 
 .. image:: images/event3.png
   :width: 80%

@@ -13,7 +13,7 @@ jupyter:
     name: py3-preamble
 ---
 
-# Plot Events
+# Plot $t\bar{t}$ Events
 ______
 
 This notebook allows one to visualize events, including jets and the genParticles they are matched to. Trees from events are also printed using the `printTrees` method in `utils`.
