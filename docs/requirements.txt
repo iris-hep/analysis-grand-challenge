@@ -87,6 +87,7 @@ mplhep==0.3.26
 mplhep-data==0.0.3
 msgpack==1.0.5
 multidict==6.0.4
+myst_parser==1.0.0
 nbclassic==0.5.4
 nbclient==0.7.3
 nbconvert==7.3.0
