@@ -5,6 +5,8 @@ import hist
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import uproot
+from servicex import ServiceXDataset
+import numpy as np
 
 def get_client(af="coffea_casa"):
     if af == "coffea_casa":
@@ -120,3 +122,34 @@ def save_histograms(all_histograms, fileset, filename):
             # W+jets scale
             f[f"{region}_wjets_scale_var_down"] = all_histograms[120j :: hist.rebin(2), region, "wjets", "scale_var_down"]
             f[f"{region}_wjets_scale_var_up"] = all_histograms[120j :: hist.rebin(2), region, "wjets", "scale_var_up"]
+
+
+class ServiceXDatasetGroup():
+    def __init__(self, fileset, backend_name="uproot", ignore_cache=False):
+        self.fileset = fileset
+
+        # create list of files (& associated processes)
+        filelist = []
+        for i, process in enumerate(fileset):
+            filelist += [[filename, process] for filename in fileset[process]["files"]]
+
+        filelist = np.array(filelist)
+        self.filelist = filelist
+        self.ds = ServiceXDataset(filelist[:,0].tolist(), backend_name=backend_name, ignore_cache=ignore_cache)
+
+    def get_data_rootfiles_uri(self, query, as_signed_url=True, title="Untitled"):
+
+        all_files = np.array(self.ds.get_data_rootfiles_uri(query, as_signed_url=as_signed_url, title=title))
+        parent_file_urls = np.array([f.file for f in all_files])
+
+        # order is not retained after transform, so we can match files to their parent files using the filename
+        # (replacing / with : to mitigate servicex filename convention )
+        parent_key = np.array([np.where(parent_file_urls==self.filelist[i][0].replace("/",":"))[0][0]
+                               for i in range(len(self.filelist))])
+
+        files_per_process = {}
+        for i, process in enumerate(self.fileset):
+            # update files for each process
+            files_per_process.update({process: all_files[parent_key[self.filelist[:,1]==process]]})
+
+        return files_per_process
