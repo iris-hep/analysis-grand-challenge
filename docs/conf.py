@@ -10,7 +10,7 @@ from __future__ import annotations
 
 project = "Analysis Grand Challenge"
 authors = ["Alexander Held", "Oksana Shadura", "Elliott Kauffman"]
-version = "0.1.0"
+version = "0.2.0"
 
 # -- General configuration ---------------------------------------------------
 
@@ -49,11 +49,11 @@ html_theme = "sphinx_book_theme"
 
 # Config for the Sphinx book
 
-html_baseurl = "https://analysis-grand-challenge-emk.readthedocs.io/en/latest/"
+html_baseurl = "https://analysis-grand-challenge.readthedocs.io/en/latest/"
 
 html_theme_options = {
     "home_page_in_toc": True,
-    "repository_url": "https://github.com/ekauffma/analysis-grand-challenge-emk/tree/read-the-docs",
+    "repository_url": "https://github.com/iris-hep/analysis-grand-challenge",
     "use_repository_button": True,
     "use_issues_button": True,
     "use_edit_page_button": True,
