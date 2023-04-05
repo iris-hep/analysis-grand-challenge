@@ -15,19 +15,19 @@ The below table gives a brief overview of all AGC versions.
      - Systematics
    * - 0.1.0
      - CMS 2015 Open Data (MiniAOD)
-     - Pure coffea; coffea with ServiceX processors; ServiceX followed by coffea
+     - Pure ``coffea``; ``coffea`` with ``ServiceX`` processors; ``ServiceX`` followed by ``coffea``
      - Exactly one lepton with :math:`p_T>25` GeV; at least four jets with :math:`p_T>25` GeV; at least one jet with :math:`b`-tag > 0.5
      - None
      - 
    * - 0.2.0
      - CMS 2015 Open Data (MiniAOD)
-     - Pure coffea; ServiceX followed by coffea
+     - Pure ``coffea``; ``ServiceX`` followed by ``coffea``
      - Exactly one lepton with :math:`p_T>25` GeV; at least four jets with :math:`p_T>25` GeV; at least one jet with :math:`b`-tag > 0.5
      - None
      - 
    * - 1.0.0
      - CMS 2015 Open Data (NanoAOD)
-     - Pure coffea; ServiceX followed by coffea
+     - Pure ``coffea``; ``ServiceX`` followed by coffea``
      - Exactly one lepton with :math:`p_T>25` GeV; at least four jets with :math:`p_T>25` GeV; at least one jet with :math:`b`-tag > 0.5
      - None
      - 

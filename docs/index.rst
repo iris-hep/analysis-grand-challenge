@@ -64,12 +64,12 @@ There is no need to implement the full analysis task — it splits into pieces (
 More details: what is being investigated in the AGC context
 ------------
 
-* New user interfaces: Complementary services that present the analyst with a notebook-based interface.  Example software: Jupyter.
-* Data access: Services that provide quick access to the experiment’s official data sets, often allowing simple derivations and local caching for efficient access.  Example software and services: Rucio, ServiceX, SkyHook, iDDS, RNTuple.
-* Event selection: Systems/frameworks allowing analysts to process entire datasets, select desired events, and calculate derived quantities.  Example software and services: Coffea, awkward-array, func_adl, RDataFrame.
-Histogramming and summary statistics: Closely tied to the event selection, histogramming tools provide physicists with the ability to summarize the observed quantities in a dataset.  Example software and services: Coffea, func_adl, cabinetry, hist.
-* Statistical model building and fitting: Tools that translate specifications for event selection, summary statistics, and histogramming quantities into statistical models, leveraging the capabilities above, and perform fits and statistical analysis with the resulting models.  Example software and services: cabinetry, pyhf, FuncX+pyhf fitting service
-* Reinterpretation / analysis preservation:  Standards for capturing the entire analysis workflow, and services to reuse the workflow which enables reinterpretation.  Example software and services: REANA, RECAST.
+* **New user interfaces**: Complementary services that present the analyst with a notebook-based interface.  Example software: Jupyter.
+* **Data access**: Services that provide quick access to the experiment’s official data sets, often allowing simple derivations and local caching for efficient access.  Example software and services: ``Rucio``, ``ServiceX``, ``SkyHook``, ``iDDS``, ``RNTuple``.
+* **Event selection**: Systems/frameworks allowing analysts to process entire datasets, select desired events, and calculate derived quantities.  Example software and services: ``coffea``, ``awkward-array``, ``func_adl``, ``RDataFrame``.
+Histogramming and summary statistics: Closely tied to the event selection, histogramming tools provide physicists with the ability to summarize the observed quantities in a dataset.  Example software and services: ``coffea``, ``func_adl``, ``cabinetry``, ``hist``.
+* **Statistical model building and fitting**: Tools that translate specifications for event selection, summary statistics, and histogramming quantities into statistical models, leveraging the capabilities above, and perform fits and statistical analysis with the resulting models.  Example software and services: ``cabinetry``, ``pyhf``, ``FuncX``+``pyhf`` fitting service
+* **Reinterpretation / analysis preservation**:  Standards for capturing the entire analysis workflow, and services to reuse the workflow which enables reinterpretation.  Example software and services: ``REANA``, ``RECAST``.
 
 Acknowledgements
 ------------
