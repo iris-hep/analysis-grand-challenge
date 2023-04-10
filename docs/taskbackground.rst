@@ -1,8 +1,8 @@
 Physics Analysis Background
-============
+===============================================================
 
 :math:`t\bar{t}` Events
------------------
+---------------------------------------------------------------
 The Analysis Grand Challenge aims to demonstrate the integration of different software components in a realistic physics analysis. The task chosen for CMS open data is a measurement of the :math:`t\bar{t}` (top-antitop quark pair production) crosssection  measurement using events with at least four jets and one lepton in the final state. This signature has two possibilities, depending on whether the lepton/neutrino pair originates from the top or antitop quark:
 
 .. image:: images/ttbar.png
@@ -33,6 +33,9 @@ The tree of the above event looks something like::
         │   └── c~
         └── b~
         
-        
+Top Mass Reconstruction
+---------------------------------------------------------------
+To measure the :math:`t\bar{t}` crosssection, we use an observable that approximately reconstructs the top quark mass. We do this in two different ways. The first uses no machine learning. Within an event, the trijet system with the highest transverse momentum (:math:`p_T`) is selected. We then calculate the combined mass of these three jets.
+
 Machine Learning Component
------------------
+---------------------------------------------------------------

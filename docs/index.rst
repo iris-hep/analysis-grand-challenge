@@ -4,12 +4,12 @@
    :align: center
 
 Analysis Grand Challenge Documentation
-================================
+===============================================================
 
 |Binder| |DOI|
 
 Introduction
-------------
+---------------------------------------------------------------
 
 The Analysis Grand Challenge (AGC) is about performing the last steps in an analysis pipeline at scale to test workflows envisioned for the HL-LHC.
 This includes
@@ -39,12 +39,12 @@ Additional information is available in two workshops focused on the AGC:
 We also have a `dedicated webpage <https://iris-hep.org/grand-challenges.html>`_.
 
 AGC and IRIS-HEP
-------------
+---------------------------------------------------------------
 
 The AGC serves as an integration exercise for IRIS-HEP, allowing the testing of new services, libraries and workflows on dedicated analysis facilities in the context of realistic physics analyses.
 
 AGC and you
-------------
+---------------------------------------------------------------
 
 We believe that the AGC can be useful in various contexts:
 
@@ -62,7 +62,7 @@ Please get in touch if you have investigated other approaches you would like to 
 There is no need to implement the full analysis task — it splits into pieces (for example the production of histograms) that can also be tackled individually.
 
 More details: what is being investigated in the AGC context
-------------
+---------------------------------------------------------------
 
 * **New user interfaces**: Complementary services that present the analyst with a notebook-based interface.  Example software: Jupyter.
 * **Data access**: Services that provide quick access to the experiment’s official data sets, often allowing simple derivations and local caching for efficient access.  Example software and services: ``Rucio``, ``ServiceX``, ``SkyHook``, ``iDDS``, ``RNTuple``.
@@ -72,7 +72,7 @@ Histogramming and summary statistics: Closely tied to the event selection, histo
 * **Reinterpretation / analysis preservation**:  Standards for capturing the entire analysis workflow, and services to reuse the workflow which enables reinterpretation.  Example software and services: ``REANA``, ``RECAST``.
 
 Acknowledgements
-------------
+---------------------------------------------------------------
 
 This work was supported by the U.S. National Science Foundation (NSF) cooperative agreement `OAC-1836650 (IRIS-HEP) <https://nsf.gov/awardsearch/showAward?AWD_ID=1836650>`_.
 
@@ -98,7 +98,7 @@ This work was supported by the U.S. National Science Foundation (NSF) cooperativ
 
 
 Search
-==================
+===============================================================
 
 * :ref:`search`
 

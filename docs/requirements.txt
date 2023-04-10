@@ -1,6 +1,7 @@
-myst_parser==1.0.0
-nbsphinx==0.9.1
+myst_parser>=1.0.0
+nbsphinx>=0.9.1
+pydata-sphinx-theme==0.13.1
 sphinx>=3.0.0
-sphinx-book-theme==1.0.0
-sphinx-copybutton==0.5.1
-sphinxcontrib-programoutput==0.17
+sphinx-book-theme>=1.0.0
+sphinx-copybutton>=0.5.1
+sphinxcontrib-programoutput>=0.17
