@@ -14,13 +14,13 @@ The below table gives a brief overview of all AGC versions.
      - Machine Learning
      - Systematics
    * - 0.1.0
-     - CMS 2015 Open Data (MiniAOD)
+     - CMS 2015 Open Data (POET)
      - Pure ``coffea``; ``coffea`` with ``ServiceX`` processors; ``ServiceX`` followed by ``coffea``
      - Exactly one lepton with :math:`p_T>25` GeV; at least four jets with :math:`p_T>25` GeV; at least one jet with :math:`b`-tag > 0.5
      - None
      - 
    * - 0.2.0
-     - CMS 2015 Open Data (MiniAOD)
+     - CMS 2015 Open Data (POET)
      - Pure ``coffea``; ``ServiceX`` followed by ``coffea``
      - Exactly one lepton with :math:`p_T>25` GeV; at least four jets with :math:`p_T>25` GeV; at least one jet with :math:`b`-tag > 0.5
      - None
@@ -41,9 +41,9 @@ The below table gives a brief overview of all AGC versions.
 Datasets
 ================================
 
-The datasets used for the CMS :math:`t\bar{t}` ntoebook are from the 2015 CMS Open Data release. Versions 0.1.0 and 0.2.0 use MiniAOD format, while all versions >=1.0.0 use NanoAOD.
+The datasets used for the CMS :math:`t\bar{t}` ntoebook are from the 2015 CMS Open Data release. Versions 0.1.0 and 0.2.0 use ntuples generated using the `Physics Objects Extractor Tool (POET) <https://github.com/cms-opendata-analyses/PhysObjectExtractorTool>`_.
 
-The NanoAOD was generated from the 2015 CMS Open Data release using this pull request of CMSSW: `https://github.com/cms-sw/cmssw/pull/39040 <https://github.com/cms-sw/cmssw/pull/39040>`_. To set this up, the following commands should be run::
+All versions >=1.0.0 use NanoAOD instead. The NanoAOD was generated from the 2015 CMS Open Data release using this pull request of CMSSW: `https://github.com/cms-sw/cmssw/pull/39040 <https://github.com/cms-sw/cmssw/pull/39040>`_. To set this up, the following commands should be run::
     
     source /cvmfs/cms.cern.ch/cmsset_default.sh
     scram list CMSSW_10_6_
