@@ -57,3 +57,53 @@ To vizualize the :math:`N=4` scenario, view the diagram below:
   :width: 80%
   :alt: Possible jet-label assignments for :math:`N=4` scenario.
   
+For each permutation, we calculate 20 features:
+
+#. :math:`\Delta R` between the :math:`top_{lepton}` jet and the lepton
+#. :math:`\Delta R` between the two :math:`W` jets
+#. :math:`\Delta R` between the first :math:`W` jet and the :math:`top_{hadron}` jet
+#. :math:`\Delta R` between the second :math:`W` jet and the :math:`top_{hadron}` jet (should have same distribution as previous feature)
+#. Combined mass of the :math:`top_{lepton}` jet and the lepton
+#. Combined mass of the two :math:`W` jets
+#. Combined mass of the two :math:`W` jets and the :math:`top_{hadron}` jet (reconstructed top mass)
+#. Combined :math:`p_T` of the two :math:`W` jets and the :math:`top_{hadron}` jet
+#. :math:`p_T` of the first :math:`W` jet
+#. :math:`p_T` of the second :math:`W` jet (should have same distribution as previous feature)
+#. :math:`p_T` of the :math:`top_{hadron}` jet
+#. :math:`p_T` of the :math:`top_{lepton}` jet
+#. ``btagCSVV2`` of the first :math:`W` jet (:math:`b`-tag value)
+#. ``btagCSVV2`` of the second :math:`W` jet (should have same distribution as previous feature)
+#. ``btagCSVV2`` of the :math:`top_{hadron}` jet
+#. ``btagCSVV2`` of the :math:`top_{lepton}` jet
+#. ``qgl`` of the first :math:`W` jet (quark-gluon discriminator)
+#. ``qgl`` of the second :math:`W` jet (should have same distribution as previous feature)
+#. ``qgl`` of the :math:`top_{hadron}` jet
+#. ``qgl`` of the :math:`top_{lepton}` jet
+
+For each permutation, all 20 features are fed into a boosted decision tree, which was trained to select correct permutations. After this, the permutation with the highest BDT score is selected as "correct", then we use those jet-parton assignments to calculate the observables of interest.
+
+It is a future goal to move onto a more sophisticated architecture, as the BDT method is restrictive since it becomes computationally expensive for events with high jet multiplicity.
+
+BDT Performance
+---------------------------------------------------------------
+We can first qualitatively compare the top mass reconstruction by the trijet combination method and the BDT method by comparing their distributions to the truth top mass reconstruction distribution:
+
+.. image:: images/topmassreconstruction.png
+  :width: 80%
+  :alt: Distribution of reconstructed top mass from different methods.
+  
+We can see that the result from using the BDT method (green) more closely matches the truth distribution (blue) than the trijet combination method (orange).
+
+If we look into the performance by calculating which jet-parton assignments are predicted correctly, we also see that the BDT method performs better. If we look at the top 6 jets in each event and restrict the set of events to those in which full reconstruction is possible (i.e. all truth labels are present in the top 6 jets), we see that the BDT selects the correct three jets for the top mass reconstruction 60.10% of the time, while the trijet combination method only selects the correct three jets 28.31% of the time.
+
+.. image:: images/bdt_performance_comparison.png
+  :width: 80%
+  :alt: Comparison of the BDT method to the trijet combination method.
+  
+The BDT is also trying to predict more information than the trijet combination method. Instead of finding the three correct jets to use for the reconstructed mass, we want to choose correct labels for four jets in an event. So to ensure that the BDT is performing as it should, we can compare BDT output to random chance. If we again look at the top 6 jets in each event and restrict the set of events to those in which full reconstruction is possible, we see the following:
+
+.. image:: images/bdt_performance.png
+  :width: 80%
+  :alt: Comparison of the BDT output to random chance.
+
+The BDT does much better than random chance at predicting jet-parton assignments.
