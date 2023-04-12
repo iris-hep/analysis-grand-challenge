@@ -39,3 +39,21 @@ To measure the :math:`t\bar{t}` crosssection, we use an observable that approxim
 
 Machine Learning Component
 ---------------------------------------------------------------
+Most modern high energy physics analyses use some form of machine learning (ML), so a machine learning task has been incorporated into the AGC :math:`t\bar{t}` crosssection  measurement to reflect this development. The method described above to reconstruct the top mass attempts to correctly select all three jets on the hadronic side of the collision. Using ML, we can go beyond this task by attempting to correctly assign each jet with its parent parton. This should allow for a more accurate top mass reconstruction as well as access to new observables, such as the angle between the jet on the leptonic side of the collision and the lepton, or the angle between the two W jets.
+
+The strategy used for this jet-parton assignment task is as follows:
+
+In each event, we want to associate four jets to three labels. We want to label two jets as :math:`W` (considering these two to be indistinguishable), one jet as :math:`top_{hadron}` (the top jet on the side of hadronic decay), and one as :math:`top_{lepton}` (the top jet on the side of leptonic decay). This is visualized in the diagram below:
+
+.. image:: images/ttbar_labels.png
+  :width: 80%
+  :alt: Diagram of a :math:`t\bar{t}` event with the three machine learning labels for jets.
+  
+In each event, we consider each permutation of jets assigned to these labels, restricting to the leading :math:`N` jets. The number of such permutations (assuming the event has at least :math:`N` jets and that :math:`N\geq 4`) is :math:`N!/(2\cdot (N-4)!)`. For example, if there are 4 jets in an event, we consider :math:`4!/2=12` permutations. The :math:`4!` comes from labelling 4 jets, while dividing by 2 accounts for the fact that two of the jets are labelled indistinguishably. If there are more than 4 jets, the remainder are assigned to a fourth category, "other". Jets are also assigned to this category indistinguishably. For example if :math:`N=7` and we have 7 jets in an event, we consider :math:`7!/(2\cdot 3!)=420` permutations, since we assign labels to 7 jets. We assign 2 jets to "W" indistinguishably, then the three remainder to "other" indistinguishably.
+
+To vizualize the :math:`N=4` scenario, view the diagram below:
+
+.. image:: images/permutations.png
+  :width: 80%
+  :alt: Possible jet-label assignments for :math:`N=4` scenario.
+  
