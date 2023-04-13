@@ -613,8 +613,6 @@ print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {f
 # The binning here corresponds to the binning used for the fit.
 
 # %%
-plt.rcParams["font.size"] = 10
-
 model_prediction = cabinetry.model_utils.prediction(model)
 figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=config)
 figs[0]["figure"]
