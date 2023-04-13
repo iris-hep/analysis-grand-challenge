@@ -43,7 +43,7 @@ def set_style():
     plt.rcParams["axes.labelcolor"] = "222222"
     plt.rcParams["xtick.color"] = "222222"
     plt.rcParams["ytick.color"] = "222222"
-    plt.rcParams["font.size"] = 12
+    plt.rcParams["font.size"] = 10
     plt.rcParams['text.color'] = "222222"
 
 
