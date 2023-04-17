@@ -377,18 +377,18 @@ def get_query(source: ObjectStream) -> ObjectStream:
     """
     return source.Where(lambda e: e.Electron_pt.Where(lambda pt: pt > 25).Count() 
                         + e.Muon_pt.Where(lambda pt: pt > 25).Count() == 1)\
-                 .Where(lambda e: e.Jet_pt.Where(lambda pt: pt > 25).Count() >= 4)\
+                 .Where(lambda f: f.Jet_pt.Where(lambda pt: pt > 25).Count() >= 4)\
                  .Where(lambda g: {"pt": g.Jet_pt, 
                                    "btagCSVV2": g.Jet_btagCSVV2}.Zip().Where(lambda jet: 
                                                                              jet.btagCSVV2 >= 0.5 
                                                                              and jet.pt > 25).Count() >= 1)\
-                 .Select(lambda f: {"Electron_pt": f.Electron_pt,
-                                    "Muon_pt": f.Muon_pt,
-                                    "Jet_mass": f.Jet_mass,
-                                    "Jet_pt": f.Jet_pt,
-                                    "Jet_eta": f.Jet_eta,
-                                    "Jet_phi": f.Jet_phi,
-                                    "Jet_btagCSVV2": f.Jet_btagCSVV2,
+                 .Select(lambda h: {"Electron_pt": h.Electron_pt,
+                                    "Muon_pt": h.Muon_pt,
+                                    "Jet_mass": h.Jet_mass,
+                                    "Jet_pt": h.Jet_pt,
+                                    "Jet_eta": h.Jet_eta,
+                                    "Jet_phi": h.Jet_phi,
+                                    "Jet_btagCSVV2": h.Jet_btagCSVV2,
                                    })
 
 
