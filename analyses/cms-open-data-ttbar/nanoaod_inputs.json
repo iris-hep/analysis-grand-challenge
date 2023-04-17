@@ -1797,57 +1797,6 @@
                     "nevts": 1000000
                 }
             ]
-        },
-        "scaledown": {
-            "nevts_total": 995200,
-            "files": [
-                {
-                    "path": "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/ST_tW_antitop_5f_scaledown_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/cmsopendata2015_single_top_tW_19415_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_20000_0000.root",
-                    "nevts": 495200
-                },
-                {
-                    "path": "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/ST_tW_top_5f_scaledown_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/cmsopendata2015_single_top_tW_19422_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0000.root",
-                    "nevts": 213600
-                },
-                {
-                    "path": "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/ST_tW_top_5f_scaledown_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/cmsopendata2015_single_top_tW_19422_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_80000_0000.root",
-                    "nevts": 286400
-                }
-            ]
-        },
-        "scaleup": {
-            "nevts_total": 998800,
-            "files": [
-                {
-                    "path": "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/ST_tW_antitop_5f_scaleup_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/cmsopendata2015_single_top_tW_19416_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_20000_0000.root",
-                    "nevts": 499600
-                },
-                {
-                    "path": "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/ST_tW_top_5f_scaleup_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/cmsopendata2015_single_top_tW_19423_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_60000_0000.root",
-                    "nevts": 499200
-                }
-            ]
-        },
-        "DS": {
-            "nevts_total": 1140600,
-            "files": [
-                {
-                    "path": "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/ST_tW_antitop_5f_DS_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/cmsopendata2015_single_top_tW_19410_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_00000_0000.root",
-                    "nevts": 260600
-                },
-                {
-                    "path": "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/ST_tW_antitop_5f_DS_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/cmsopendata2015_single_top_tW_19410_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_50000_0000.root",
-                    "nevts": 238600
-                },
-                {
-                    "path": "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/ST_tW_antitop_5f_DS_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/cmsopendata2015_single_top_tW_19412_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_20000_0000.root",
-                    "nevts": 151800
-                },
-                {
-                    "path": "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/ST_tW_top_5f_DS_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/cmsopendata2015_single_top_tW_19417_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0000.root",
-                    "nevts": 489600
-                }
-            ]
         }
     },
     "wjets": {
