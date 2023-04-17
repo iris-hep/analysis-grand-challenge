@@ -69,8 +69,8 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 #
 # The number of files per sample set here determines the size of the dataset we are processing.
 # There are 9 samples being used here, all part of the 2015 CMS Open Data release.
-# They are pre-converted from miniAOD files into ntuple format, similar to nanoAODs.
-# More details about the inputs can be found [here](https://github.com/iris-hep/analysis-grand-challenge/tree/main/datasets/cms-open-data-2015).
+#
+# These samples were originally published in miniAOD format, but for the purposes of this demonstration were pre-converted into nanoAOD format. More details about the inputs can be found [here](https://github.com/iris-hep/analysis-grand-challenge/tree/main/datasets/cms-open-data-2015).
 #
 # The table below summarizes the amount of data processed depending on the `N_FILES_MAX_PER_SAMPLE` setting.
 #
