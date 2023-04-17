@@ -194,7 +194,6 @@ class TtbarAnalysis(processor.ProcessorABC):
 
         # for pt_var in pt_variations:
         for syst_var in syst_variations:
-
             ### event selection
             # very very loosely based on https://arxiv.org/abs/2006.13076
 
@@ -218,9 +217,7 @@ class TtbarAnalysis(processor.ProcessorABC):
             B_TAG_THRESHOLD = 0.5
 
             ######### Store boolean masks with PackedSelection ##########
-
             selections = PackedSelection(dtype='uint64')
-
             # Basic selection criteria
             selections.add("exactly_1l",(ak.num(elecs) + ak.num(muons)) == 1)
             selections.add("atleast_4j",ak.num(jets) >= 4)
@@ -245,11 +242,7 @@ class TtbarAnalysis(processor.ProcessorABC):
                     # pick trijet candidate with largest pT and calculate mass of system
                     trijet_mass = trijet["p4"][ak.argmax(trijet.p4.pt, axis=1, keepdims=True)].mass
                     observable = ak.flatten(trijet_mass)
-
                 syst_var_name = f"{syst_var}"
-
-                # Note: Not sure if I like this approach or not
-
                 # Break up the filling into event weight systematics and object variation systematics
                 if syst_var in event_systs:
                     for i_dir,direction in enumerate(["up","down"]):
