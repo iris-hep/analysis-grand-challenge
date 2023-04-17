@@ -74,17 +74,17 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 #
 # The table below summarizes the amount of data processed depending on the `N_FILES_MAX_PER_SAMPLE` setting.
 #
-# | setting | number of files | total size |
-# | --- | --- | --- |
-# | `1` | 12 | 25.1 GB |
-# | `2` | 24 | 46.5 GB |
-# | `5` | 52 | 110 GB |
-# | `10` | 88 | 205 GB |
-# | `20` | 149 | 364 GB |
-# | `50` | 264 | 636 GB |
-# | `100` | 404 | 965 GB |
-# | `200` | 604 | 1.40 TB |
-# | `-1` | 796 | 1.78 TB |
+# | setting | number of files | total size | number of events |
+# | --- | --- | --- | --- |
+# | `1` | 9 | 21.4 GB | 10455719 |
+# | `2` | 18 | 41.7 GB | 19497435 |
+# | `5` | 43 | 105 GB | 47996231 |
+# | `10` | 79 | 200 GB | 90546458 |
+# | `20` | 140 | 359 GB | 163123242 |
+# | `50` | 255 | 631 GB | 297247463 |
+# | `100` | 395 | 960 GB | 470397795 |
+# | `200` | 595 | 1.40 TB | 705273291 |
+# | `-1` | 787 | 1.78 TB | 940160174 |
 #
 # The input files are all in the 1–3 GB range.
 
