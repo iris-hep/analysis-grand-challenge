@@ -257,10 +257,9 @@ class TtbarAnalysis(processor.ProcessorABC):
             ### event selection
             # very very loosely based on https://arxiv.org/abs/2006.13076
 
-            # pT > 25 GeV for leptons & jets
-            selected_electrons = events.Electron[(events.Electron.pt>25)]
-            selected_muons = events.Muon[(events.Muon.pt >25)]
-            jet_filter = (events.Jet.pt * events[pt_var]) > 25
+            selected_electrons = events.Electron[(events.Electron.pt > 25)] # require pt > 25 GeV for electrons
+            selected_muons = events.Muon[(events.Muon.pt > 25)] # require pt > 25 GeV for muons
+            jet_filter = (events.Jet.pt * events[pt_var]) > 25 # pT > 25 GeV for jets (scaled by systematic variations)
             selected_jets = events.Jet[jet_filter]
 
             # single lepton requirement
