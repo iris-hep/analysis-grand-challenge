@@ -76,8 +76,8 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 #
 # | setting | number of files | total size | number of events |
 # | --- | --- | --- | --- |
-# | `1` | 9 | 21.4 GB | 10455719 |
-# | `2` | 18 | 41.7 GB | 19497435 |
+# | `1` | 9 | 22.9 GB | 10455719 |
+# | `2` | 18 | 42.8 GB | 19497435 |
 # | `5` | 43 | 105 GB | 47996231 |
 # | `10` | 79 | 200 GB | 90546458 |
 # | `20` | 140 | 359 GB | 163123242 |
