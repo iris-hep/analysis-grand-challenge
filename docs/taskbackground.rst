@@ -86,7 +86,7 @@ It is a future goal to move onto a more sophisticated architecture, as the BDT m
 
 BDT Performance
 ---------------------------------------------------------------
-We can first qualitatively compare the top mass reconstruction by the trijet combination method and the BDT method by comparing their distributions to the truth top mass reconstruction distribution:
+We can first qualitatively compare the top mass reconstruction by the trijet combination method and the BDT method by comparing their distributions to the truth top mass reconstruction distribution. The events considered here are those in which it is possible to correctly reconstruct all jet-parton assignments in the leading four jets.
 
 .. image:: images/topmassreconstruction.png
   :width: 80%
