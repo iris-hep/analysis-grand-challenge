@@ -3,7 +3,7 @@ Physics Analysis Background
 
 :math:`t\bar{t}` Events
 ---------------------------------------------------------------
-Implementations of analysis tasks in the Analysis Grand Challenge aim to demonstrate the integration of different software components in a realistic physics analysis. The task chosen for CMS open data is a measurement of the :math:`t\bar{t}` (top-antitop quark pair production) crosssection  measurement using events with at least four jets and one lepton in the final state. This signature has two possibilities, depending on whether the lepton/neutrino pair originates from the top or antitop quark:
+Implementations of analysis tasks in the Analysis Grand Challenge aim to demonstrate the integration of different software components in a realistic physics analysis. The task chosen for CMS open data is a measurement of the :math:`t\bar{t}` (top-antitop quark pair production) cross-section  measurement using events with at least four jets and one lepton in the final state. This signature has two possibilities, depending on whether the lepton/neutrino pair originates from the top or antitop quark:
 
 .. image:: images/ttbar.png
   :width: 80%
@@ -35,11 +35,11 @@ The tree of the above event looks something like::
         
 Top Mass Reconstruction
 ---------------------------------------------------------------
-To measure the :math:`t\bar{t}` crosssection, we use an observable that approximately reconstructs the top quark mass. We do this in two different ways. The first uses no machine learning. Within an event, the trijet system with the highest transverse momentum (:math:`p_T`) is selected. We then calculate the combined mass of these three jets.
+To measure the :math:`t\bar{t}` cross-section, we use an observable that approximately reconstructs the top quark mass. We do this in two different ways. The first uses no machine learning. Within an event, the trijet system with the highest transverse momentum (:math:`p_T`) is selected. We then calculate the combined mass of these three jets.
 
 Machine Learning Component
 ---------------------------------------------------------------
-Most modern high energy physics analyses use some form of machine learning (ML), so a machine learning task has been incorporated into the AGC :math:`t\bar{t}` crosssection  measurement to reflect this development. The method described above to reconstruct the top mass attempts to correctly select all three jets on the hadronic side of the collision. Using ML, we can go beyond this task by attempting to correctly assign each jet with its parent parton. This should allow for a more accurate top mass reconstruction as well as access to new observables, such as the angle between the jet on the leptonic side of the collision and the lepton, or the angle between the two W jets.
+Most modern high energy physics analyses use some form of machine learning (ML), so a machine learning task has been incorporated into the AGC :math:`t\bar{t}` cross-section  measurement to reflect this development. The method described above to reconstruct the top mass attempts to correctly select all three jets on the hadronic side of the collision. Using ML, we can go beyond this task by attempting to correctly assign each jet with its parent parton. This should allow for a more accurate top mass reconstruction as well as access to new observables, such as the angle between the jet on the leptonic side of the collision and the lepton, or the angle between the two W jets.
 
 The strategy used for this jet-parton assignment task is as follows:
 
