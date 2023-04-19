@@ -41,7 +41,7 @@ The below table gives a brief overview of all AGC versions.
 Datasets
 ================================
 
-The datasets used for the CMS :math:`t\bar{t}` ntoebook are from the 2015 CMS Open Data release. Versions 0.1.0 and 0.2.0 use ntuples generated using the `Physics Objects Extractor Tool (POET) <https://github.com/cms-opendata-analyses/PhysObjectExtractorTool>`_.
+The datasets used for the CMS :math:`t\bar{t}` notebook are from the 2015 CMS Open Data release. Versions 0.1.0 and 0.2.0 use ntuples generated using the `Physics Objects Extractor Tool (POET) <https://github.com/cms-opendata-analyses/PhysObjectExtractorTool>`_.
 
 All versions >=1.0.0 use NanoAOD instead. The NanoAOD was generated from the 2015 CMS Open Data release using this pull request of CMSSW: `https://github.com/cms-sw/cmssw/pull/39040 <https://github.com/cms-sw/cmssw/pull/39040>`_. To set this up, the following commands should be run::
     
