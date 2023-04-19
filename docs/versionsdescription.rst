@@ -146,7 +146,7 @@ The data used is the same, regardless of MiniAOD vs NanoAOD. The list of dataset
     
     * `24210 <https://opendata.cern.ch/record/24210>`_: single txt file
     
-More information about datasets can be found in `analysis-grand-challenge/datasets/cms-open-data-2015/`.
+More information about datasets can be found in `analysis-grand-challenge/datasets/cms-open-data-2015/ <https://github.com/iris-hep/analysis-grand-challenge/tree/main/datasets/cms-open-data-2015>`_.
 
 
 Cuts
