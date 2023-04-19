@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build docs with sphinx
-        run: |
-          pip install -r docs/requirements.txt
-          sphinx-build docs docs/_build
       - name: Install apt-get dependencies
         run: |
           sudo apt-get update
           sudo apt-get -qq install pandoc
+      - name: Build docs with sphinx
+        run: |
+          pip install -r docs/requirements.txt
+          sphinx-build docs docs/_build
