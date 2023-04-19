@@ -49,7 +49,7 @@ html_theme = "sphinx_book_theme"
 
 # Config for the Sphinx book
 
-html_baseurl = "https://analysis-grand-challenge.readthedocs.io/en/latest/"
+html_baseurl = "https://agc.readthedocs.io/en/latest/"
 
 html_theme_options = {
     "home_page_in_toc": True,
