@@ -1,24 +1,25 @@
----
-jupyter:
-  jupytext:
-    formats: ipynb,md
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.14.1
-  kernelspec:
-    display_name: Python 3 (ipykernel)
-    language: python
-    name: py3-preamble
----
+# ---
+# jupyter:
+#   jupytext:
+#     formats: ipynb,py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.14.1
+#   kernelspec:
+#     display_name: Python 3 (ipykernel)
+#     language: python
+#     name: python3
+# ---
 
-# Plot $t\bar{t}$ Events
-______
+# %% [markdown]
+# # Plot $t\bar{t}$ Events
+# ______
+#
+# This notebook allows one to visualize events, including jets and the genParticles they are matched to. Trees from events are also printed using the `printTrees` method in `utils`.
 
-This notebook allows one to visualize events, including jets and the genParticles they are matched to. Trees from events are also printed using the `printTrees` method in `utils`.
-
-```python
+# %%
 # IMPORTS
 import uproot
 from coffea.nanoevents import NanoEventsFactory
@@ -29,18 +30,16 @@ import particle
 from utils import printTrees
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
-```
 
-```python
+# %%
 # file must be nanoAOD
 filepath = "https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneCUETP8M1_13TeV-powheg-pythia8/cmsopendata2015_ttbar_19980_PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext3-v1_00000_0004.root"
 # process events into NanoAODSchema
 events = NanoEventsFactory.from_root(filepath, 
                                      treepath="Events", 
                                      entry_stop=50000).events()
-```
 
-```python
+# %%
 # filter electrons, muons by pT
 selected_electrons = events.Electron[events.Electron.pt > 25]
 selected_muons = events.Muon[events.Muon.pt > 25]
@@ -75,9 +74,8 @@ selected_jets_region = selected_jets[region_filter][:,:4]
 selected_electrons_region = selected_electrons[region_filter]
 selected_muons_region = selected_muons[region_filter]
 selected_genpart_region = selected_genpart[region_filter]
-```
 
-```python
+# %%
 ## filter genParticles to "matchable" particles
 
 # make sure parent is not None
@@ -99,9 +97,8 @@ selected_genpart_region_reduced = selected_genpart_region_reduced[genpart_filter
 # get rid of copies
 genpart_filter4 = selected_genpart_region_reduced.hasFlags("isLastCopy")
 selected_genpart_region_reduced = selected_genpart_region_reduced[genpart_filter4]
-```
 
-```python
+# %%
 # plotting candidates include daughters of t/W or t/W (remove copies) 
 plotting_candidates = selected_genpart_region[genpart_filter]
 genpart_filter_plotting = ((((np.abs(plotting_candidates.pdgId)<=5) & 
@@ -112,24 +109,21 @@ genpart_filter_plotting = ((((np.abs(plotting_candidates.pdgId)<=5) &
                            (plotting_candidates.hasFlags("isLastCopy")) & 
                            (np.abs(plotting_candidates.pdgId)>0))
 plotting_candidates = plotting_candidates[genpart_filter_plotting]
-```
 
-```python
+# %%
 # list of all quarks (no requirement on parentage)
 quark_filter = ((np.abs(selected_genpart_region.pdgId)<=9) & 
                       selected_genpart_region.hasFlags("isLastCopy"))
 all_quarks= selected_genpart_region[quark_filter]
-```
 
-```python
+# %%
 # find labels using pdgid of parent of nearest genPart
 nearest_genpart = selected_jets_region.nearest(selected_genpart_region_reduced, 
                                                threshold=0.4)
 nearest_parent = nearest_genpart.distinctParent
 nearest_parent_pdgid = nearest_parent.pdgId
-```
 
-```python
+# %%
 parent_pdgid = nearest_parent.pdgId # pdgId of parent particle
 grandchild_pdgid = nearest_parent.distinctChildren.distinctChildren.pdgId # pdgId of particle's parent's grandchildren
 
@@ -163,16 +157,14 @@ labels = labels[training_event_filter]
 nearest_genpart = nearest_genpart[training_event_filter]
 nearest_parent = nearest_parent[training_event_filter]
 nearest_parent_pdgid = nearest_parent_pdgid[training_event_filter]
-```
 
-```python
+# %%
 # jet colors for plotting
 jetcolors = ['brown','red','orange',
              'darkgreen','teal','dodgerblue',
              'blue','blueviolet','purple','deeppink']
-```
 
-```python tags=[]
+# %% tags=[]
 for iEvt in range(10):
     
     print("-----------------------------------------------------------------------------------------------")
@@ -390,4 +382,3 @@ for iEvt in range(10):
     fig.tight_layout()
     
     plt.show()
-```
