@@ -1,0 +1,6 @@
+awkward==1.10.3
+coffea==0.7.21
+matplotlib==3.7.1
+numpy==1.23.5
+particle==0.21.0
+uproot==4.1.6
