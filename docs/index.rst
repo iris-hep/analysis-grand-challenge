@@ -1,4 +1,4 @@
-.. image:: analyses/cms-open-data-ttbar/utils/ecosystem.png
+.. image:: cms-open-data-ttbar/utils/ecosystem.png
    :width: 95%
    :alt: AGC Pipeline
    :align: center
@@ -82,10 +82,10 @@ This work was supported by the U.S. National Science Foundation (NSF) cooperativ
    :caption: ttbar with CMS Open Data
    :glob:
 
-   analyses/cms-open-data-ttbar/ttbar_analysis_pipeline
-   docs/versionsdescription
-   docs/taskbackground
-   docs/event-plotting/plotEvents
+   cms-open-data-ttbar/ttbar_analysis_pipeline
+   versionsdescription
+   taskbackground
+   event-plotting/plotEvents
 
 .. toctree::
    :maxdepth: 2
@@ -93,7 +93,7 @@ This work was supported by the U.S. National Science Foundation (NSF) cooperativ
    :caption: H>ZZ* with ATLAS Open Data
    :glob:
 
-   analyses/atlas-open-data-hzz/HZZ_analysis_pipeline
+   atlas-open-data-hzz/HZZ_analysis_pipeline
    
 
 
