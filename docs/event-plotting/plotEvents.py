@@ -27,7 +27,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import awkward as ak
 import particle
-from utils import printTrees
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
@@ -166,14 +165,6 @@ jetcolors = ['brown','red','orange',
 
 # %% tags=[]
 for iEvt in range(10):
-    
-    print("-----------------------------------------------------------------------------------------------")
-    print("-----------------------------------------------------------------------------------------------")
-    print(f"                                         EVENT {iEvt}                                         ")
-    print("-----------------------------------------------------------------------------------------------")
-    # print event tree from genParticles
-    printTrees(selected_genpart_region[iEvt])
-    print("-----------------------------------------------------------------------------------------------")
     
     # define mpl figure
     fig,axs = plt.subplots(1,2,figsize=(10,6),gridspec_kw={'width_ratios': [2.3, 1]})

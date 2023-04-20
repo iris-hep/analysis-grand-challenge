@@ -38,6 +38,13 @@ exclude_patterns = [
     "**.ipynb_checkpoints",
     ".DS_Store",
     ".env",
+    "workshops/*",
+    "tests/*",
+    "datasets/*",
+    "analyses/atlas-open-data-hzz/alternative_implementations/*",
+    "analyses/cms-open-data-ttbar/coffea.ipynb",
+    "analyses/*/README.md",
+    "README.md"
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -54,6 +61,7 @@ html_baseurl = "https://agc.readthedocs.io/en/latest/"
 html_theme_options = {
     "home_page_in_toc": True,
     "repository_url": "https://github.com/iris-hep/analysis-grand-challenge",
+    "repository_branch": "main",
     "use_repository_button": True,
     "use_issues_button": True,
     "use_edit_page_button": True,
@@ -66,7 +74,7 @@ html_static_path: list[str] = []
 
 # -- Options for Notebook input ----------------------------------------------
 
-html_logo = "pipeline.png"
+html_logo = "docs/pipeline.png"
 html_title = f"Analysis Grand Challenge {version}"
 
 nbsphinx_execute = "auto"  # auto, never
