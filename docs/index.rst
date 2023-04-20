@@ -79,7 +79,7 @@ This work was supported by the U.S. National Science Foundation (NSF) cooperativ
 .. toctree::
    :maxdepth: 2
    :titlesonly:
-   :caption: CMS AGC
+   :caption: ttbar with CMS Open Data
    :glob:
 
    cms-open-data-ttbar/ttbar_analysis_pipeline
@@ -90,7 +90,7 @@ This work was supported by the U.S. National Science Foundation (NSF) cooperativ
 .. toctree::
    :maxdepth: 2
    :titlesonly:
-   :caption: ATLAS AGC
+   :caption: H>ZZ* with ATLAS Open Data
    :glob:
 
    atlas-open-data-hzz/HZZ_analysis_pipeline
