@@ -31,7 +31,7 @@ Additional information is available in two workshops focused on the AGC:
 - [IRIS-HEP AGC Tools 2021 Workshop, Nov 3–4 2021](https://indico.cern.ch/e/agc-tools-workshop)
 - [IRIS-HEP AGC Tools 2022 Workshop, April 25–26 2022](https://indico.cern.ch/e/agc-tools-2)
 
-We also have a [dedicated webpage](https://iris-hep.org/grand-challenges.html).
+We also have a [dedicated webpage](https://iris-hep.org/grand-challenges.html) and a [website for documentation](https://agc.readthedocs.io/en/latest/?badge=latest).
 
 ## AGC and IRIS-HEP
 
