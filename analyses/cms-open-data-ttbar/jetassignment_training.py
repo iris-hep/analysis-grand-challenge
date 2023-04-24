@@ -440,6 +440,10 @@ output, metrics = run(fileset,
                       "Events", 
                       processor_instance = JetClassifier(permutations_dict, labels_dict))
 
+# %% tags=[]
+import pickle
+output = pickle.load(open("output_temp5.p","rb"))
+
 # %%
 # grab features and labels and convert to np array
 features = output['features'].value
@@ -1014,11 +1018,13 @@ def initialize_mlflow():
 
 
 # %% tags=[]
+USE_DASK_ML=True
 if USE_DASK_ML:
     start_time = time.time() 
     
     client = utils.get_client()
-    client.run(initialize_mlflow)
+    if USE_MLFLOW:
+        client.run(initialize_mlflow)
     
     futures = client.map(fit_model,
                          samples_even, 
