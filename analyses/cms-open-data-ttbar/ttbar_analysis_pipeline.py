@@ -10,7 +10,7 @@
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
-#     name: py3-preamble
+#     name: python3
 # ---
 
 # %% [markdown]
@@ -99,15 +99,6 @@ USE_DASK = True
 
 # enable ServiceX
 USE_SERVICEX = False
-
-
-### ML-INFERENCE SETTINGS
-
-# enable ML inference
-USE_INFERENCE = True
-
-# enable inference using NVIDIA Triton server
-USE_TRITON = False
 
 ### LOAD OTHER CONFIGURATION VARIABLES
 with open("config.json") as json_data_file:
@@ -426,7 +417,8 @@ metrics.update({
 if not os.path.exists("metrics"):
     os.makedirs("metrics")
 timestamp = time.strftime('%Y%m%d-%H%M%S')
-metric_file_name = f"metrics/{AF_NAME}-{timestamp}.json"
+af_name = metrics["af"]
+metric_file_name = f"metrics/{af_name}-{timestamp}.json"
 with open(metric_file_name, "w") as f:
     f.write(json.dumps(metrics))
 
