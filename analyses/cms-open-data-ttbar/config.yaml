@@ -9,7 +9,7 @@ global:
 benchmarking:
 
   # chunk size to use
-  CHUNKSIZE: 200000
+  CHUNKSIZE: 500000
   
   # metadata to propagate through to metrics
   # "ssl-dev" allows for the switch to local data on /data
