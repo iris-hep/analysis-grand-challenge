@@ -10,7 +10,7 @@
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
-#     name: python3
+#     name: py3-preamble
 # ---
 
 # %% [markdown]
@@ -100,32 +100,18 @@ USE_DASK = True
 # enable ServiceX
 USE_SERVICEX = False
 
-# ServiceX: ignore cache with repeated queries
-SERVICEX_IGNORE_CACHE = False
 
-# analysis facility: set to "coffea_casa" for coffea-casa environments, "EAF" for FNAL, "local" for local setups
-AF = "coffea_casa"
+### ML-INFERENCE SETTINGS
 
+# enable ML inference
+USE_INFERENCE = True
 
-### BENCHMARKING-SPECIFIC SETTINGS
+# enable inference using NVIDIA Triton server
+USE_TRITON = False
 
-# chunk size to use
-CHUNKSIZE = 500_000
-
-# metadata to propagate through to metrics
-AF_NAME = "coffea_casa"  # "ssl-dev" allows for the switch to local data on /data
-SYSTEMATICS = "all"  # currently has no effect
-CORES_PER_WORKER = 2  # does not do anything, only used for metric gathering (set to 2 for distributed coffea-casa)
-
-# scaling for local setups with FuturesExecutor
-NUM_CORES = 4
-
-# only I/O, all other processing disabled
-DISABLE_PROCESSING = False
-
-# read additional branches (only with DISABLE_PROCESSING = True)
-# acceptable values are 2.7, 4, 15, 25, 50 (corresponding to % of file read), 2.7% corresponds to the standard branches used in the notebook
-IO_FILE_PERCENT = 2.7
+### LOAD OTHER CONFIGURATION VARIABLES
+with open("config.json") as json_data_file:
+    config = json.load(json_data_file)
 
 
 # %% [markdown]
@@ -158,7 +144,7 @@ def jet_pt_resolution(pt):
 
 
 class TtbarAnalysis(processor.ProcessorABC):
-    def __init__(self, disable_processing, io_file_percent):
+    def __init__(self, disable_processing, io_branches):
         num_bins = 25
         bin_low = 50
         bin_high = 550
@@ -172,44 +158,10 @@ class TtbarAnalysis(processor.ProcessorABC):
             .Weight()
         )
         self.disable_processing = disable_processing
-        self.io_file_percent = io_file_percent
+        self.io_branches = io_branches
 
     def only_do_IO(self, events):
-        # standard AGC branches cover 2.7% of the data
-            branches_to_read = []
-            if self.io_file_percent >= 2.7:
-                branches_to_read.extend(["Jet_pt", "Jet_eta", "Jet_phi", "Jet_btagCSVV2", "Jet_mass", "Muon_pt", "Electron_pt"])
-            
-            if self.io_file_percent >= 4:
-                branches_to_read.extend(["Electron_phi", "Electron_eta","Electron_mass","Muon_phi","Muon_eta","Muon_mass",
-                                         "Photon_pt","Photon_eta","Photon_mass","Jet_jetId"])
-            
-            if self.io_file_percent>=15:
-                branches_to_read.extend(["Jet_nConstituents","Jet_electronIdx1","Jet_electronIdx2","Jet_muonIdx1","Jet_muonIdx2",
-                                         "Jet_chHEF","Jet_area","Jet_puId","Jet_qgl","Jet_btagDeepB","Jet_btagDeepCvB",
-                                         "Jet_btagDeepCvL","Jet_btagDeepFlavB","Jet_btagDeepFlavCvB","Jet_btagDeepFlavCvL",
-                                         "Jet_btagDeepFlavQG","Jet_chEmEF","Jet_chFPV0EF","Jet_muEF","Jet_muonSubtrFactor",
-                                         "Jet_neEmEF","Jet_neHEF","Jet_puIdDisc"])
-            
-            if self.io_file_percent>=25:
-                branches_to_read.extend(["GenPart_pt","GenPart_eta","GenPart_phi","GenPart_mass","GenPart_genPartIdxMother",
-                                         "GenPart_pdgId","GenPart_status","GenPart_statusFlags"])
-            
-            if self.io_file_percent==50:
-                branches_to_read.extend(["Jet_rawFactor","Jet_bRegCorr","Jet_bRegRes","Jet_cRegCorr","Jet_cRegRes","Jet_nElectrons",
-                                         "Jet_nMuons","GenJet_pt","GenJet_eta","GenJet_phi","GenJet_mass","Tau_pt","Tau_eta","Tau_mass",
-                                         "Tau_phi","Muon_dxy","Muon_dxyErr","Muon_dxybs","Muon_dz","Muon_dzErr","Electron_dxy",
-                                         "Electron_dxyErr","Electron_dz","Electron_dzErr","Electron_eInvMinusPInv","Electron_energyErr",
-                                         "Electron_hoe","Electron_ip3d","Electron_jetPtRelv2","Electron_jetRelIso",
-                                         "Electron_miniPFRelIso_all","Electron_miniPFRelIso_chg","Electron_mvaFall17V2Iso",
-                                         "Electron_mvaFall17V2noIso","Electron_pfRelIso03_all","Electron_pfRelIso03_chg","Electron_r9",
-                                         "Electron_scEtOverPt","Electron_sieie","Electron_sip3d","Electron_mvaTTH","Electron_charge",
-                                         "Electron_cutBased","Electron_jetIdx","Electron_pdgId","Electron_photonIdx","Electron_tightCharge"])
-                
-            if self.io_file_percent not in [2.7, 4, 15, 25, 50]:
-                raise NotImplementedError("supported values for I/O percentage are 2.7, 4, 15, 25, 50")
-            
-            for branch in branches_to_read:
+            for branch in self.io_branches:
                 if "_" in branch:
                     split = branch.split("_")
                     object_type = split[0]
@@ -359,7 +311,7 @@ class TtbarAnalysis(processor.ProcessorABC):
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
 # %%
-fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False, af_name=AF_NAME)  # local files on /data for ssl-dev
+fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False, af_name=config["benchmarking"]["AF_NAME"])  # local files on /data for ssl-dev
 
 print(f"processes in fileset: {list(fileset.keys())}")
 print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files'][0]}, ...],")
@@ -411,7 +363,7 @@ if USE_SERVICEX:
 
     # now we query the files using a wrapper around ServiceXDataset to transform all processes at once
     t0 = time.time()
-    ds = utils.ServiceXDatasetGroup(fileset, backend_name="uproot", ignore_cache=SERVICEX_IGNORE_CACHE)
+    ds = utils.ServiceXDatasetGroup(fileset, backend_name="uproot", ignore_cache=config["benchmarking"]["SERVICEX_IGNORE_CACHE"])
     files_per_process = ds.get_data_rootfiles_uri(query, as_signed_url=True, title="CMS ttbar")
 
     print(f"ServiceX data delivery took {time.time() - t0:.2f} seconds")
@@ -430,11 +382,11 @@ if USE_SERVICEX:
 # %%
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 if USE_DASK:
-    executor = processor.DaskExecutor(client=utils.get_client(AF))
+    executor = processor.DaskExecutor(client=utils.get_client(af=config["global"]["AF"]))
 else:
-    executor = processor.FuturesExecutor(workers=NUM_CORES)
+    executor = processor.FuturesExecutor(workers=config["benchmarking"]["NUM_CORES"])
         
-run = processor.Runner(executor=executor, schema=NanoAODSchema, savemetrics=True, metadata_cache={}, chunksize=CHUNKSIZE)
+run = processor.Runner(executor=executor, schema=NanoAODSchema, savemetrics=True, metadata_cache={}, chunksize=config["benchmarking"]["CHUNKSIZE"])
 
 if USE_SERVICEX:
     treename = "servicex"
@@ -445,7 +397,7 @@ else:
 filemeta = run.preprocess(fileset, treename=treename)  # pre-processing
 
 t0 = time.monotonic()
-all_histograms, metrics = run(fileset, treename, processor_instance=TtbarAnalysis(DISABLE_PROCESSING, IO_FILE_PERCENT))  # processing
+all_histograms, metrics = run(fileset, treename, processor_instance=TtbarAnalysis(config["benchmarking"]["DISABLE_PROCESSING"], config["benchmarking"]["IO_BRANCHES"][config["benchmarking"]["IO_FILE_PERCENT"]]))  # processing
 exec_time = time.monotonic() - t0
 
 all_histograms = all_histograms["hist"]
@@ -457,17 +409,17 @@ print(f"\nexecution took {exec_time:.2f} seconds")
 dataset_source = "/data" if fileset["ttbar__nominal"]["files"][0].startswith("/data") else "https://xrootd-local.unl.edu:1094" # TODO: xcache support
 metrics.update({
     "walltime": exec_time, 
-    "num_workers": NUM_CORES, 
-    "af": AF_NAME, 
+    "num_workers": config["benchmarking"]["NUM_CORES"], 
+    "af": config["benchmarking"]["AF_NAME"], 
     "dataset_source": dataset_source, 
     "use_dask": USE_DASK, 
     "use_servicex": USE_SERVICEX, 
-    "systematics": SYSTEMATICS, 
+    "systematics": config["benchmarking"]["SYSTEMATICS"], 
     "n_files_max_per_sample": N_FILES_MAX_PER_SAMPLE,
-    "cores_per_worker": CORES_PER_WORKER, 
-    "chunksize": CHUNKSIZE, 
-    "disable_processing": DISABLE_PROCESSING, 
-    "io_file_percent": IO_FILE_PERCENT
+    "cores_per_worker": config["benchmarking"]["CORES_PER_WORKER"], 
+    "chunksize": config["benchmarking"]["CHUNKSIZE"], 
+    "disable_processing": config["benchmarking"]["DISABLE_PROCESSING"], 
+    "io_file_percent": config["benchmarking"]["IO_FILE_PERCENT"]
 })
 
 # save metrics to disk
