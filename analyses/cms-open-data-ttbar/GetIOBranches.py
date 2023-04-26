@@ -6,7 +6,6 @@ ratio_json_path = "nanoaod_branch_ratios.json"
 agc_original_branches = ["Jet_pt", "Jet_eta", "Jet_phi", "Jet_btagCSVV2", "Jet_mass", 
                          "Muon_pt", "Electron_pt"]
 desired_percents = [15,25,50]
-config_json_path = "config.json"
 
 
 def main():
@@ -40,13 +39,7 @@ def main():
             current_sum+=values[i]
         io_branch_dict[percent] = branch_names
 
-    with open(config_json_path) as json_file:
-        config = json.load(json_file)
-    
-    config["benchmarking"]["IO_BRANCHES"] = io_branch_dict
-    
-    with open(config_json_path, "w") as outfile:
-        json.dump(config, outfile, indent=4)
+    print(json.dumps(io_branch_dict, sort_keys=True, indent=4))
 
 
 if __name__ == "__main__":

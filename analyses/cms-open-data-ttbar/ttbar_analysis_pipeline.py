@@ -56,6 +56,7 @@ from func_adl_servicex import ServiceXSourceUpROOT
 
 import hist
 import json
+import yaml
 import matplotlib.pyplot as plt
 import numpy as np
 import uproot
@@ -90,7 +91,6 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 
 # %% tags=[]
 ### GLOBAL CONFIGURATION
-
 # input files per process, set to e.g. 10 (smaller number = faster)
 N_FILES_MAX_PER_SAMPLE = 5
 
@@ -101,8 +101,8 @@ USE_DASK = True
 USE_SERVICEX = False
 
 ### LOAD OTHER CONFIGURATION VARIABLES
-with open("config.json") as json_data_file:
-    config = json.load(json_data_file)
+with open("config.yaml") as config_file:
+    config = yaml.safe_load(config_file)
 
 
 # %% [markdown]
