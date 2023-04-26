@@ -34,6 +34,7 @@ def main():
             branch_names.append(key)
             current_sum+=values[i]
             if 100*current_sum>=percent:
+                print(f"Expected Percentage = {percent}, Calculated Percentage = {100*np.round(current_sum,3)}")
                 break
         io_branch_dict[percent] = branch_names
 
@@ -43,7 +44,7 @@ def main():
     config["benchmarking"]["IO_BRANCHES"] = io_branch_dict
     
     with open(config_json_path, "w") as outfile:
-        json.dump(config, outfile)
+        json.dump(config, outfile, indent=4)
 
 
 if __name__ == "__main__":
