@@ -32,10 +32,10 @@
 #
 # The workflow for this training notebook is outlined as follows:
 # * Load data and calculate training features and labels using `coffea`/`dask`
-# * Optimize BDT (`xgboost` model) using `hyperopt` (TODO: Track using `mlflow`)
-# * Save best model (TODO: save to `onnx`)
+# * Optimize BDT using $n$-fold cross-validation and track using `mlflow`
+# * Register best model in `mlflow` model repository
 
-# %%
+# %% tags=[]
 from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 import awkward as ak
@@ -59,11 +59,11 @@ from mlflow.models.signature import infer_signature
 from mlflow.tracking import MlflowClient
 from xgboost import XGBClassifier
 
-# %%
+# %% tags=[]
 ### GLOBAL CONFIGURATION
 
 # input files per process, set to e.g. 10 (smaller number = faster, want to use larger number for training)
-N_FILES_MAX_PER_SAMPLE = 20
+N_FILES_MAX_PER_SAMPLE = 5
 
 # set to True for DaskExecutor
 USE_DASK_PROCESSING = True
@@ -77,17 +77,18 @@ CHUNKSIZE = 100_000
 # analysis facility: set to "coffea_casa" for coffea-casa environments, "EAF" for FNAL, "local" for local setups
 AF = "coffea_casa"
 
+
 ### MACHINE LEARNING OPTIONS
 
 # enable Dask (whether to use dask for hyperparameter optimization. currently does not work)
-USE_DASK_ML = False
+USE_DASK_ML = True
 
 # enable MLFlow logging (to store metrics and models of hyperparameter optimization trials)
-USE_MLFLOW = False
+USE_MLFLOW = True
 
 # enable MLFlow model logging/registering
-MODEL_LOGGING = False
-MODEL_REGISTERING = False
+MODEL_LOGGING = True
+MODEL_REGISTERING = True
 
 # number of folds for cross-validation
 N_FOLD = 2
@@ -95,16 +96,13 @@ N_FOLD = 2
 # number of trials (per model) for hyperparameter optimization. Total number of trials will be 2*N_TRIALS
 N_TRIALS = 5
 
-# name to use for saving model to triton server
-MODEL_NAME = "sigbkg_bdt"
-
-# if True, write over previous versions of model in triton directory
-WRITE_OVER = True
+# name to use for registering model
+MODEL_NAME = "reconstruction_bdt_xgb"
 
 # number of events to use for training (more is better, but slower)
 N_EVENTS_TRAIN = 10000
 
-# %%
+# %% tags=[]
 # get dictionaries for permutation indices, associated labels, and evaluation matrices
 # permutation indices correspond to the different possible combinations of jets in an event for correspondence 
 # with the W boson, the top quark on the side of hadronic decay, and the top quark on the side of leptonic decay
@@ -116,7 +114,7 @@ evaluation_matrix = evaluation_matrices[4]
 print(evaluation_matrix)
 
 
-# %%
+# %% tags=[]
 ## functions for calculating features and labels for the BDT
 def training_filter(jets, electrons, muons, genparts, even):
     '''
@@ -127,9 +125,14 @@ def training_filter(jets, electrons, muons, genparts, even):
         electrons: selected electrons after region filter
         muons: selected muons after region filter
         genparts: selected genpart after region filter
+        even: whether the event is even-numbered (used to separate training events)
     
     Returns:
-        jets, electrons, muons, labels
+        jets: selected jets after training filter
+        electrons: selected electrons after training filter
+        muons: selected muons after training filter
+        labels: labels of jets within an event (24=W, 6=top_hadron, -6=top_lepton)
+        even: whether the event is even-numbered
     '''
     #### filter genPart to valid matching candidates ####
 
@@ -299,7 +302,7 @@ def get_training_set(jets, electrons, muons, labels, permutations_dict, labels_d
 #
 # The processor returns the training features and labels we will use in our BDT
 
-# %%
+# %% tags=[]
 # function to create column accumulator from list
 def col_accumulator(a):
     return processor.column_accumulator(np.array(a))
@@ -405,7 +408,7 @@ class JetClassifier(processor_base):
 #
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
-# %%
+# %% tags=[]
 fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, 
                                   use_xcache=False)
 
@@ -414,9 +417,6 @@ fileset_keys = list(fileset.keys())
 for key in fileset_keys:
     if key!="ttbar__nominal":
         fileset.pop(key)
-
-# %% tags=[]
-fileset['ttbar__nominal']['metadata']
 
 # %% [markdown]
 # ### Execute the data delivery pipeline
@@ -441,10 +441,6 @@ output, metrics = run(fileset,
                       processor_instance = JetClassifier(permutations_dict, labels_dict))
 
 # %% tags=[]
-import pickle
-output = pickle.load(open("output_temp5.p","rb"))
-
-# %%
 # grab features and labels and convert to np array
 features = output['features'].value
 labels = output['labels'].value
@@ -452,7 +448,7 @@ even = output['even'].value
 observable = output['observable'].value
 
 labels = labels.reshape((len(labels),))
-even = np.repeat(even, 12) # twelver permutations for each event
+even = np.repeat(even, 12) # twelve permutations for each event
 
 # %% [markdown]
 # The key for the labeling scheme is as follows
@@ -759,7 +755,7 @@ fig.show()
 #
 # The model used here is `xgboost`'s gradient-boosted decision tree (`XGBClassifier`). Hyperparameter optimization is performed using random selection from a sample space of hyperparameters then testing model fits in a parallelized manner using `dask`. Optional `mlflow` logging is included.
 
-# %%
+# %% tags=[]
 # grab features and labels and convert to np array
 features = output['features'].value
 labels = output['labels'].value
@@ -792,11 +788,13 @@ which_combination_odd = which_combination[np.invert(even)]
 print("features_even.shape = ", features_even.shape)
 print("features_odd.shape = ", features_odd.shape)
 
-# %%
+N_EVENTS_TRAIN = min(min(int(features_odd.shape[0]/12), N_EVENTS_TRAIN), int(features_even.shape[0]/12))
+
+# %% tags=[]
 # set up trials
 if USE_MLFLOW:
     
-    os.environ['MLFLOW_TRACKING_TOKEN'] = ""
+    os.environ['MLFLOW_TRACKING_TOKEN'] = "" # enter token here
     os.environ['MLFLOW_TRACKING_URI'] = "https://mlflow-demo.software-dev.ncsa.illinois.edu"
     
     mlflow.set_tracking_uri('https://mlflow-demo.software-dev.ncsa.illinois.edu') 
@@ -813,7 +811,7 @@ if USE_MLFLOW:
         run = MlflowClient().create_run(experiment_id=experiment_id, run_name=f"run-{n}")
         run_id_list.append(run.info.run_id)
 
-# %%
+# %% tags=[]
 sampler = ParameterSampler({'max_depth': np.arange(1,81,10,dtype=int), 
                             'n_estimators': np.arange(1,501,50,dtype=int), 
                             'learning_rate': np.linspace(0.01, 1, 10),
@@ -843,7 +841,7 @@ for i in range(N_TRIALS):
 print("Example of Trial Parameters: ")
 samples_even[0]
 
-# %%
+# %% tags=[]
 if USE_MLFLOW:
     # set mlflowclient
     mlflowclient = MlflowClient()
@@ -851,7 +849,7 @@ else:
     mlflowclient = None
 
 
-# %%
+# %% tags=[]
 def modified_cross_validation(model, 
                               features, labels, 
                               evaluation_matrix, n_folds=2):
@@ -948,7 +946,7 @@ def modified_cross_validation(model,
            }
 
 
-# %%
+# %% tags=[]
 def fit_model(params, 
               features, 
               labels, 
@@ -1000,17 +998,17 @@ def fit_model(params,
                 mlflow.xgboost.log_model(result["model"], "model", signature=signature)
             result.pop("model")
                 
-    if not use_mlflow:
+    if not log_models:
         return {"score": np.average(result["test_jet_score"]),
                 "full_result": result}
     return {"score": np.average(result["test_jet_score"])}
 
 
-# %%
+# %% tags=[]
 # function to provide necessary environment variables to workers
 def initialize_mlflow(): 
     
-    os.environ['MLFLOW_TRACKING_TOKEN'] = ""
+    os.environ['MLFLOW_TRACKING_TOKEN'] = "" # enter token here
     os.environ['MLFLOW_TRACKING_URI'] = "https://mlflow-demo.software-dev.ncsa.illinois.edu"
     
     mlflow.set_tracking_uri('https://mlflow-demo.software-dev.ncsa.illinois.edu') 
@@ -1018,7 +1016,6 @@ def initialize_mlflow():
 
 
 # %% tags=[]
-USE_DASK_ML=True
 if USE_DASK_ML:
     start_time = time.time() 
     
@@ -1065,7 +1062,7 @@ best_parameters_even = samples_even[np.argmax(scores)]
 print("best_parameters_even = ")
 best_parameters_even
 
-# %%
+# %% tags=[]
 if MODEL_LOGGING and USE_MLFLOW:
     best_run_id = samples_even[np.argmax(scores)]["run_id"]
     best_model_path = f'runs:/{best_run_id}/model'
@@ -1078,7 +1075,7 @@ if MODEL_LOGGING and USE_MLFLOW:
 else:
     best_model_even = res[np.argmax(scores)]["full_result"]["model"]
     
-best_model_even.save_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_even.model")
+best_model_even.save_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_even.json")
 
 # %% tags=[]
 if USE_DASK_ML:
@@ -1123,7 +1120,7 @@ print()
 
 scores = [res[i]["score"] for i in range(len(res))]
 best_parameters_odd = samples_odd[np.argmax(scores)]
-print("best_parameters_even = ")
+print("best_parameters_odd = ")
 best_parameters_odd
 
 # %% tags=[]
@@ -1139,7 +1136,7 @@ if MODEL_LOGGING and USE_MLFLOW:
 else:
     best_model_odd = res[np.argmax(scores)]["full_result"]["model"]
     
-best_model_odd.save_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_odd.model")
+best_model_odd.save_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_odd.json")
 
 # %% [markdown]
 # # Evaluation with Optimized Model
@@ -1263,15 +1260,15 @@ score = sum(scores)/len(scores)
 print("Training Jet Score = ", score)
 
 # %% [markdown]
-# ### $m_{bjj}$ test (Compare BDT output to previous method)
+# ### m_bjj test (Compare BDT output to previous method)
 
-# %%
+# %% tags=[]
 best_model_even = XGBClassifier()
-best_model_even.load_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_even.model")
+best_model_even.load_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_even.json")
 best_model_odd = XGBClassifier()
-best_model_odd.load_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_odd.model")
+best_model_odd.load_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_odd.json")
 
-# %%
+# %% tags=[]
 # grab features and labels and convert to np array
 features = output['features'].value
 labels = output['labels'].value
@@ -1279,7 +1276,7 @@ even = output['even'].value
 observable = output['observable'].value
 even = np.repeat(even, 12)
 
-# %%
+# %% tags=[]
 features_even = features[even]
 labels_even = labels[even]
 features_odd = features[np.invert(even)]
@@ -1288,7 +1285,7 @@ labels_odd = labels[np.invert(even)]
 labels_even = labels_even.reshape((len(labels_even),))
 labels_odd = labels_odd.reshape((len(labels_odd),))
 
-# %%
+# %% tags=[]
 features_even_reshaped = features_even.reshape((int(len(features_even)/12),12,20))
 top_mass_candidates_even = features_even_reshaped[:,:,6]
 features_odd_reshaped = features_odd.reshape((int(len(features_odd)/12),12,20))
@@ -1298,7 +1295,7 @@ observable_list = observable.astype(np.float32).tolist()
 all_correct_top_mass_even = features_even[labels_even==1,6]
 all_correct_top_mass_odd = features_odd[labels_odd==1,6]
 
-# %%
+# %% tags=[]
 #### mass histogram ####
 
 # binning
