@@ -38,6 +38,9 @@ exclude_patterns = [
     "**.ipynb_checkpoints",
     ".DS_Store",
     ".env",
+    "atlas-open-data-hzz/alternative_implementations/*",
+    "cms-open-data-ttbar/coffea.ipynb",
+    "*/README.md",
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -54,9 +57,10 @@ html_baseurl = "https://agc.readthedocs.io/en/latest/"
 html_theme_options = {
     "home_page_in_toc": True,
     "repository_url": "https://github.com/iris-hep/analysis-grand-challenge",
+    "repository_branch": "main/docs",
     "use_repository_button": True,
     "use_issues_button": True,
-    "use_edit_page_button": True,
+    "use_edit_page_button": False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

@@ -19,7 +19,9 @@ To look at more events, take a look at **Plot :math:`t\bar{t}` Events**.
   :width: 80%
   :alt: Example of a :math:`t\bar{t}` event in our signal region.
   
-The tree of the above event looks something like::
+The tree of the above event looks something like
+
+.. code-block:: text
 
     g
     ├── t
