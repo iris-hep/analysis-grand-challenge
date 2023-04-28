@@ -1,0 +1,167 @@
+global:
+
+  # ServiceX: ignore cache with repeated queries
+  SERVICEX_IGNORE_CACHE: false
+  
+  # analysis facility: set to "coffea_casa" for coffea-casa environments, "EAF" for FNAL, "local" for local setups
+  AF: coffea_casa
+  
+benchmarking:
+
+  # chunk size to use
+  CHUNKSIZE: 500000
+  
+  # metadata to propagate through to metrics
+  # "ssl-dev" allows for the switch to local data on /data
+  AF_NAME: coffea_casa
+  
+  # currently has no effect
+  SYSTEMATICS: all
+  
+  # does not do anything, only used for metric gathering (set to 2 for distributed coffea-casa)
+  CORES_PER_WORKER: 2
+  
+  # scaling for local setups with FuturesExecutor
+  NUM_CORES: 4
+  
+  # only I/O, all other processing disabled
+  DISABLE_PROCESSING: false
+  
+  # read additional branches (only with DISABLE_PROCESSING = True)
+  # acceptable values are 4.1, 15, 25, 50 (corresponding to % of file read), 4.1% corresponds to the standard branches used in the notebook
+  IO_FILE_PERCENT: '4.1'
+  
+  # nanoAOD branches that correspond to different values of IO_FILE_PERCENT
+  IO_BRANCHES:
+    '4.1':
+      - Jet_pt
+      - Jet_eta
+      - Jet_phi
+      - Jet_btagCSVV2
+      - Jet_mass
+      - Muon_pt
+      - Electron_pt
+    '15':
+      - LHEPdfWeight
+      - GenPart_pdgId
+      - CorrT1METJet_phi
+    '25':
+      - LHEPdfWeight
+      - GenPart_pt
+      - GenPart_eta
+      - GenPart_pdgId
+      - LHEScaleWeight
+    '50':
+      - LHEPdfWeight
+      - GenPart_pt
+      - GenPart_eta
+      - GenPart_phi
+      - GenPart_pdgId
+      - GenPart_genPartIdxMother
+      - GenPart_statusFlags
+      - GenPart_mass
+      - LHEScaleWeight
+      - GenJet_pt
+      - GenPart_status
+      - LHEPart_eta
+      - LHEPart_phi
+      - LHEPart_pt
+      - GenJet_eta
+      - GenJet_phi
+      - Jet_eta
+      - Jet_phi
+      - SoftActivityJet_pt
+      - SoftActivityJet_phi
+      - SoftActivityJet_eta
+      - GenJet_mass
+      - Jet_pt
+      - Jet_mass
+      - LHEPart_mass
+      - Jet_qgl
+      - Jet_muonSubtrFactor
+      - Jet_puIdDisc
+      
+ml:
+
+  MAX_N_JETS: 6
+  
+  
+  MODEL_NAME: reconstruction_bdt_xgb
+  
+  
+  TRITON_URL: agc-triton-inference-server:8001
+  
+  
+  MODEL_VERSION_EVEN: 1
+  MODEL_VERSION_ODD: 2
+  
+  
+  XGBOOST_MODEL_PATH_EVEN: models/model_even.json
+  XGBOOST_MODEL_PATH_ODD: models/model_odd.json
+  
+  
+  BIN_RANGES:
+    - [0,1]
+    - [0,1]
+    - [0,1]
+    - [0,1]
+    - [50,300]
+    - [50,300]
+    - [50,550]
+    - [50,550]
+    - [25,300]
+    - [25,300]
+    - [25,300]
+    - [25,300]
+    - [0,1]
+    - [0,1]
+    - [0,1]
+    - [0,1]
+    - [-1,1]
+    - [-1,1]
+    - [-1,1]
+    - [-1,1]
+    
+  FEATURE_NAMES:
+    - deltar_leptontoplep
+    - deltar_w1w2
+    - deltar_w1tophad
+    - deltar_w2tophad
+    - mass_leptontoplep
+    - mass_w1w2
+    - mass_w1w2tophad
+    - pt_w1w2tophad
+    - pt_w1
+    - pt_w2
+    - pt_tophad
+    - pt_toplep
+    - btag_w1
+    - btag_w1
+    - btag_tophad
+    - btag_toplep
+    - qgl_w1
+    - qgl_w1
+    - qgl_tophad
+    - qgl_toplep
+    
+  FEATURE_DESCRIPTIONS:
+    - 'Delta R between $top_{lepton}$ Jet and Lepton'
+    - 'Delta R between the two W Jets'
+    - 'Delta R between first W Jet and $top_{hadron}$ Jet'
+    - 'Delta R between second W Jet and $top_{hadron}$ Jet'
+    - 'Combined Mass of $top_{lepton}$ Jet and Lepton [GeV]'
+    - 'Combined Mass of the two W Jets [GeV]'
+    - 'Combined Mass of $top_{hadron}$ Jet and the two W Jets [GeV]'
+    - 'Combined $p_T$ of $top_{hadron}$ Jet and the two W Jets [GeV]'
+    - '$p_T$ of the first W Jet [GeV]'
+    - '$p_T$ of the second W Jet [GeV]'
+    - '$p_T$ of the $top_{hadron}$ Jet [GeV]'
+    - '$p_T$ of the $top_{lepton}$ Jet [GeV]'
+    - 'btagCSVV2 of the first W Jet'
+    - 'btagCSVV2 of the second W Jet'
+    - 'btagCSVV2 of the $top_{hadron}$ Jet'
+    - 'btagCSVV2 of the $top_{lepton}$ Jet'
+    - 'qgl of the first W Jet'
+    - 'qgl of the second W Jet'
+    - 'qgl of the $top_{hadron}$ Jet'
+    - 'qgl of the $top_{lepton}$ Jet'
