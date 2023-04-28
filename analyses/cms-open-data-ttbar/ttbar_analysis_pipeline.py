@@ -40,7 +40,7 @@
 # %% [markdown]
 # ### Imports: setting up our environment
 
-# %%
+# %% tags=[]
 import asyncio
 import logging
 import os
@@ -54,6 +54,7 @@ from func_adl import ObjectStream
 from func_adl_servicex import ServiceXSourceUpROOT
 import hist
 import json
+import yaml
 import matplotlib.pyplot as plt
 import numpy as np
 import uproot
@@ -68,8 +69,7 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 # %% [markdown]
 # ### Configuration: number of files and data delivery path
 #
-# The number of files per sample set here determines the size of the dataset we are processing.
-# There are 9 samples being used here, all part of the 2015 CMS Open Data release.
+# The number of files per sample set here determines the size of the dataset we are processing. There are 9 samples being used here, all part of the 2015 CMS Open Data release.
 #
 # These samples were originally published in miniAOD format, but for the purposes of this demonstration were pre-converted into nanoAOD format. More details about the inputs can be found [here](https://github.com/iris-hep/analysis-grand-challenge/tree/main/datasets/cms-open-data-2015).
 #
@@ -77,8 +77,8 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 #
 # | setting | number of files | total size | number of events |
 # | --- | --- | --- | --- |
-# | `1` | 9 | 21.4 GB | 10455719 |
-# | `2` | 18 | 41.7 GB | 19497435 |
+# | `1` | 9 | 22.9 GB | 10455719 |
+# | `2` | 18 | 42.8 GB | 19497435 |
 # | `5` | 43 | 105 GB | 47996231 |
 # | `10` | 79 | 200 GB | 90546458 |
 # | `20` | 140 | 359 GB | 163123242 |
@@ -89,11 +89,11 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 #
 # The input files are all in the 1–3 GB range.
 
-# %%
+# %% tags=[]
 ### GLOBAL CONFIGURATION
 
 # input files per process, set to e.g. 10 (smaller number = faster)
-N_FILES_MAX_PER_SAMPLE = 5
+N_FILES_MAX_PER_SAMPLE = 1
 
 # enable Dask
 USE_DASK = True
@@ -101,70 +101,32 @@ USE_DASK = True
 # enable ServiceX
 USE_SERVICEX = False
 
-# ServiceX: ignore cache with repeated queries
-SERVICEX_IGNORE_CACHE = False
-
-# analysis facility: set to "coffea_casa" for coffea-casa environments, "EAF" for FNAL, "local" for local setups
-AF = "coffea_casa"
-
 
 ### ML-INFERENCE SETTINGS
 
 # enable ML inference
 USE_INFERENCE = True
 
-# maximum number of jets to consider for event reconstruction BDT (ordered by pT)
-MAX_N_JETS = 6
-
 # enable inference using NVIDIA Triton server
 USE_TRITON = False
 
-# name of model loaded in triton server
-MODEL_NAME = "reconstruction_bdt_xgb"
-
-# URL of triton server (agc-triton-inference-server:8001 for coffea-casa at UNL)
-TRITON_URL = "agc-triton-inference-server:8001"
-
-# versions of triton model to use (separate models depending on event number. don't mix training and inference)
-MODEL_VERSION_EVEN = "1"
-MODEL_VERSION_ODD = "2"
-
-# path to local models (no triton)
-XGBOOST_MODEL_PATH_EVEN = "models/model_even.model"
-XGBOOST_MODEL_PATH_ODD = "models/model_odd.model"
-
-
-### BENCHMARKING-SPECIFIC SETTINGS
-
-# chunk size to use
-CHUNKSIZE = 200_000
-
-# metadata to propagate through to metrics
-AF_NAME = "coffea_casa"  # "ssl-dev" allows for the switch to local data on /data
-SYSTEMATICS = "all"  # currently has no effect
-CORES_PER_WORKER = 2  # does not do anything, only used for metric gathering (set to 2 for distributed coffea-casa)
-
-# scaling for local setups with FuturesExecutor
-NUM_CORES = 4
-
-# only I/O, all other processing disabled
-DISABLE_PROCESSING = False
-
-# read additional branches (only with DISABLE_PROCESSING = True)
-# acceptable values are 2.7, 4, 15, 25, 50 (corresponding to % of file read), 2.7% corresponds to the standard branches used in the notebook
-IO_FILE_PERCENT = 2.7
+### LOAD OTHER CONFIGURATION VARIABLES
+with open("config.yaml") as config_file:
+    config = yaml.safe_load(config_file)
+    
+config["ml"]["USE_INFERENCE"] = USE_INFERENCE
+config["ml"]["USE_TRITON"] = USE_TRITON
 
 # %% [markdown]
 # ### Machine Learning Task
 #
 # During the processing step, machine learning is used to calculate one of the variables used for this analysis. The models used are trained separately in the `jetassignment_training.ipynb` notebook. Jets in the events are assigned to labels corresponding with their parent partons using a boosted decision tree (BDT). More information about the model and training can be found within that notebook. To obtain the features used as inputs for the BDT, we use the methods defined below:
 
-# %%
-permutations_dict = utils.get_permutations_dict(MAX_N_JETS)
+# %% tags=[]
+permutations_dict = utils.get_permutations_dict(config["ml"]["MAX_N_JETS"])
 
 
-# %%
-## get inputs to BDT
+# %% tags=[]
 def get_features(jets, electrons, muons, permutations_dict):
     '''
     Calculate features for each of the 12 combinations per event
@@ -257,7 +219,7 @@ def get_features(jets, electrons, muons, permutations_dict):
 # - calculating systematic uncertainties at the event and object level,
 # - filling all the information into histograms that get aggregated and ultimately returned to us by `coffea`.
 
-# %%
+# %% tags=[]
 # functions creating systematic variations
 def flat_variation(ones):
     # 2.5% weight variations
@@ -279,16 +241,12 @@ def jet_pt_resolution(pt):
 
 class TtbarAnalysis(processor.ProcessorABC):
     def __init__(self, 
-                 disable_processing, 
-                 io_file_percent, 
-                 use_inference=False,
-                 use_triton=False, 
-                 xgboost_model_even="", 
-                 xgboost_model_odd="", 
-                 model_name="", 
-                 model_vers_even="", 
-                 model_vers_odd="", 
-                 url="",
+                 use_dask,
+                 disable_processing,
+                 io_branches,
+                 ml_options,
+                 xgboost_model_even,
+                 xgboost_model_odd,
                  permutations_dict={}):
         
         num_bins = 25
@@ -304,30 +262,20 @@ class TtbarAnalysis(processor.ProcessorABC):
             .Weight()
         )
         
+        self.use_dask = use_dask
         self.disable_processing = disable_processing
-        self.io_file_percent = io_file_percent
+        self.io_branches = io_branches
         
-        self.use_inference = use_inference
+        self.use_inference = ml_options["USE_INFERENCE"]
         if self.use_inference:
             self.ml_hist_dict = {}
-            bin_ranges = [[0,6],[0,6],[0,6],[0,6],[50,300],[50,300],[50,550],[50,550],[25,300],[25,300],[25,300],[25,300],
-                          [0,1],[0,1],[0,1],[0,1],[-1,1],[-1,1],[-1,1],[-1,1]]
-            self.feature_names = ["deltar_leptontoplep","deltar_w1w2","deltar_w1tophad","deltar_w2tophad","mass_leptontoplep","mass_w1w2",
-                             "mass_w1w2tophad","pt_w1w2tophad","pt_w1","pt_w2","pt_tophad","pt_toplep",
-                             "btag_w1","btag_w2","btag_tophad","btag_toplep","qgl_w1","qgl_w2","qgl_tophad","qgl_toplep"]
-            feature_descriptions = [
-                "$\Delta R$ between $top_{lepton}$ Jet and Lepton", "$\Delta R$ between the two W Jets", "$\Delta R$ between first W Jet and $top_{hadron}$ Jet", "$\Delta R$ between second W Jet and $top_{hadron}$ Jet",
-                "Combined Mass of $top_{lepton}$ Jet and Lepton [GeV]", "Combined Mass of the two W Jets [GeV]", "Combined Mass of $top_{hadron}$ Jet and the two W Jets [GeV]",
-                "Combined $p_T$ of $top_{hadron}$ Jet and the two W Jets [GeV]",
-                "$p_T$ of the first W Jet [GeV]", "$p_T$ of the second W Jet [GeV]", "$p_T$ of the $top_{hadron}$ Jet [GeV]", "$p_T$ of the $top_{lepton}$ Jet [GeV]",
-                "btagCSVV2 of the first W Jet [GeV]", "btagCSVV2 of the second W Jet [GeV]", "btagCSVV2 of the $top_{hadron}$ Jet [GeV]", "btagCSVV2 of the $top_{lepton}$ Jet [GeV]",
-                "qgl of the first W Jet [GeV]", "qgl of the second W Jet [GeV]", "qgl of the $top_{hadron}$ Jet [GeV]", "qgl of the $top_{lepton}$ Jet [GeV]",
-            ]
+            self.feature_names = ml_options["FEATURE_NAMES"]
+            feature_descriptions = ml_options["FEATURE_DESCRIPTIONS"]
             for i in range(len(self.feature_names)):
                 self.ml_hist_dict[f"hist_{self.feature_names[i]}"] = (
                     hist.Hist.new.Reg(num_bins, 
-                                      bin_ranges[i][0], 
-                                      bin_ranges[i][1], 
+                                      ml_options["BIN_RANGES"][i][0], 
+                                      ml_options["BIN_RANGES"][i][1], 
                                       name="observable", 
                                       label=feature_descriptions[i])
                     .StrCat([], name="process", label="Process", growth=True)
@@ -336,59 +284,25 @@ class TtbarAnalysis(processor.ProcessorABC):
                 )
 
             # for ML inference
-            self.use_triton = use_triton
+            self.use_triton = ml_options["USE_TRITON"]
             self.xgboost_model_even = xgboost_model_even
             self.xgboost_model_odd = xgboost_model_odd
-            self.model_name = model_name
-            self.model_vers_even = model_vers_even
-            self.model_vers_odd = model_vers_odd
-            self.url = url
+            self.model_name = ml_options["MODEL_NAME"]
+            self.model_vers_even = ml_options["MODEL_VERSION_EVEN"]
+            self.model_vers_odd = ml_options["MODEL_VERSION_ODD"]
+            self.url = ml_options["TRITON_URL"]
             self.permutations_dict = permutations_dict
 
     def only_do_IO(self, events):
-        # standard AGC branches cover 2.7% of the data
-            branches_to_read = []
-            if self.io_file_percent >= 2.7:
-                branches_to_read.extend(["Jet_pt", "Jet_eta", "Jet_phi", "Jet_btagCSVV2", "Jet_mass", "Muon_pt", "Electron_pt"])
-            
-            if self.io_file_percent >= 4:
-                branches_to_read.extend(["Electron_phi", "Electron_eta","Electron_mass","Muon_phi","Muon_eta","Muon_mass",
-                                         "Photon_pt","Photon_eta","Photon_mass","Jet_jetId"])
-            
-            if self.io_file_percent>=15:
-                branches_to_read.extend(["Jet_nConstituents","Jet_electronIdx1","Jet_electronIdx2","Jet_muonIdx1","Jet_muonIdx2",
-                                         "Jet_chHEF","Jet_area","Jet_puId","Jet_qgl","Jet_btagDeepB","Jet_btagDeepCvB",
-                                         "Jet_btagDeepCvL","Jet_btagDeepFlavB","Jet_btagDeepFlavCvB","Jet_btagDeepFlavCvL",
-                                         "Jet_btagDeepFlavQG","Jet_chEmEF","Jet_chFPV0EF","Jet_muEF","Jet_muonSubtrFactor",
-                                         "Jet_neEmEF","Jet_neHEF","Jet_puIdDisc"])
-            
-            if self.io_file_percent>=25:
-                branches_to_read.extend(["GenPart_pt","GenPart_eta","GenPart_phi","GenPart_mass","GenPart_genPartIdxMother",
-                                         "GenPart_pdgId","GenPart_status","GenPart_statusFlags"])
-            
-            if self.io_file_percent==50:
-                branches_to_read.extend(["Jet_rawFactor","Jet_bRegCorr","Jet_bRegRes","Jet_cRegCorr","Jet_cRegRes","Jet_nElectrons",
-                                         "Jet_nMuons","GenJet_pt","GenJet_eta","GenJet_phi","GenJet_mass","Tau_pt","Tau_eta","Tau_mass",
-                                         "Tau_phi","Muon_dxy","Muon_dxyErr","Muon_dxybs","Muon_dz","Muon_dzErr","Electron_dxy",
-                                         "Electron_dxyErr","Electron_dz","Electron_dzErr","Electron_eInvMinusPInv","Electron_energyErr",
-                                         "Electron_hoe","Electron_ip3d","Electron_jetPtRelv2","Electron_jetRelIso",
-                                         "Electron_miniPFRelIso_all","Electron_miniPFRelIso_chg","Electron_mvaFall17V2Iso",
-                                         "Electron_mvaFall17V2noIso","Electron_pfRelIso03_all","Electron_pfRelIso03_chg","Electron_r9",
-                                         "Electron_scEtOverPt","Electron_sieie","Electron_sip3d","Electron_mvaTTH","Electron_charge",
-                                         "Electron_cutBased","Electron_jetIdx","Electron_pdgId","Electron_photonIdx","Electron_tightCharge"])
-                
-            if self.io_file_percent not in [2.7, 4, 15, 25, 50]:
-                raise NotImplementedError("supported values for I/O percentage are 2.7, 4, 15, 25, 50")
-            
-            for branch in branches_to_read:
-                if "_" in branch:
-                    split = branch.split("_")
-                    object_type = split[0]
-                    property_name = '_'.join(split[1:])
-                    ak.materialized(events[object_type][property_name])
-                else:
-                    ak.materialized(events[branch])
-            return {"hist": {}}
+        for branch in self.io_branches:
+            if "_" in branch:
+                split = branch.split("_")
+                object_type = split[0]
+                property_name = '_'.join(split[1:])
+                ak.materialized(events[object_type][property_name])
+            else:
+                ak.materialized(events[branch])
+        return {"hist": {}}
 
     def process(self, events):
         if self.disable_processing:
@@ -421,6 +335,15 @@ class TtbarAnalysis(processor.ProcessorABC):
                 input_name = model_metadata.inputs[0].name
                 dtype = model_metadata.inputs[0].datatype
                 output_name = model_metadata.outputs[0].name
+                
+            if not self.use_dask:
+                model_even = XGBClassifier()
+                model_even.load_model(self.xgboost_model_even)
+                self.xgboost_model_even = model_even
+                
+                model_odd = XGBClassifier()
+                model_odd.load_model(self.xgboost_model_odd)
+                self.xgboost_model_odd = model_odd
 
         #### systematics
         # example of a simple flat weight variation, using the coffea nanoevents systematics feature
@@ -612,8 +535,8 @@ class TtbarAnalysis(processor.ProcessorABC):
 #
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
-# %%
-fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False, af_name=AF_NAME)  # local files on /data for ssl-dev
+# %% tags=[]
+fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False, af_name=config["benchmarking"]["AF_NAME"])  # local files on /data for ssl-dev
 
 print(f"processes in fileset: {list(fileset.keys())}")
 print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files'][0]}, ...],")
@@ -625,7 +548,7 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 #
 # Define the func_adl query to be used for the purpose of extracting columns and filtering.
 
-# %%
+# %% tags=[]
 def get_query(source: ObjectStream) -> ObjectStream:
     """Query for event / column selection: >=4j >=1b, ==1 lep with pT>25 GeV, return relevant columns
     """
@@ -658,7 +581,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
 #
 # Using the queries created with `func_adl`, we are using `ServiceX` to read the CMS Open Data files to build cached files with only the specific event information as dictated by the query.
 
-# %%
+# %% tags=[]
 if USE_SERVICEX:
     # dummy dataset on which to generate the query
     dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "Events", backend_name="uproot")
@@ -672,7 +595,9 @@ if USE_SERVICEX:
 
     # now we query the files using a wrapper around ServiceXDataset to transform all processes at once
     t0 = time.time()
-    ds = utils.ServiceXDatasetGroup(fileset, backend_name="uproot", ignore_cache=SERVICEX_IGNORE_CACHE)
+    ds = utils.ServiceXDatasetGroup(fileset, 
+                                    backend_name="uproot", 
+                                    ignore_cache=config["global"]["SERVICEX_IGNORE_CACHE"])
     files_per_process = ds.get_data_rootfiles_uri(query, as_signed_url=True, title="CMS ttbar")
 
     print(f"ServiceX data delivery took {time.time() - t0:.2f} seconds")
@@ -688,14 +613,14 @@ if USE_SERVICEX:
 #
 # When `USE_SERVICEX` is false, the input files need to be processed during this step as well.
 
-# %%
+# %% tags=[]
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 if USE_DASK:
-    executor = processor.DaskExecutor(client=utils.get_client(AF))
+    executor = processor.DaskExecutor(client=utils.get_client(config["global"]["AF"]))
 else:
-    executor = processor.FuturesExecutor(workers=NUM_CORES)
+    executor = processor.FuturesExecutor(workers=config["benchmarking"]["NUM_CORES"])
         
-run = processor.Runner(executor=executor, schema=NanoAODSchema, savemetrics=True, metadata_cache={}, chunksize=CHUNKSIZE)
+run = processor.Runner(executor=executor, schema=NanoAODSchema, savemetrics=True, metadata_cache={}, chunksize=config["benchmarking"]["CHUNKSIZE"])
 
 if USE_SERVICEX:
     treename = "servicex"
@@ -703,11 +628,15 @@ if USE_SERVICEX:
 else:
     treename = "Events"
     
+if not USE_DASK and not USE_TRITON and USE_INFERENCE:
+    model_even = config["ml"]["XGBOOST_MODEL_PATH_EVEN"]
+    model_odd = config["ml"]["XGBOOST_MODEL_PATH_ODD"]
+    
 if not USE_TRITON and USE_INFERENCE:
     model_even = XGBClassifier()
-    model_even.load_model(XGBOOST_MODEL_PATH_EVEN)
+    model_even.load_model(config["ml"]["XGBOOST_MODEL_PATH_EVEN"])
     model_odd = XGBClassifier()
-    model_odd.load_model(XGBOOST_MODEL_PATH_ODD)
+    model_odd.load_model(config["ml"]["XGBOOST_MODEL_PATH_ODD"])
     
 else:
     model_even = None
@@ -716,44 +645,43 @@ else:
 filemeta = run.preprocess(fileset, treename=treename)  # pre-processing
 
 t0 = time.monotonic()
-all_histograms, metrics = run(fileset, treename, processor_instance=TtbarAnalysis(DISABLE_PROCESSING, 
-                                                                                  IO_FILE_PERCENT,
-                                                                                  USE_INFERENCE, 
-                                                                                  USE_TRITON,
+all_histograms, metrics = run(fileset, treename, processor_instance=TtbarAnalysis(USE_DASK,
+                                                                                  config["benchmarking"]["DISABLE_PROCESSING"], 
+                                                                                  config["benchmarking"]["IO_BRANCHES"][
+                                                                                      config["benchmarking"]["IO_FILE_PERCENT"]
+                                                                                  ],
+                                                                                  config["ml"],
                                                                                   model_even, 
                                                                                   model_odd,
-                                                                                  MODEL_NAME, 
-                                                                                  MODEL_VERSION_EVEN, 
-                                                                                  MODEL_VERSION_ODD, 
-                                                                                  TRITON_URL, 
                                                                                   permutations_dict))  # processing
 exec_time = time.monotonic() - t0
 
 print(f"\nexecution took {exec_time:.2f} seconds")
 
-# %%
+# %% tags=[]
 # track metrics
 dataset_source = "/data" if fileset["ttbar__nominal"]["files"][0].startswith("/data") else "https://xrootd-local.unl.edu:1094" # TODO: xcache support
 metrics.update({
     "walltime": exec_time, 
-    "num_workers": NUM_CORES, 
-    "af": AF_NAME, 
+    "num_workers": config["benchmarking"]["NUM_CORES"], 
+    "af": config["benchmarking"]["AF_NAME"], 
     "dataset_source": dataset_source, 
     "use_dask": USE_DASK, 
     "use_servicex": USE_SERVICEX, 
-    "systematics": SYSTEMATICS, 
+    "systematics": config["benchmarking"]["SYSTEMATICS"], 
     "n_files_max_per_sample": N_FILES_MAX_PER_SAMPLE,
-    "cores_per_worker": CORES_PER_WORKER, 
-    "chunksize": CHUNKSIZE, 
-    "disable_processing": DISABLE_PROCESSING, 
-    "io_file_percent": IO_FILE_PERCENT
+    "cores_per_worker": config["benchmarking"]["CORES_PER_WORKER"], 
+    "chunksize": config["benchmarking"]["CHUNKSIZE"], 
+    "disable_processing": config["benchmarking"]["DISABLE_PROCESSING"], 
+    "io_file_percent": config["benchmarking"]["IO_FILE_PERCENT"]
 })
 
 # save metrics to disk
 if not os.path.exists("metrics"):
     os.makedirs("metrics")
 timestamp = time.strftime('%Y%m%d-%H%M%S')
-metric_file_name = f"metrics/{AF_NAME}-{timestamp}.json"
+af_name = config["benchmarking"]["AF_NAME"]
+metric_file_name = f"metrics/{af_name}-{timestamp}.json"
 with open(metric_file_name, "w") as f:
     f.write(json.dumps(metrics))
 
@@ -768,7 +696,7 @@ print(f"amount of data read: {metrics['bytesread']/1000**2:.2f} MB")  # likely b
 # Let's have a look at the data we obtained.
 # We built histograms in two phase space regions, for multiple physics processes and systematic variations.
 
-# %%
+# %% tags=[]
 utils.set_style()
 
 all_histograms["hist"][120j::hist.rebin(2), "4j1b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1, edgecolor="grey")
@@ -776,7 +704,7 @@ plt.legend(frameon=False)
 plt.title("$\geq$ 4 jets, 1 b-tag")
 plt.xlabel("$H_T$ [GeV]");
 
-# %%
+# %% tags=[]
 all_histograms["hist"][:, "4j2b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1,edgecolor="grey")
 plt.legend(frameon=False)
 plt.title("$\geq$ 4 jets, $\geq$ 2 b-tags")
@@ -791,7 +719,7 @@ plt.xlabel("$m_{bjj}$ [Gev]");
 #
 # We are making of [UHI](https://uhi.readthedocs.io/) here to re-bin.
 
-# %%
+# %% tags=[]
 # b-tagging variations
 all_histograms["hist"][120j::hist.rebin(2), "4j1b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
 all_histograms["hist"][120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_0_up"].plot(label="NP 1", linewidth=2)
@@ -802,7 +730,7 @@ plt.legend(frameon=False)
 plt.xlabel("$H_T$ [GeV]")
 plt.title("b-tagging variations");
 
-# %%
+# %% tags=[]
 # jet energy scale variations
 all_histograms["hist"][:, "4j2b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
 all_histograms["hist"][:, "4j2b", "ttbar", "pt_scale_up"].plot(label="scale up", linewidth=2)
@@ -830,7 +758,7 @@ if USE_INFERENCE:
 # We'll save everything to disk for subsequent usage.
 # This also builds pseudo-data by combining events from the various simulation setups we have processed.
 
-# %%
+# %% tags=[]
 utils.save_histograms(all_histograms['hist'], fileset, "histograms.root")
 if USE_INFERENCE:
     utils.save_ml_histograms(all_histograms['ml_hist_dict'], fileset, "histograms_ml.root")
@@ -841,7 +769,7 @@ if USE_INFERENCE:
 # A statistical model has been defined in `config.yml`, ready to be used with our output.
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
-# %%
+# %% tags=[]
 config = cabinetry.configuration.load("cabinetry_config.yml")
 cabinetry.templates.collect(config)
 cabinetry.templates.postprocess(config)  # optional post-processing (e.g. smoothing)
@@ -851,13 +779,13 @@ cabinetry.workspace.save(ws, "workspace.json")
 # %% [markdown]
 # We can inspect the workspace with `pyhf`, or use `pyhf` to perform inference.
 
-# %%
+# %% tags=[]
 # !pyhf inspect workspace.json | head -n 20
 
 # %% [markdown]
 # Let's try out what we built: the next cell will perform a maximum likelihood fit of our statistical model to the pseudodata we built.
 
-# %%
+# %% tags=[]
 model, data = cabinetry.model_utils.model_and_data(ws)
 fit_results = cabinetry.fit.fit(model, data)
 
@@ -868,7 +796,7 @@ cabinetry.visualize.pulls(
 # %% [markdown]
 # For this pseudodata, what is the resulting ttbar cross-section divided by the Standard Model prediction?
 
-# %%
+# %% tags=[]
 poi_index = model.config.poi_index
 print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {fit_results.uncertainty[poi_index]:.3f}")
 
@@ -876,23 +804,23 @@ print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {f
 # Let's also visualize the model before and after the fit, in both the regions we are using.
 # The binning here corresponds to the binning used for the fit.
 
-# %%
+# %% tags=[]
 model_prediction = cabinetry.model_utils.prediction(model)
 figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=config)
 figs[0]["figure"]
 
-# %%
+# %% tags=[]
 figs[1]["figure"]
 
 # %% [markdown]
 # We can see very good post-fit agreement.
 
-# %%
+# %% tags=[]
 model_prediction_postfit = cabinetry.model_utils.prediction(model, fit_results=fit_results)
 figs = cabinetry.visualize.data_mc(model_prediction_postfit, data, close_figure=True, config=config)
 figs[0]["figure"]
 
-# %%
+# %% tags=[]
 figs[1]["figure"]
 
 # %% [markdown]
@@ -943,6 +871,3 @@ figs = utils.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, c
 # Please do not hesitate to get in touch if you would like to join the effort, or are interested in re-implementing (pieces of) the pipeline with different tools!
 #
 # Our mailing list is analysis-grand-challenge@iris-hep.org, sign up via the [Google group](https://groups.google.com/a/iris-hep.org/g/analysis-grand-challenge).
-
-# %% [markdown]
-#
