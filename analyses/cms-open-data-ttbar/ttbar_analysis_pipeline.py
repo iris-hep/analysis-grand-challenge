@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.1
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -40,7 +40,7 @@
 # %% [markdown]
 # ### Imports: setting up our environment
 
-# %% tags=[]
+# %%
 import asyncio
 import logging
 import os
@@ -90,7 +90,7 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 #
 # The input files are all in the 1–3 GB range.
 
-# %% tags=[]
+# %%
 ### GLOBAL CONFIGURATION
 # input files per process, set to e.g. 10 (smaller number = faster)
 N_FILES_MAX_PER_SAMPLE = 5
@@ -115,7 +115,7 @@ with open("config.yaml") as config_file:
 # - calculating systematic uncertainties at the event and object level,
 # - filling all the information into histograms that get aggregated and ultimately returned to us by `coffea`.
 
-# %% tags=[]
+# %%
 # functions creating systematic variations
 def jet_pt_resolution(pt):
     # normal distribution with 5% variations, shape matches jets
@@ -279,7 +279,7 @@ class TtbarAnalysis(processor.ProcessorABC):
 #
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
-# %% tags=[]
+# %%
 fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False, af_name=config["benchmarking"]["AF_NAME"])  # local files on /data for ssl-dev
 
 print(f"processes in fileset: {list(fileset.keys())}")
@@ -292,7 +292,7 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 #
 # Define the func_adl query to be used for the purpose of extracting columns and filtering.
 
-# %% tags=[]
+# %%
 def get_query(source: ObjectStream) -> ObjectStream:
     """Query for event / column selection: >=4j >=1b, ==1 lep with pT>25 GeV, return relevant columns
     """
@@ -318,7 +318,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
 #
 # Using the queries created with `func_adl`, we are using `ServiceX` to read the CMS Open Data files to build cached files with only the specific event information as dictated by the query.
 
-# %% tags=[]
+# %%
 if USE_SERVICEX:
     # dummy dataset on which to generate the query
     dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "Events", backend_name="uproot")
@@ -348,7 +348,7 @@ if USE_SERVICEX:
 #
 # When `USE_SERVICEX` is false, the input files need to be processed during this step as well.
 
-# %% tags=[]
+# %%
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 if USE_DASK:
     executor = processor.DaskExecutor(client=utils.get_client(af=config["global"]["AF"]))
@@ -373,7 +373,7 @@ all_histograms = all_histograms["hist"]
 
 print(f"\nexecution took {exec_time:.2f} seconds")
 
-# %% tags=[]
+# %%
 # track metrics
 dataset_source = "/data" if fileset["ttbar__nominal"]["files"][0].startswith("/data") else "https://xrootd-local.unl.edu:1094" # TODO: xcache support
 metrics.update({
@@ -411,7 +411,7 @@ print(f"amount of data read: {metrics['bytesread']/1000**2:.2f} MB")  # likely b
 # Let's have a look at the data we obtained.
 # We built histograms in two phase space regions, for multiple physics processes and systematic variations.
 
-# %% tags=[]
+# %%
 utils.set_style()
 
 all_histograms[120j::hist.rebin(2), "4j1b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1, edgecolor="grey")
@@ -419,7 +419,7 @@ plt.legend(frameon=False)
 plt.title(">= 4 jets, 1 b-tag")
 plt.xlabel("HT [GeV]");
 
-# %% tags=[]
+# %%
 all_histograms[:, "4j2b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1,edgecolor="grey")
 plt.legend(frameon=False)
 plt.title(">= 4 jets, >= 2 b-tags")
@@ -434,7 +434,7 @@ plt.xlabel("$m_{bjj}$ [Gev]");
 #
 # We are making of [UHI](https://uhi.readthedocs.io/) here to re-bin.
 
-# %% tags=[]
+# %%
 # b-tagging variations
 all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
 all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_0_up"].plot(label="NP 1", linewidth=2)
@@ -445,7 +445,7 @@ plt.legend(frameon=False)
 plt.xlabel("HT [GeV]")
 plt.title("b-tagging variations");
 
-# %% tags=[]
+# %%
 # jet energy scale variations
 all_histograms[:, "4j2b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
 all_histograms[:, "4j2b", "ttbar", "pt_scale_up"].plot(label="scale up", linewidth=2)
@@ -460,7 +460,7 @@ plt.title("Jet energy variations");
 # We'll save everything to disk for subsequent usage.
 # This also builds pseudo-data by combining events from the various simulation setups we have processed.
 
-# %% tags=[]
+# %%
 utils.save_histograms(all_histograms, fileset, "histograms.root")
 
 # %% [markdown]
@@ -469,7 +469,7 @@ utils.save_histograms(all_histograms, fileset, "histograms.root")
 # A statistical model has been defined in `config.yml`, ready to be used with our output.
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
-# %% tags=[]
+# %%
 config = cabinetry.configuration.load("cabinetry_config.yml")
 cabinetry.templates.collect(config)
 cabinetry.templates.postprocess(config)  # optional post-processing (e.g. smoothing)
@@ -479,13 +479,13 @@ cabinetry.workspace.save(ws, "workspace.json")
 # %% [markdown]
 # We can inspect the workspace with `pyhf`, or use `pyhf` to perform inference.
 
-# %% tags=[]
+# %%
 # !pyhf inspect workspace.json | head -n 20
 
 # %% [markdown]
 # Let's try out what we built: the next cell will perform a maximum likelihood fit of our statistical model to the pseudodata we built.
 
-# %% tags=[]
+# %%
 model, data = cabinetry.model_utils.model_and_data(ws)
 fit_results = cabinetry.fit.fit(model, data)
 
@@ -496,7 +496,7 @@ cabinetry.visualize.pulls(
 # %% [markdown]
 # For this pseudodata, what is the resulting ttbar cross-section divided by the Standard Model prediction?
 
-# %% tags=[]
+# %%
 poi_index = model.config.poi_index
 print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {fit_results.uncertainty[poi_index]:.3f}")
 
@@ -504,23 +504,23 @@ print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {f
 # Let's also visualize the model before and after the fit, in both the regions we are using.
 # The binning here corresponds to the binning used for the fit.
 
-# %% tags=[]
+# %%
 model_prediction = cabinetry.model_utils.prediction(model)
 figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=config)
 figs[0]["figure"]
 
-# %% tags=[]
+# %%
 figs[1]["figure"]
 
 # %% [markdown]
 # We can see very good post-fit agreement.
 
-# %% tags=[]
+# %%
 model_prediction_postfit = cabinetry.model_utils.prediction(model, fit_results=fit_results)
 figs = cabinetry.visualize.data_mc(model_prediction_postfit, data, close_figure=True, config=config)
 figs[0]["figure"]
 
-# %% tags=[]
+# %%
 figs[1]["figure"]
 
 # %% [markdown]
