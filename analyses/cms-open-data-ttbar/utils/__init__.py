@@ -511,3 +511,69 @@ def plot_data_mc(model_prediction_prefit, model_prediction_postfit, data, config
     
     return figs
     
+# modified from generate_config in https://github.com/triton-inference-server/fil_backend/blob/main/qa/L0_e2e/generate_example_model.py
+def generate_triton_config(model_name, 
+                           num_features, 
+                           predict_proba=False,
+                           max_batch_size=50000000):
+    
+    """Return a string with the full Triton config.pbtxt for this model
+    """
+    
+    if predict_proba:
+        output_dim = 2
+    else:
+        output_dim = 1
+        
+    predict_proba = str(bool(predict_proba)).lower()
+
+    
+    return f"""name: "{model_name}"
+backend: "fil"
+max_batch_size: {max_batch_size}
+input [
+ {{
+    name: "input__0"
+    data_type: TYPE_FP32
+    dims: [ {num_features} ]
+  }}
+]
+output [
+ {{
+    name: "output__0"
+    data_type: TYPE_FP32
+    dims: [ {output_dim} ]
+  }}
+]
+instance_group [{{ kind: "KIND_GPU" }}]
+parameters [
+  {{
+    key: "model_type"
+    value: {{ string_value: "xgboost" }}
+  }},
+  {{
+    key: "predict_proba"
+    value: {{ string_value: "{predict_proba}" }}
+  }},
+  {{
+    key: "output_class"
+    value: {{ string_value: "true" }}
+  }},
+  {{
+    key: "threshold"
+    value: {{ string_value: "0.5" }}
+  }},
+  {{
+    key: "algo"
+    value: {{ string_value: "ALGO_AUTO" }}
+  }},
+  {{
+    key: "storage_type"
+    value: {{ string_value: "AUTO" }}
+  }},
+  {{
+    key: "blocks_per_sm"
+    value: {{ string_value: "0" }}
+  }}
+]
+dynamic_batching {{ }}"""

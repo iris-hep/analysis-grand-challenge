@@ -66,7 +66,7 @@ from xgboost import XGBClassifier
 N_FILES_MAX_PER_SAMPLE = 5
 
 # set to True for DaskExecutor
-USE_DASK_PROCESSING = True
+USE_DASK_PROCESSING = False
 
 # number of cores if using FuturesExecutor
 NUM_CORES = 4
@@ -81,14 +81,17 @@ AF = "coffea_casa"
 ### MACHINE LEARNING OPTIONS
 
 # enable Dask (whether to use dask for hyperparameter optimization. currently does not work)
-USE_DASK_ML = True
+USE_DASK_ML = False
 
 # enable MLFlow logging (to store metrics and models of hyperparameter optimization trials)
 USE_MLFLOW = True
 
 # enable MLFlow model logging/registering
 MODEL_LOGGING = True
-MODEL_REGISTERING = True
+MODEL_REGISTERING = False
+
+# enter generated mlflow tracking token (temporary solution) https://wiki.ncsa.illinois.edu/display/NCSASoftware/MLFlow+at+NCSA
+MLFLOW_TRACKING_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ6eXdjRVdfd2hOSzBTMDJLS3Nxd0Q0cGNjTXJpc1BSUUJDcEo4T0o1Rm40In0.eyJleHAiOjE2ODI5ODA1NjMsImlhdCI6MTY4Mjk0NDU2NywiYXV0aF90aW1lIjoxNjgyOTQ0NTY0LCJqdGkiOiJjMjFjOTFiMy0wM2Y3LTRkMzUtYTM4Yi1mN2I2NjBlZTZlNzkiLCJpc3MiOiJodHRwczovL2tleWNsb2FrLnNvZnR3YXJlLWRldi5uY3NhLmlsbGlub2lzLmVkdS9yZWFsbXMvbWxmbG93IiwiYXVkIjpbIm1sZmxvdy1kZW1vIiwiYWNjb3VudCJdLCJzdWIiOiIyOTdhM2ExNS02Nzc0LTQ0NDItOGVjNy0zNzBlNmVhNzM2MWIiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJtbGZsb3ctZGVtbyIsInNlc3Npb25fc3RhdGUiOiJmNGEwMDQzZi04NDhhLTRiNzktYTkwYy1kMWU4M2QyNjAwMzkiLCJzY29wZSI6InByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2lkIjoiZjRhMDA0M2YtODQ4YS00Yjc5LWE5MGMtZDFlODNkMjYwMDM5IiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJFbGxpb3R0IEthdWZmbWFuIiwiZ3JvdXBzIjpbIi9ncnBfamlyYV91c2VycyIsIi9zZF9tbGZsb3ciLCIvYWxsX3VzZXJzIiwiL2ppcmEtdXNlcnMiLCIvYWxsX2hwY191c2VyX3NwbyIsIm9mZmxpbmVfYWNjZXNzIiwiZGVmYXVsdC1yb2xlcy1tbGZsb3ciLCJ1bWFfYXV0aG9yaXphdGlvbiJdLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJla2F1ZmZtYSIsImdpdmVuX25hbWUiOiJFbGxpb3R0IiwiZmFtaWx5X25hbWUiOiJLYXVmZm1hbiIsImVtYWlsIjoiZWxtYWthODcwMEBnbWFpbC5jb20ifQ.t0YOAPRxAW16zSMPr-Mgce6vP-iH7OCQLb4SyMhcm1fg10mL0F1ta3TAhQWzLAM1Z0-mXNRmw9r2HLYxovu08gAGPfpEzI86zyA0t7RJr7MDIAHFN7bFqiLaZgOoQQ5DsmAQh2QdVUGDjhSJ4YCEvIgE37SFXrMdoJUKv5C4kCeG9h8bXg4t6mQP5z5LI8MWAclrIRBFxQWS1st3uA8Smh63IAsKxeY5RZS3hkNLXhF8Cx8GX0FB57QU-VgdN-QfhPQVNMFU-37UlDv_90c6FF-AklmgBKxYTwWfZ6g8lCNp6mlFufQfMGLCTedKpB5tacsvAxO4edd7l8u9KVy4Og"
 
 # number of folds for cross-validation
 N_FOLD = 2
@@ -99,7 +102,7 @@ N_TRIALS = 5
 # name to use for registering model
 MODEL_NAME = "reconstruction_bdt_xgb"
 
-# number of events to use for training (more is better, but slower)
+# number of events to use for training (more results in higher efficiency, but slower to train)
 N_EVENTS_TRAIN = 10000
 
 # %% tags=[]
@@ -460,7 +463,7 @@ even = np.repeat(even, 12) # twelve permutations for each event
 # There are twelve combinations for each event, so each event will have 1 correct combination, 2 completely incorrect combinations, and 9 partially correct combinations.
 
 # %% [markdown]
-# # Histograms of Training Variables
+# ### Histograms of Training Variables
 # To vizualize the separation power of the different variables, histograms are created for each of the three labels. Only `all_correct` and `none_correct` are used for training purposes.
 
 # %% tags=[]
@@ -751,7 +754,7 @@ ax.set_title("top_lepton Jet qgl")
 fig.show()
 
 # %% [markdown]
-# # Model Optimization
+# ### Model Optimization
 #
 # The model used here is `xgboost`'s gradient-boosted decision tree (`XGBClassifier`). Hyperparameter optimization is performed using random selection from a sample space of hyperparameters then testing model fits in a parallelized manner using `dask`. Optional `mlflow` logging is included.
 
@@ -794,7 +797,7 @@ N_EVENTS_TRAIN = min(min(int(features_odd.shape[0]/12), N_EVENTS_TRAIN), int(fea
 # set up trials
 if USE_MLFLOW:
     
-    os.environ['MLFLOW_TRACKING_TOKEN'] = "" # enter token here
+    os.environ['MLFLOW_TRACKING_TOKEN'] = MLFLOW_TRACKING_TOKEN
     os.environ['MLFLOW_TRACKING_URI'] = "https://mlflow-demo.software-dev.ncsa.illinois.edu"
     
     mlflow.set_tracking_uri('https://mlflow-demo.software-dev.ncsa.illinois.edu') 
@@ -1008,7 +1011,7 @@ def fit_model(params,
 # function to provide necessary environment variables to workers
 def initialize_mlflow(): 
     
-    os.environ['MLFLOW_TRACKING_TOKEN'] = "" # enter token here
+    os.environ['MLFLOW_TRACKING_TOKEN'] = MLFLOW_TRACKING_TOKEN
     os.environ['MLFLOW_TRACKING_URI'] = "https://mlflow-demo.software-dev.ncsa.illinois.edu"
     
     mlflow.set_tracking_uri('https://mlflow-demo.software-dev.ncsa.illinois.edu') 
@@ -1139,7 +1142,50 @@ else:
 best_model_odd.save_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_odd.json")
 
 # %% [markdown]
-# # Evaluation with Optimized Model
+# ### Uploading model to NVIDIA Triton (optional)
+
+# %% tags=[]
+# generating Triton config file
+config_txt = utils.generate_triton_config("reconstruction_bdt_xgb", 
+                                          20, 
+                                          predict_proba=True)
+print(config_txt)
+
+# %% tags=[]
+# !mkdir reconstruction_bdt_xgb
+
+# %% tags=[]
+with open(f'reconstruction_bdt_xgb/config.pbtxt', 'w') as the_file:
+    the_file.write(config_txt)
+
+# %% tags=[]
+# !mkdir reconstruction_bdt_xgb/1
+
+# %% tags=[]
+best_model_even.save_model("reconstruction_bdt_xgb/1/xgboost.model")
+
+# %% tags=[]
+# !mkdir reconstruction_bdt_xgb/2
+
+# %% tags=[]
+best_model_even.save_model("reconstruction_bdt_xgb/2/xgboost.model")
+
+# %% [markdown]
+# If you are using UNL open data, you can upload the model repository to the Triton server using `mc` in the command line:
+#
+# ```
+# mc alias set triton http://$BUCKET_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+# mc cp -r reconstruction_bdt_xgb triton/$BUCKET_NAME/reconstruction_bdt_xgb/
+# ```
+#
+# The server may need to be restarted in order to load the model.
+
+# %% tags=[]
+# remove model directory after uploading to triton
+# !rm -r reconstruction_bdt_xgb
+
+# %% [markdown]
+# ### Evaluation with Optimized Model
 
 # %% tags=[]
 # make predictions

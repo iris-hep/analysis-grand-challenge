@@ -29,6 +29,7 @@ analyses/atlas-open-data-hzz/figures
 # CMS ttbar
 analyses/cms-open-data-ttbar/workspace.json
 analyses/cms-open-data-ttbar/metrics
+analyses/cms-open-data-ttbar/reconstruction_bdt_xgb
 
 # dask
 dask-worker-space/
