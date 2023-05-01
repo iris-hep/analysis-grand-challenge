@@ -52,7 +52,6 @@ import correctionlib
 from coffea import processor
 from coffea.nanoevents import NanoAODSchema
 from coffea.analysis_tools import PackedSelection
-from servicex import ServiceXDataset
 from func_adl import ObjectStream
 from func_adl_servicex import ServiceXSourceUpROOT
 
@@ -219,20 +218,20 @@ class TtbarAnalysis(processor.ProcessorABC):
             ######### Store boolean masks with PackedSelection ##########
             selections = PackedSelection(dtype='uint64')
             # Basic selection criteria
-            selections.add("exactly_1l",(ak.num(elecs) + ak.num(muons)) == 1)
-            selections.add("atleast_4j",ak.num(jets) >= 4)
-            selections.add("exactly_1b",ak.sum(jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) == 1)
-            selections.add("atleast_2b",ak.sum(jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2)
+            selections.add("exactly_1l", (ak.num(elecs) + ak.num(muons)) == 1)
+            selections.add("atleast_4j", ak.num(jets) >= 4)
+            selections.add("exactly_1b", ak.sum(jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) == 1)
+            selections.add("atleast_2b", ak.sum(jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2)
             # Complex selection criteria
-            selections.add("4j1b",selections.all("exactly_1l", "atleast_4j", "exactly_1b"))
-            selections.add("4j2b",selections.all("exactly_1l", "atleast_4j", "atleast_2b"))
+            selections.add("4j1b", selections.all("exactly_1l", "atleast_4j", "exactly_1b"))
+            selections.add("4j2b", selections.all("exactly_1l", "atleast_4j", "atleast_2b"))
 
             for region in ["4j1b", "4j2b"]:
                 region_selection = selections.all(region)
                 region_jets = jets[region_selection]
                 region_weights = np.ones(len(region_jets)) * xsec_weight
                 if region == "4j1b":
-                    observable = ak.sum(region_jets.pt,axis=-1)
+                    observable = ak.sum(region_jets.pt, axis=-1)
                 elif region == "4j2b":
                     # reconstruct hadronic top as bjj system with largest pT
                     trijet = ak.combinations(region_jets, 3, fields=["j1", "j2", "j3"])  # trijet candidates
@@ -245,14 +244,14 @@ class TtbarAnalysis(processor.ProcessorABC):
                 syst_var_name = f"{syst_var}"
                 # Break up the filling into event weight systematics and object variation systematics
                 if syst_var in event_systs:
-                    for i_dir,direction in enumerate(["up","down"]):
+                    for i_dir, direction in enumerate(["up", "down"]):
                         # Should be an event weight systematic with an up/down variation
                         if syst_var.startswith("btag_var"):
                             i_jet = int(syst_var.rsplit("_",1)[-1])   # Kind of fragile
-                            wgt_variation = self.cset["event_systematics"].evaluate("btag_var",direction,region_jets.pt[:,i_jet])
+                            wgt_variation = self.cset["event_systematics"].evaluate("btag_var", direction, region_jets.pt[:,i_jet])
                         elif syst_var == "scale_var":
                             # The pt array is only used to make sure the output array has the correct shape
-                            wgt_variation = self.cset["event_systematics"].evaluate("scale_var",direction,region_jets.pt[:,0])
+                            wgt_variation = self.cset["event_systematics"].evaluate("scale_var", direction, region_jets.pt[:,0])
                         syst_var_name = f"{syst_var}_{direction}"
                         histogram.fill(
                             observable=observable, region=region, process=process,
