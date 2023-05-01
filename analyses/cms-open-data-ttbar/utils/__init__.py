@@ -1,5 +1,6 @@
 import asyncio
 import json
+import yaml
 
 import hist
 import matplotlib as mpl
@@ -8,6 +9,9 @@ import uproot
 from servicex import ServiceXDataset
 import numpy as np
 import awkward as ak
+
+with open("config.yaml") as config_file:
+    config = yaml.safe_load(config_file)
 
 def get_client(af="coffea_casa"):
     if af == "coffea_casa":
@@ -128,14 +132,12 @@ def save_histograms(all_histograms, fileset, filename):
 def save_ml_histograms(hist_dict, fileset, filename):
     nominal_samples = [sample for sample in fileset.keys() if "nominal" in sample]
 
-    features = ["deltar_leptontoplep","deltar_w1w2","deltar_w1tophad","deltar_w2tophad","mass_leptontoplep","mass_w1w2",
-                "mass_w1w2tophad","pt_w1w2tophad","pt_w1","pt_w2","pt_tophad","pt_toplep",
-                "btag_w1","btag_w2","btag_tophad","btag_toplep","qgl_w1","qgl_w2","qgl_tophad","qgl_toplep"]
-    for feature in features:
+    
+    for feature in config["ml"]["FEATURE_NAMES"]:
         hist_dict[f"hist_{feature}"] += 1e-6  # add minimal event count to all bins to avoid crashes when processing a small number of samples
 
     with uproot.recreate(filename) as f:
-        for feature in features:
+        for feature in config["ml"]["FEATURE_NAMES"]:
             current_hist = hist_dict[f"hist_{feature}"]
             f[f"{feature}_pseudodata"] = (current_hist[:, "ttbar", "ME_var"] + current_hist[:, "ttbar", "PS_var"]) / 2  + current_hist[:, "wjets", "nominal"]
             

@@ -9,7 +9,7 @@ global:
 benchmarking:
 
   # chunk size to use
-  CHUNKSIZE: 500000
+  CHUNKSIZE: 100000
   
   # metadata to propagate through to metrics
   # "ssl-dev" allows for the switch to local data on /data
@@ -89,11 +89,11 @@ ml:
   MODEL_NAME: reconstruction_bdt_xgb
   
   
-  TRITON_URL: agc-triton-inference-server:8001
+  TRITON_URL: 'agc-triton-inference-server:8001'
   
   
-  MODEL_VERSION_EVEN: 1
-  MODEL_VERSION_ODD: 2
+  MODEL_VERSION_EVEN: '2'
+  MODEL_VERSION_ODD: '1'
   
   
   XGBOOST_MODEL_PATH_EVEN: models/model_even.json
@@ -101,10 +101,10 @@ ml:
   
   
   BIN_RANGES:
-    - [0,1]
-    - [0,1]
-    - [0,1]
-    - [0,1]
+    - [0,6]
+    - [0,6]
+    - [0,6]
+    - [0,6]
     - [50,300]
     - [50,300]
     - [50,550]
@@ -136,11 +136,11 @@ ml:
     - pt_tophad
     - pt_toplep
     - btag_w1
-    - btag_w1
+    - btag_w2
     - btag_tophad
     - btag_toplep
     - qgl_w1
-    - qgl_w1
+    - qgl_w2
     - qgl_tophad
     - qgl_toplep
     
