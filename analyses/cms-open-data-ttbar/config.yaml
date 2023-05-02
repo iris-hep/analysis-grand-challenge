@@ -9,7 +9,7 @@ global:
 benchmarking:
 
   # chunk size to use
-  CHUNKSIZE: 500000
+  CHUNKSIZE: 100000
   
   # metadata to propagate through to metrics
   # "ssl-dev" allows for the switch to local data on /data
@@ -80,3 +80,88 @@ benchmarking:
       - Jet_qgl
       - Jet_muonSubtrFactor
       - Jet_puIdDisc
+      
+ml:
+
+  MAX_N_JETS: 6
+  
+  
+  MODEL_NAME: reconstruction_bdt_xgb
+  
+  
+  TRITON_URL: 'agc-triton-inference-server:8001'
+  
+  
+  MODEL_VERSION_EVEN: '2'
+  MODEL_VERSION_ODD: '1'
+  
+  
+  XGBOOST_MODEL_PATH_EVEN: models/model_even.json
+  XGBOOST_MODEL_PATH_ODD: models/model_odd.json
+  
+  
+  BIN_RANGES:
+    - [0,6]
+    - [0,6]
+    - [0,6]
+    - [0,6]
+    - [50,300]
+    - [50,300]
+    - [50,550]
+    - [50,550]
+    - [25,300]
+    - [25,300]
+    - [25,300]
+    - [25,300]
+    - [0,1]
+    - [0,1]
+    - [0,1]
+    - [0,1]
+    - [-1,1]
+    - [-1,1]
+    - [-1,1]
+    - [-1,1]
+    
+  FEATURE_NAMES:
+    - deltar_leptontoplep
+    - deltar_w1w2
+    - deltar_w1tophad
+    - deltar_w2tophad
+    - mass_leptontoplep
+    - mass_w1w2
+    - mass_w1w2tophad
+    - pt_w1w2tophad
+    - pt_w1
+    - pt_w2
+    - pt_tophad
+    - pt_toplep
+    - btag_w1
+    - btag_w2
+    - btag_tophad
+    - btag_toplep
+    - qgl_w1
+    - qgl_w2
+    - qgl_tophad
+    - qgl_toplep
+    
+  FEATURE_DESCRIPTIONS:
+    - 'Delta R between $top_{lepton}$ Jet and Lepton'
+    - 'Delta R between the two W Jets'
+    - 'Delta R between first W Jet and $top_{hadron}$ Jet'
+    - 'Delta R between second W Jet and $top_{hadron}$ Jet'
+    - 'Combined Mass of $top_{lepton}$ Jet and Lepton [GeV]'
+    - 'Combined Mass of the two W Jets [GeV]'
+    - 'Combined Mass of $top_{hadron}$ Jet and the two W Jets [GeV]'
+    - 'Combined $p_T$ of $top_{hadron}$ Jet and the two W Jets [GeV]'
+    - '$p_T$ of the first W Jet [GeV]'
+    - '$p_T$ of the second W Jet [GeV]'
+    - '$p_T$ of the $top_{hadron}$ Jet [GeV]'
+    - '$p_T$ of the $top_{lepton}$ Jet [GeV]'
+    - 'btagCSVV2 of the first W Jet'
+    - 'btagCSVV2 of the second W Jet'
+    - 'btagCSVV2 of the $top_{hadron}$ Jet'
+    - 'btagCSVV2 of the $top_{lepton}$ Jet'
+    - 'qgl of the first W Jet'
+    - 'qgl of the second W Jet'
+    - 'qgl of the $top_{hadron}$ Jet'
+    - 'qgl of the $top_{lepton}$ Jet'
