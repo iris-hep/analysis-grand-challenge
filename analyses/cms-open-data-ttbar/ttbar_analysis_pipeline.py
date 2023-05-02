@@ -205,7 +205,7 @@ def get_features(jets, electrons, muons, permutations_dict):
     features[:,14] = ak.flatten(jets[perms[...,2]].btagCSVV2).to_numpy()
     features[:,15] = ak.flatten(jets[perms[...,3]].btagCSVV2).to_numpy()
     
-    # qgl of every jet
+    # quark-gluon likelihood discriminator of every jet
     features[:,16] = ak.flatten(jets[perms[...,0]].qgl).to_numpy()
     features[:,17] = ak.flatten(jets[perms[...,1]].qgl).to_numpy()
     features[:,18] = ak.flatten(jets[perms[...,2]].qgl).to_numpy()
@@ -729,7 +729,7 @@ if USE_INFERENCE:
 # %% tags=[]
 utils.save_histograms(all_histograms['hist'], fileset, "histograms.root")
 if USE_INFERENCE:
-    utils.save_ml_histograms(all_histograms['ml_hist_dict'], fileset, "histograms_ml.root", config)
+    utils.save_ml_histograms(all_histograms['ml_hist_dict'], fileset, "histograms_ml.root")
 
 # %% [markdown]
 # ### Statistical inference
