@@ -1,6 +1,5 @@
 import asyncio
 import json
-import yaml
 
 import hist
 import matplotlib as mpl
@@ -9,9 +8,6 @@ import uproot
 from servicex import ServiceXDataset
 import numpy as np
 import awkward as ak
-
-with open("config.yaml") as config_file:
-    config = yaml.safe_load(config_file)
 
 def get_client(af="coffea_casa"):
     if af == "coffea_casa":
@@ -129,7 +125,7 @@ def save_histograms(all_histograms, fileset, filename):
             f[f"{region}_wjets_scale_var_up"] = all_histograms[120j :: hist.rebin(2), region, "wjets", "scale_var_up"]
             
             
-def save_ml_histograms(hist_dict, fileset, filename):
+def save_ml_histograms(hist_dict, fileset, filename, config):
     nominal_samples = [sample for sample in fileset.keys() if "nominal" in sample]
 
     

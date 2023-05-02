@@ -729,7 +729,7 @@ if USE_INFERENCE:
 # %% tags=[]
 utils.save_histograms(all_histograms['hist'], fileset, "histograms.root")
 if USE_INFERENCE:
-    utils.save_ml_histograms(all_histograms['ml_hist_dict'], fileset, "histograms_ml.root")
+    utils.save_ml_histograms(all_histograms['ml_hist_dict'], fileset, "histograms_ml.root", config)
 
 # %% [markdown]
 # ### Statistical inference
