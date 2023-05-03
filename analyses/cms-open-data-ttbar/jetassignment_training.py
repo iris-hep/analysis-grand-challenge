@@ -88,7 +88,10 @@ USE_MLFLOW = True
 
 # enable MLFlow model logging/registering
 MODEL_LOGGING = True
-MODEL_REGISTERING = True
+MODEL_REGISTERING = False
+
+# enter generated mlflow tracking token (temporary solution) https://wiki.ncsa.illinois.edu/display/NCSASoftware/MLFlow+at+NCSA
+MLFLOW_TRACKING_TOKEN = ""
 
 # number of folds for cross-validation
 N_FOLD = 2
