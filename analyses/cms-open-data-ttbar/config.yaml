@@ -123,45 +123,45 @@ ml:
     - [-1,1]
     
   FEATURE_NAMES:
-    - deltar_leptontoplep
+    - deltar_leptonbtoplep
     - deltar_w1w2
-    - deltar_w1tophad
-    - deltar_w2tophad
-    - mass_leptontoplep
+    - deltar_w1btophad
+    - deltar_w2btophad
+    - mass_leptonbtoplep
     - mass_w1w2
-    - mass_w1w2tophad
-    - pt_w1w2tophad
+    - mass_w1w2btophad
+    - pt_w1w2btophad
     - pt_w1
     - pt_w2
-    - pt_tophad
-    - pt_toplep
+    - pt_btophad
+    - pt_btoplep
     - btag_w1
     - btag_w2
-    - btag_tophad
-    - btag_toplep
+    - btag_btophad
+    - btag_btoplep
     - qgl_w1
     - qgl_w2
-    - qgl_tophad
-    - qgl_toplep
+    - qgl_btophad
+    - qgl_btoplep
     
   FEATURE_DESCRIPTIONS:
-    - 'Delta R between $top_{lepton}$ Jet and Lepton'
+    - 'Delta R between $b_{top-lep}$ Jet and Lepton'
     - 'Delta R between the two W Jets'
-    - 'Delta R between first W Jet and $top_{hadron}$ Jet'
-    - 'Delta R between second W Jet and $top_{hadron}$ Jet'
-    - 'Combined Mass of $top_{lepton}$ Jet and Lepton [GeV]'
+    - 'Delta R between first W Jet and $b_{top-had}$ Jet'
+    - 'Delta R between second W Jet and $b_{top-had}$ Jet'
+    - 'Combined Mass of $b_{top-lep}$ Jet and Lepton [GeV]'
     - 'Combined Mass of the two W Jets [GeV]'
-    - 'Combined Mass of $top_{hadron}$ Jet and the two W Jets [GeV]'
-    - 'Combined $p_T$ of $top_{hadron}$ Jet and the two W Jets [GeV]'
+    - 'Combined Mass of $b_{top-had}$ Jet and the two W Jets [GeV]'
+    - 'Combined $p_T$ of $b_{top-had}$ Jet and the two W Jets [GeV]'
     - '$p_T$ of the first W Jet [GeV]'
     - '$p_T$ of the second W Jet [GeV]'
-    - '$p_T$ of the $top_{hadron}$ Jet [GeV]'
-    - '$p_T$ of the $top_{lepton}$ Jet [GeV]'
+    - '$p_T$ of the $b_{top-had}$ Jet [GeV]'
+    - '$p_T$ of the $b_{top-lep}$ Jet [GeV]'
     - 'btagCSVV2 of the first W Jet'
     - 'btagCSVV2 of the second W Jet'
-    - 'btagCSVV2 of the $top_{hadron}$ Jet'
-    - 'btagCSVV2 of the $top_{lepton}$ Jet'
+    - 'btagCSVV2 of the $b_{top-had}$ Jet'
+    - 'btagCSVV2 of the $b_{top-lep}$ Jet'
     - 'Quark vs Gluon likelihood discriminator of the first W Jet'
     - 'Quark vs Gluon likelihood discriminator of the second W Jet'
-    - 'Quark vs Gluon likelihood discriminator of the $top_{hadron}$ Jet'
-    - 'Quark vs Gluon likelihood discriminator of the $top_{lepton}$ Jet'
+    - 'Quark vs Gluon likelihood discriminator of the $b_{top-had}$ Jet'
+    - 'Quark vs Gluon likelihood discriminator of the $b_{top-lep}$ Jet'
