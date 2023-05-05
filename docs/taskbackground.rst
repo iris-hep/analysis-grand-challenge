@@ -45,7 +45,7 @@ Most modern high energy physics analyses use some form of machine learning (ML),
 
 The strategy used for this jet-parton assignment task is as follows:
 
-In each event, we want to associate four jets to three labels. We want to label two jets as :math:`W` (considering these two to be indistinguishable), one jet as :math:`top_{hadron}` (the top jet on the side of hadronic decay), and one as :math:`top_{lepton}` (the top jet on the side of leptonic decay). This is visualized in the diagram below:
+In each event, we want to associate four jets to three labels. We want to label two jets as :math:`W` (considering these two to be indistinguishable), one jet as :math:`b_{top-had}` (the top jet on the side of hadronic decay), and one as :math:`b_{top-lep}` (the top jet on the side of leptonic decay). This is visualized in the diagram below:
 
 .. image:: images/ttbar_labels.png
   :width: 80%
@@ -61,26 +61,26 @@ To vizualize the :math:`N=4` scenario, view the diagram below:
   
 For each permutation, we calculate 20 features:
 
-#. :math:`\Delta R` between the :math:`top_{lepton}` jet and the lepton
+#. :math:`\Delta R` between the :math:`b_{top-lep}` jet and the lepton
 #. :math:`\Delta R` between the two :math:`W` jets
-#. :math:`\Delta R` between the first :math:`W` jet and the :math:`top_{hadron}` jet
-#. :math:`\Delta R` between the second :math:`W` jet and the :math:`top_{hadron}` jet (should have same distribution as previous feature)
-#. Combined mass of the :math:`top_{lepton}` jet and the lepton
+#. :math:`\Delta R` between the first :math:`W` jet and the :math:`b_{top-had}` jet
+#. :math:`\Delta R` between the second :math:`W` jet and the :math:`b_{top-had}` jet (should have same distribution as previous feature)
+#. Combined mass of the :math:`b_{top-lep}` jet and the lepton
 #. Combined mass of the two :math:`W` jets
-#. Combined mass of the two :math:`W` jets and the :math:`top_{hadron}` jet (reconstructed top mass)
-#. Combined :math:`p_T` of the two :math:`W` jets and the :math:`top_{hadron}` jet
+#. Combined mass of the two :math:`W` jets and the :math:`b_{top-had}` jet (reconstructed top mass)
+#. Combined :math:`p_T` of the two :math:`W` jets and the :math:`b_{top-had}` jet
 #. :math:`p_T` of the first :math:`W` jet
 #. :math:`p_T` of the second :math:`W` jet (should have same distribution as previous feature)
-#. :math:`p_T` of the :math:`top_{hadron}` jet
-#. :math:`p_T` of the :math:`top_{lepton}` jet
+#. :math:`p_T` of the :math:`b_{top-had}` jet
+#. :math:`p_T` of the :math:`b_{top-lep}` jet
 #. ``btagCSVV2`` of the first :math:`W` jet (:math:`b`-tag value)
 #. ``btagCSVV2`` of the second :math:`W` jet (should have same distribution as previous feature)
-#. ``btagCSVV2`` of the :math:`top_{hadron}` jet
-#. ``btagCSVV2`` of the :math:`top_{lepton}` jet
+#. ``btagCSVV2`` of the :math:`b_{top-had}` jet
+#. ``btagCSVV2`` of the :math:`b_{top-lep}` jet
 #. ``qgl`` of the first :math:`W` jet (quark-gluon discriminator)
 #. ``qgl`` of the second :math:`W` jet (should have same distribution as previous feature)
-#. ``qgl`` of the :math:`top_{hadron}` jet
-#. ``qgl`` of the :math:`top_{lepton}` jet
+#. ``qgl`` of the :math:`b_{top-had}` jet
+#. ``qgl`` of the :math:`b_{top-lep}` jet
 
 For each permutation, all 20 features are fed into a boosted decision tree, which was trained to select correct permutations. After this, the permutation with the highest BDT score is selected as "correct", then we use those jet-parton assignments to calculate the observables of interest.
 

@@ -162,7 +162,7 @@ def get_features(jets, electrons, muons, permutations_dict):
 
     feature_count = 0
 
-    # delta R between top_lepton and lepton
+    # delta R between b_toplep and lepton
     features[:,0] = ak.flatten(np.sqrt((leptons.eta - jets[perms[...,3]].eta)**2 +
                                        (leptons.phi - jets[perms[...,3]].phi)**2)).to_numpy()
 
@@ -171,24 +171,24 @@ def get_features(jets, electrons, muons, permutations_dict):
     features[:,1] = ak.flatten(np.sqrt((jets[perms[...,0]].eta - jets[perms[...,1]].eta)**2 +
                                        (jets[perms[...,0]].phi - jets[perms[...,1]].phi)**2)).to_numpy()
 
-    #delta R between W and top_hadron
+    #delta R between W and b_tophad
     features[:,2] = ak.flatten(np.sqrt((jets[perms[...,0]].eta - jets[perms[...,2]].eta)**2 +
                                        (jets[perms[...,0]].phi - jets[perms[...,2]].phi)**2)).to_numpy()
     features[:,3] = ak.flatten(np.sqrt((jets[perms[...,1]].eta - jets[perms[...,2]].eta)**2 +
                                        (jets[perms[...,1]].phi - jets[perms[...,2]].phi)**2)).to_numpy()
 
-    # combined mass of top_lepton and lepton
+    # combined mass of b_toplep and lepton
     features[:,4] = ak.flatten((leptons + jets[perms[...,3]]).mass).to_numpy()
 
     # combined mass of W
     features[:,5] = ak.flatten((jets[perms[...,0]] + jets[perms[...,1]]).mass).to_numpy()
 
-    # combined mass of W and top_hadron
+    # combined mass of W and b_tophad
     features[:,6] = ak.flatten((jets[perms[...,0]] + jets[perms[...,1]] +
                                  jets[perms[...,2]]).mass).to_numpy()
 
     feature_count+=1
-    # combined pT of W and top_hadron
+    # combined pT of W and b_tophad
     features[:,7] = ak.flatten((jets[perms[...,0]] + jets[perms[...,1]] +
                                  jets[perms[...,2]]).pt).to_numpy()
 
