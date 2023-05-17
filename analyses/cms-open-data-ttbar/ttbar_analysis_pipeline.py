@@ -60,7 +60,6 @@ import yaml
 import matplotlib.pyplot as plt
 import numpy as np
 import uproot
-import tritonclient.grpc as grpcclient
 from xgboost import XGBClassifier
 import pyhf
 
@@ -324,6 +323,7 @@ class TtbarAnalysis(processor.ProcessorABC):
         # setup triton gRPC client
         if self.use_inference:
             if self.use_triton:
+                import tritonclient.grpc as grpcclient
                 triton_client = grpcclient.InferenceServerClient(url=self.url)
                 model_metadata = triton_client.get_model_metadata(self.model_name, self.model_vers_even)
                 input_name = model_metadata.inputs[0].name
