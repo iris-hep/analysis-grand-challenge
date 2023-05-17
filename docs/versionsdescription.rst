@@ -36,7 +36,7 @@ The below table gives a brief overview of all AGC versions.
      - 
      - 
      - BDT to predict jet-parton assignment in :math:`t\bar{t}` events
-     -  
+     - 
 
 Datasets
 ================================

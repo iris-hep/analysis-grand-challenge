@@ -1,19 +1,39 @@
-Physics Analysis Background
+:math:`t\bar{t}` Analysis Background
 ===============================================================
+The chapter covers the :math:`t\bar{t}`-analysis logic. `2015 CMS Open Data <https://cms.cern/news/first-cms-open-data-lhc-run-2-released>`_ is assumed as input data for concreteness (see :doc:`AGC Versions <./versionsdescription>`* section for more information). The basic idea of this chapter is to give a basic algorithm for distinguishing the t-quark pair production channel among other concurrent channels (production of single t-quark and w-jet) and to get the mass peak of the t-quark using a histogram.
 
-:math:`t\bar{t}` Events
+Input
 ---------------------------------------------------------------
-Implementations of analysis tasks in the Analysis Grand Challenge aim to demonstrate the integration of different software components in a realistic physics analysis. The task chosen for CMS open data is a measurement of the :math:`t\bar{t}` (top-antitop quark pair production) cross-section  measurement using events with at least four jets and one lepton in the final state. This signature has two possibilities, depending on whether the lepton/neutrino pair originates from the top or antitop quark:
+Input data is five sets of ``ROOT``-files. Each set is produced in MC simulation and represents a partial interaction channel, one of five: **:math:`t\bar{t}`**-channel, **single top s**-channel, **single top t**-channel, **single top tW**-channel, **Wjets**-channel. 
+The ``ROOT``-file structure can be represented as a schematic:
+
+.. image:: images/input_structure.png
+  :width: 60%
+  :alt: Diagram showing the structure of each ``ROOT`` file with separate fields for electrons, muons, and jets.
+
+This diagram shows only those fields that will be required for further analysis, such as electron, muon, and jet. Each of these branches has its number of particles (:math:`N_e`, :math:`N_{\mu}`, :math:`N_{jet}`), the transverse momentum value (:math:`p_T`) that will be used in the following sections for events filtering. Also, jets have a b-tag value, which is the output of a discriminator used to identify b-jets (jets produced by b-quark).
+
+Output
+---------------------------------------------------------------
+The analysis task involves selecting events from the input dataset in which measured quantities originate from :math:`t\bar{t}` decay. In real data, one cannot know with 100\% certainty that an event comes from a specific process, including :math:`t\bar{t}` decay. Through our simulated data, we can ascertain the truth information of each event, which provides us extra tools to develop our analysis. Our data is separated by file into five channels: **ttbar**, **single_top_s_chan**, **single_top_t_chan**, **single_top_tW**, and **wjets**).
+
+To select events for out analysis, we will apply some criteria (explained below) and then compare the relative rate of those events which indeed were generated with :math:`t\bar{t}` pair production. The example below demonstrates successful event selection, since the majority of events belong to the :math:`t\bar{t}`-channel.
+
+.. image:: images/analysis.png
+  :width: 80%
+  :alt: Top mass distribution demonstrating successful :math:`t\bar{t}` analysis.
+  
+Event Selection
+---------------------------------------------------------------
+Not all event information is needed for this analysis. The only objects to which selection criteria will be applied are leptons (electrons and muons) and jets that are the products of $t\bar{t}$ decay. In the semi-leptonic decay channel of :math:`t\bar{t}` production, two jets, two b-jets, and one lepton are expected, as can be concluded from the diagram below:
 
 .. image:: images/ttbar.png
   :width: 80%
   :alt: Diagram of a :math:`t\bar{t}` event with four jets and one lepton.
 
-The jets are illustrated in purple. These are collimated showers of hadrons resulting from quarks, which cannot exist on their own due to colour confinement.
-
 Here is an example of the above signature in CMS Open Data. Since this is Monte Carlo simulated data, we can look at the particles that the jets originate from. The jets are plotted as circles in the :math:`\eta`-:math:`\phi` plane, and color-coordinated with the truth particles they are matched to. Note that :math:`\phi` is a circular variable, so the top of the graph matches to the bottom. The jets that are outlined in solid black are b-tagged, which means that they have properties which strongly indicate that they originate from bottom quarks.
 
-To look at more events, take a look at **Plot :math:`t\bar{t}` Events**.
+To look at more events, take a look at :doc:`AGC Versions <./event-plotting/plotEvents>`*.
 
 .. image:: images/event3.png
   :width: 80%
@@ -35,9 +55,78 @@ The tree of the above event looks something like
         │   └── c~
         └── b~
         
+To ensure that we retain the highest possible purity of :math:`t\bar{t}` events in the signal region, we make the following cuts:
+
+* Events must contain exactly one lepton, which must have :math:`p_T>30` GeV, :math:`|\eta|<2.1`, and ``sip3d<4`` (significance of 3d impact parameter)
+* Jets must have :math:`p_T>30` GeV, :math:`|\eta|>2.4`, and ``isTightLeptonVeto``
+* Events must have at least four jets
+* Events must have exactly one :math:`b`-tagged jet
+
+There are a few more details about the cuts, which one can read about in :doc:`AGC Versions <./versionsdescription>`* in the **Cuts** section.
+
+
+Weighting
+---------------------------------------------------------------
+The above-described algorithm assumes that data samples generated using different channels come into the histogram with equivalent weights. This is not the case, as the relative number of events in each sample does not reflect the rate at which that process occurs in our detected events. So we need to account for the cross-section when processing events. This is the formula for calculating weights:
+
+.. math::
+    
+    w_i = {{\sigma}_i L \over N_i}
+
+where :math:`i` represents the partial interaction channel, :math:`\sigma` is the partial cross-section, :math:`L` is the luminosity, and :math:`N_i` is the total number of events in the data sample.
+
+The luminosity for this dataset is :math:`L=3378\;pb^{-1}`.
+
+The cross-section values used are listed below (obtained from `this site <https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCTopWG>`_):
+
+.. list-table:: Cross-section values
+   :widths: 50 50
+   :header-rows: 1
+
+   * - Process
+     - Cross-section [pb]
+   * - ttbar
+     - 729.84
+   * - single_top_s_chan
+     - 6.839
+   * - single_top_t_chan
+     - 214.2
+   * - single_top_tW
+     - 79.3
+   * - wjets
+     - 
+
 Top Mass Reconstruction
 ---------------------------------------------------------------
 To measure the :math:`t\bar{t}` cross-section, we use an observable that approximately reconstructs the top quark mass. We do this in two different ways. The first uses no machine learning. Within an event, the trijet system with the highest transverse momentum (:math:`p_T`) is selected. We then calculate the combined mass of these three jets.
+
+Statistical Model
+---------------------------------------------------------------
+We want to develop a statistical model, parameterized by some physical parameters :math:`\vec{\alpha}`. We have one parameter of interest, the :math:`t\bar{t}` cross-section, and a handful of *nuisance parameters*, which are free physics parameters that are not of interest in this analysis. Changing any nuisance parameter can have an effect on the expected rate of a physics process and/or distribution shapes, leading to systematic uncertainties. In general, we model the effects of changing nuisance parameters by generating Monte Carlo selections for different variations of parameters. Once we have these, we can utilize different interpolation strategies to construct a continuous parameterization. 
+
+Generally, and inclusive of this analysis example, we consider three different variations: one "nominal" parameter setting, where the nominal setting is chosen based on previous experience and studies, one "up" sample, where the parameter is increased by :math:`1\sigma`, and one "down" sample, where the parameter is decreased by :math:`1\sigma`. The standard uncertainties of the parameters often originate from auxiliary measurements, which necessitate the inclusion of additional constraint terms in the statistical model. Using the up/nominal/down measurements, an interpolation can be made (for each bin) so that a model prediction can be provided for any parameter value:
+
+.. image:: images/interpolation.png
+  :width: 60%
+  :alt: Example of interpolation for model predictions, obtained from `CERN-OPEN-2012-016 <https://cds.cern.ch/record/1456844>`_.
+  
+The above example was obtained from `CERN-OPEN-2012-016 <https://cds.cern.ch/record/1456844>`_.
+
+Using our (pseudo)data, we run a maximum likelihood fit over all parameters to find the best-fit parameter values. The model will be made to have higher agreement with the data while nuisance parameters stay as close to the nominal values as possible. 
+
+The results of this fit can be seen in the below diagram, which demonstrates how far each parameter was pulled from its nominal value:
+
+.. image:: images/pulls.png
+  :width: 60%
+  :alt: A pull diagram showing the fit results for each parameter with respect to their nominal values.
+
+Here is what the model looks like, before and after the fit is performed:
+
+.. image:: images/fit.png
+  :width: 80%
+  :alt: The histogram of the reconstructed top mass (:math:`m_{bjj}`) before and after maximum likelihood fit.
+
+
 
 Machine Learning Component
 ---------------------------------------------------------------
@@ -109,3 +198,6 @@ The BDT is also trying to predict more information than the trijet combination m
   :alt: Comparison of the BDT output to random chance.
 
 The BDT does much better than random chance at predicting jet-parton assignments.
+
+------------
+**Document Authors**: `Andrii Falko <https://github.com/andriiknu>`_, `Elliott Kauffman <https://github.com/ekauffma>`_
