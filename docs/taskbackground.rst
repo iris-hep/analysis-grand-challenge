@@ -13,15 +13,7 @@ The ``ROOT``-file structure can be represented as a schematic:
 
 This diagram shows only those fields that will be required for further analysis, such as electron, muon, and jet. Each of these branches has its number of particles (:math:`N_e`, :math:`N_{\mu}`, :math:`N_{jet}`), the transverse momentum value (:math:`p_T`) that will be used in the following sections for events filtering. Also, jets have a b-tag value, which is the output of a discriminator used to identify b-jets (jets produced by b-quark).
 
-Output
----------------------------------------------------------------
 The analysis task involves selecting events from the input dataset in which measured quantities originate from :math:`t\bar{t}` decay. In real data, one cannot know with 100\% certainty that an event comes from a specific process, including :math:`t\bar{t}` decay. Through our simulated data, we can ascertain the truth information of each event, which provides us extra tools to develop our analysis. Our data is separated by file into five channels: **ttbar**, **single_top_s_chan**, **single_top_t_chan**, **single_top_tW**, and **wjets**).
-
-To select events for out analysis, we will apply some criteria (explained below) and then compare the relative rate of those events which indeed were generated with :math:`t\bar{t}` pair production. The example below demonstrates successful event selection, since the majority of events belong to the :math:`t\bar{t}`-channel.
-
-.. image:: images/analysis.png
-  :width: 80%
-  :alt: Top mass distribution demonstrating successful :math:`t\bar{t}` analysis.
   
 Event Selection
 ---------------------------------------------------------------
@@ -98,7 +90,19 @@ The cross-section values used are listed below (obtained from `this site <https:
 
 Top Mass Reconstruction
 ---------------------------------------------------------------
-To measure the :math:`t\bar{t}` cross-section, we use an observable that approximately reconstructs the top quark mass. We do this in two different ways. The first uses no machine learning. Within an event, the trijet system with the highest transverse momentum (:math:`p_T`) is selected. We then calculate the combined mass of these three jets.
+To measure the :math:`t\bar{t}` cross-section, we use an observable that approximately reconstructs the top quark mass. This is done using the following steps:
+
+#. Filter the events using the criteria explained above (including requiring at least four jets and exactly one lepton)
+#. Calculate all possible combinations of three jets from all jets in each event (utilizes ``ak.combinations``)
+#. Ensure that there is at least one b-tagged jet in each candidate combination (``btagCSVV2 > B_TAG_THRESHOLD``)
+#. Choose the combination with the largest combined transverse momentum (:math:`p_T`)
+#. Calculate combined mass of trijet system
+
+Successful top mass reconstruction can be inferred from the below histogram, which is peaked around the top mass (:math:`\approx 173 GeV`). We can also see that our selection criteria worked, since the majority of events in the histogram are from the :math:`t\bar{t}` sample.
+
+.. image:: images/analysis.png
+  :width: 80%
+  :alt: Top mass distribution demonstrating successful top mass reconstruction.
 
 Statistical Model
 ---------------------------------------------------------------
@@ -126,7 +130,7 @@ Here is what the model looks like, before and after the fit is performed:
   :width: 80%
   :alt: The histogram of the reconstructed top mass (:math:`m_{bjj}`) before and after maximum likelihood fit.
 
-
+For more information to statistics in LHC physics, visit `this document <https://arxiv.org/abs/1503.07622>`_, which aided in writing this quick overview.
 
 Machine Learning Component
 ---------------------------------------------------------------
