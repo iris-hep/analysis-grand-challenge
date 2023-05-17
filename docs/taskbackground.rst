@@ -93,7 +93,7 @@ The cross-section values used are listed below (obtained from `this site <https:
    * - single_top_tW
      - 79.3
    * - wjets
-     - 
+     - 61526.7 * 0.253
 
 4. Top Mass Reconstruction
 ---------------------------------------------------------------
