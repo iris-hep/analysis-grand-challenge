@@ -530,30 +530,80 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 
 # %% tags=[]
 def get_query(source: ObjectStream) -> ObjectStream:
-    """Query for event / column selection: >=4j >=1b, ==1 lep with pT>25 GeV, return relevant columns
+    """Query for event / column selection: >=4j >=1b, ==1 lep with pT>30 GeV + additional cuts, return relevant columns
     """
-    return source.Where(lambda e: e.Electron_pt.Where(lambda pt: pt > 25).Count()
-                        + e.Muon_pt.Where(lambda pt: pt > 25).Count() == 1)\
-                 .Where(lambda f: f.Jet_pt.Where(lambda pt: pt > 25).Count() >= 4)\
-                 .Where(lambda g: {"pt": g.Jet_pt,
-                                   "btagCSVV2": g.Jet_btagCSVV2}.Zip().Where(lambda jet:
-                                                                             jet.btagCSVV2 >= 0.5
-                                                                             and jet.pt > 25).Count() >= 1)\
-                 .Select(lambda h: {"Electron_pt": h.Electron_pt,
-                                    "Electron_eta": h.Electron_eta,
-                                    "Electron_phi": h.Electron_phi,
-                                    "Electron_mass": h.Electron_mass,
-                                    "Muon_pt": h.Muon_pt,
-                                    "Muon_eta": h.Muon_eta,
-                                    "Muon_phi": h.Muon_phi,
-                                    "Muon_mass": h.Muon_mass,
-                                    "Jet_mass": h.Jet_mass,
-                                    "Jet_pt": h.Jet_pt,
-                                    "Jet_eta": h.Jet_eta,
-                                    "Jet_phi": h.Jet_phi,
-                                    "Jet_btagCSVV2": h.Jet_btagCSVV2,
-                                    "Jet_qgl": h.Jet_qgl,
-                                   })
+    cuts = source.Where(lambda e: {"pt": e.Electron_pt, "eta": e.Electron_eta, "cutBased": e.Electron_cutBased, "sip3d": e.Electron_sip3d}.Zip().Where(lambda electron: 
+                                                                          electron.pt > 30 
+                                                                          and abs(electron.eta) < 2.1 
+                                                                          and electron.cutBased == 4 
+                                                                          and electron.sip3d < 4).Count() 
+                        + {"pt": e.Muon_pt, 
+                           "eta": e.Muon_eta,
+                           "tightId": e.Muon_tightId,
+                           "sip3d": e.Muon_sip3d,
+                           "pfRelIso04_all": e.Muon_pfRelIso04_all}.Where(lambda muon:
+                                                                          muon.pt > 30 
+                                                                          and abs(muon.eta) < 2.1 
+                                                                          and muon.tightId 
+                                                                          and muon.pfRelIso04_all < 0.15)\
+                        .Count() == 1)\
+                 .Where(lambda f: {"pt": f.Jet_pt, 
+                                   "eta": f.Jet_eta,
+                                   "isTightLeptonVeto": f.Jet_isTightLeptonVeto}.Zip().Where(lambda jet: 
+                                                                                             jet.pt > 30 
+                                                                                             and abs(jet.eta) < 2.4
+                                                                                             and jet.isTightLeptonVeto)\
+                        .Count() >= 4)\
+                 .Where(lambda g: {"pt": g.Jet_pt, 
+                                   "eta": g.Jet_eta,
+                                   "isTightLeptonVeto": g.Jet_isTightLeptonVeto,
+                                   "btagCSVV2": g.Jet_btagCSVV2}.Zip().Where(lambda jet: 
+                                                                             jet.btagCSVV2 >= 0.5 
+                                                                             and jet.pt > 30
+                                                                             and abs(jet.eta) < 2.4 
+                                                                             and jet.isTightLeptonVeto)\
+                        .Count() >= 1)
+    
+    if USE_INFERENCE:
+        return cuts.Select(lambda h: {"Electron_pt": h.Electron_pt,
+                                      "Electron_eta": h.Electron_eta,
+                                      "Electron_phi": h.Electron_phi,
+                                      "Electron_mass": h.Electron_mass,
+                                      "Electron_cutBased": h.Electron_cutBased,
+                                      "Electron_sip3d": h.Electron_sip3d,
+                                      "Muon_pt": h.Muon_pt,
+                                      "Muon_eta": h.Muon_eta,
+                                      "Muon_phi": h.Muon_phi,
+                                      "Muon_mass": h.Muon_mass,
+                                      "Muon_tightId": h.Muon_tightId,
+                                      "Muon_sip3d": h.Muon_sip3d,
+                                      "Muon_pfRelIso04_all": h.Muon_pfRelIso04_all,
+                                      "Jet_mass": h.Jet_mass,
+                                      "Jet_pt": h.Jet_pt,
+                                      "Jet_eta": h.Jet_eta,
+                                      "Jet_phi": h.Jet_phi,
+                                      "Jet_isTightLeptonVeto": h.Jet_isTightLeptonVeto,
+                                      "Jet_btagCSVV2": h.Jet_btagCSVV2,
+                                      "Jet_qgl": h.Jet_qgl,
+                                     })
+        
+    else:
+        return cuts.Select(lambda h: {"Electron_pt": h.Electron_pt,
+                                      "Electron_eta": h.Electron_eta,
+                                      "Electron_cutBased": h.Electron_cutBased,
+                                      "Electron_sip3d": h.Electron_sip3d,
+                                      "Muon_pt": h.Muon_pt,
+                                      "Muon_eta": h.Muon_eta,
+                                      "Muon_tightId": h.Muon_tightId,
+                                      "Muon_sip3d": h.Muon_sip3d,
+                                      "Muon_pfRelIso04_all": h.Muon_pfRelIso04_all,
+                                      "Jet_mass": h.Jet_mass,
+                                      "Jet_pt": h.Jet_pt,
+                                      "Jet_eta": h.Jet_eta,
+                                      "Jet_phi": h.Jet_phi,
+                                      "Jet_isTightLeptonVeto": h.Jet_isTightLeptonVeto,
+                                      "Jet_btagCSVV2": h.Jet_btagCSVV2,
+                                     })
 
 
 # %% [markdown]
