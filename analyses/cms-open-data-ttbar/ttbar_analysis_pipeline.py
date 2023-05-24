@@ -803,21 +803,23 @@ figs[1]["figure"]
 
 # %% tags=[]
 # load the ml workspace (uses the ml observable instead of previous method)
-config_ml = cabinetry.configuration.load("cabinetry_config_ml.yml")
-cabinetry.templates.collect(config_ml)
-cabinetry.templates.postprocess(config_ml)  # optional post-processing (e.g. smoothing)
+if USE_INFERENCE:
+    config_ml = cabinetry.configuration.load("cabinetry_config_ml.yml")
+    cabinetry.templates.collect(config_ml)
+    cabinetry.templates.postprocess(config_ml)  # optional post-processing (e.g. smoothing)
 
-ws_ml = cabinetry.workspace.build(config_ml)
-ws_pruned = pyhf.Workspace(ws_ml).prune(channels=["Feature3", "Feature8", "Feature9",
-                                                  "Feature10", "Feature11", "Feature12",
-                                                  "Feature13", "Feature14", "Feature15",
-                                                  "Feature16", "Feature17", "Feature18",
-                                                  "Feature19"])
+    ws_ml = cabinetry.workspace.build(config_ml)
+    ws_pruned = pyhf.Workspace(ws_ml).prune(channels=["Feature3", "Feature8", "Feature9",
+                                                      "Feature10", "Feature11", "Feature12",
+                                                      "Feature13", "Feature14", "Feature15",
+                                                      "Feature16", "Feature17", "Feature18",
+                                                      "Feature19"])
 
-cabinetry.workspace.save(ws_pruned, "workspace_ml.json")
+    cabinetry.workspace.save(ws_pruned, "workspace_ml.json")
 
 # %% tags=[]
-model_ml, data_ml = cabinetry.model_utils.model_and_data(ws_pruned)
+if USE_INFERENCE:
+    model_ml, data_ml = cabinetry.model_utils.model_and_data(ws_pruned)
 
 # %% [markdown]
 # We have a channel for each ML observable:
@@ -827,12 +829,14 @@ model_ml, data_ml = cabinetry.model_utils.model_and_data(ws_pruned)
 
 # %%
 # obtain model prediction before and after fit
-model_prediction = cabinetry.model_utils.prediction(model_ml)
-fit_results_mod = cabinetry.model_utils.match_fit_results(model_ml, fit_results)
-model_prediction_postfit = cabinetry.model_utils.prediction(model_ml, fit_results=fit_results_mod)
+if USE_INFERENCE:
+    model_prediction = cabinetry.model_utils.prediction(model_ml)
+    fit_results_mod = cabinetry.model_utils.match_fit_results(model_ml, fit_results)
+    model_prediction_postfit = cabinetry.model_utils.prediction(model_ml, fit_results=fit_results_mod)
 
 # %% tags=[]
-figs = utils.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
+if USE_INFERENCE:
+    figs = utils.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
 
 # %% [markdown]
 # ### What is next?
