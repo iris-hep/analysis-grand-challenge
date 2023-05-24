@@ -770,11 +770,22 @@ plt.title("Jet energy variations");
 # %% tags=[]
 # ML inference variables
 if USE_INFERENCE:
+    fig, axs = plt.subplots(10,2,figsize=(14,40))
     for i in range(len(config["ml"]["FEATURE_NAMES"])):
-        all_histograms['ml_hist_dict'][f'hist_{config["ml"]["FEATURE_NAMES"][i]}'][:, :, "nominal"].stack("process").project("observable").plot(stack=True, histtype="fill", linewidth=1, edgecolor="grey")
-        plt.legend(frameon=False)
-        plt.title(f"ML Observable #{i}")
-        plt.show()
+        if i<10: 
+            column=0
+            row=i
+        else: 
+            column=1
+            row=i-10
+        all_histograms['ml_hist_dict'][f'hist_{config["ml"]["FEATURE_NAMES"][i]}'][:, :, "nominal"].stack("process").project("observable").plot(
+            stack=True, 
+            histtype="fill", 
+            linewidth=1, 
+            edgecolor="grey", 
+            ax=axs[row,column])
+        axs[row, column].legend(frameon=False)
+    fig.show()
 
 # %% [markdown]
 # ### Save histograms to disk
