@@ -26,7 +26,7 @@ Also, jets have a b-tag value, which is the output of a discriminator used to id
 
 The analysis task involves selecting events from the input dataset in which measured quantities originate from :math:`t\bar{t}` decay. 
 In real data, one cannot know with 100\% certainty that an event comes from a specific process, including :math:`t\bar{t}` decay. Through our simulated data, we can ascertain the truth information of each event, which provides us extra tools to develop our analysis. 
-Our data is separated by file into five channels: **ttbar**, **single_top_s_chan**, **single_top_t_chan**, **single_top_tW**, and **wjets**).
+Our data is separated by file into five channels: ``ttbar``, ``single_top_s_chan``, ``single_top_t_chan``, ``single_top_tW``, and ``wjets``).
   
 2. Event Selection
 ---------------------------------------------------------------
