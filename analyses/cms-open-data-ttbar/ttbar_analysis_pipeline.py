@@ -532,37 +532,37 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 def get_query(source: ObjectStream) -> ObjectStream:
     """Query for event / column selection: >=4j >=1b, ==1 lep with pT>30 GeV + additional cuts, return relevant columns
     """
-    cuts = source.Where(lambda e: {"pt": e.Electron_pt, "eta": e.Electron_eta, "cutBased": e.Electron_cutBased, "sip3d": e.Electron_sip3d}.Zip().Where(lambda electron: 
-                                                                          electron.pt > 30 
-                                                                          and abs(electron.eta) < 2.1 
-                                                                          and electron.cutBased == 4 
-                                                                          and electron.sip3d < 4).Count() 
+    cuts = source.Where(lambda e: {"pt": e.Electron_pt, 
+                                   "eta": e.Electron_eta, 
+                                   "cutBased": e.Electron_cutBased, 
+                                   "sip3d": e.Electron_sip3d}\
+                        .Zip().Where(lambda electron: (electron.pt > 30 
+                                                       and abs(electron.eta) < 2.1 
+                                                       and electron.cutBased == 4 
+                                                       and electron.sip3d < 4)).Count() 
                         + {"pt": e.Muon_pt, 
                            "eta": e.Muon_eta,
                            "tightId": e.Muon_tightId,
                            "sip3d": e.Muon_sip3d,
-                           "pfRelIso04_all": e.Muon_pfRelIso04_all}.Where(lambda muon:
-                                                                          muon.pt > 30 
-                                                                          and abs(muon.eta) < 2.1 
-                                                                          and muon.tightId 
-                                                                          and muon.pfRelIso04_all < 0.15)\
-                        .Count() == 1)\
+                           "pfRelIso04_all": e.Muon_pfRelIso04_all}\
+                        .Zip().Where(lambda muon: (muon.pt > 30 
+                                                   and abs(muon.eta) < 2.1 
+                                                   and muon.tightId 
+                                                   and muon.pfRelIso04_all < 0.15)).Count() == 1)\
                  .Where(lambda f: {"pt": f.Jet_pt, 
                                    "eta": f.Jet_eta,
-                                   "isTightLeptonVeto": f.Jet_isTightLeptonVeto}.Zip().Where(lambda jet: 
-                                                                                             jet.pt > 30 
-                                                                                             and abs(jet.eta) < 2.4
-                                                                                             and jet.isTightLeptonVeto)\
-                        .Count() >= 4)\
+                                   "isTightLeptonVeto": f.Jet_isTightLeptonVeto}\
+                        .Zip().Where(lambda jet: (jet.pt > 30 
+                                                  and abs(jet.eta) < 2.4
+                                                  and jet.isTightLeptonVeto)).Count() >= 4)\
                  .Where(lambda g: {"pt": g.Jet_pt, 
                                    "eta": g.Jet_eta,
                                    "isTightLeptonVeto": g.Jet_isTightLeptonVeto,
-                                   "btagCSVV2": g.Jet_btagCSVV2}.Zip().Where(lambda jet: 
-                                                                             jet.btagCSVV2 >= 0.5 
-                                                                             and jet.pt > 30
-                                                                             and abs(jet.eta) < 2.4 
-                                                                             and jet.isTightLeptonVeto)\
-                        .Count() >= 1)
+                                   "btagCSVV2": g.Jet_btagCSVV2}\
+                        .Zip().Where(lambda jet: (jet.btagCSVV2 >= 0.5 
+                                                  and jet.pt > 30
+                                                  and abs(jet.eta) < 2.4 
+                                                  and jet.isTightLeptonVeto)).Count() >= 1)
     
     if USE_INFERENCE:
         return cuts.Select(lambda h: {"Electron_pt": h.Electron_pt,
