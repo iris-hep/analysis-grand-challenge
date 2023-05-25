@@ -1,6 +1,7 @@
 :math:`t\bar{t}` Analysis Background
 ===============================================================
-The section covers the different components of the :math:`t\bar{t}` analysis using `2015 CMS Open Data <https://cms.cern/news/first-cms-open-data-lhc-run-2-released>`_ (see **AGC Versions** section for more information). Here is an overview of what is covered here:
+The section covers the different components of the :math:`t\bar{t}` analysis using `2015 CMS Open Data <https://cms.cern/news/first-cms-open-data-lhc-run-2-released>`_ (see **AGC Versions** section for more information). 
+Here is an overview of what is covered in this page:
 
 #. Brief description of the input data.
 #. Event selection criteria and description of the signal event signature.
@@ -11,28 +12,38 @@ The section covers the different components of the :math:`t\bar{t}` analysis usi
 
 1. Input
 ---------------------------------------------------------------
-Input data is five sets of ``ROOT``-files. Each set is produced in MC simulation and represents a partial interaction channel, one of five: **:math:`t\bar{t}`**-channel, **single top s**-channel, **single top t**-channel, **single top tW**-channel, **Wjets**-channel. 
+Input data is five sets of ``ROOT``-files. 
+Each set is produced in MC simulation and represents a partial interaction channel, one of five: **ttbar**-channel, **single top s**-channel, **single top t**-channel, **single top tW**-channel, **Wjets**-channel. 
 The ``ROOT``-file structure can be represented as a schematic:
 
 .. image:: images/input_structure.png
   :width: 60%
   :alt: Diagram showing the structure of each ``ROOT`` file with separate fields for electrons, muons, and jets.
 
-This diagram shows only those fields that will be required for further analysis, such as electron, muon, and jet. Each of these branches has its number of particles (:math:`N_e`, :math:`N_{\mu}`, :math:`N_{jet}`), the transverse momentum value (:math:`p_T`) that will be used in the following sections for events filtering. Also, jets have a b-tag value, which is the output of a discriminator used to identify b-jets (jets produced by b-quark).
+This diagram shows only those fields that will be required for further analysis, such as electron, muon, and jet. 
+Each of these branches has its number of particles (:math:`N_e`, :math:`N_{\mu}`, :math:`N_{jet}`), the transverse momentum value (:math:`p_T`) that will be used in the following sections for events filtering. 
+Also, jets have a b-tag value, which is the output of a discriminator used to identify b-jets (jets produced by b-quark).
 
-The analysis task involves selecting events from the input dataset in which measured quantities originate from :math:`t\bar{t}` decay. In real data, one cannot know with 100\% certainty that an event comes from a specific process, including :math:`t\bar{t}` decay. Through our simulated data, we can ascertain the truth information of each event, which provides us extra tools to develop our analysis. Our data is separated by file into five channels: **ttbar**, **single_top_s_chan**, **single_top_t_chan**, **single_top_tW**, and **wjets**).
+The analysis task involves selecting events from the input dataset in which measured quantities originate from :math:`t\bar{t}` decay. 
+In real data, one cannot know with 100\% certainty that an event comes from a specific process, including :math:`t\bar{t}` decay. Through our simulated data, we can ascertain the truth information of each event, which provides us extra tools to develop our analysis. 
+Our data is separated by file into five channels: **ttbar**, **single_top_s_chan**, **single_top_t_chan**, **single_top_tW**, and **wjets**).
   
 2. Event Selection
 ---------------------------------------------------------------
-Not all event information is needed for this analysis. The only objects to which selection criteria will be applied are leptons (electrons and muons) and jets that are the products of $t\bar{t}$ decay. In the semi-leptonic decay channel of :math:`t\bar{t}` production, two jets, two b-jets, and one lepton are expected, as can be concluded from the diagram below:
+Not all event information is needed for this analysis. 
+The only objects to which selection criteria will be applied are leptons (electrons and muons) and jets that are the products of :math:`t\bar{t}` decay. 
+In the semi-leptonic decay channel of :math:`t\bar{t}` production, two jets, two b-jets, and one lepton are expected, as can be concluded from the diagram below:
 
 .. image:: images/ttbar.png
   :width: 80%
   :alt: Diagram of a :math:`t\bar{t}` event with four jets and one lepton.
 
-Here is an example of the above signature in CMS Open Data. Since this is Monte Carlo simulated data, we can look at the particles that the jets originate from. The jets are plotted as circles in the :math:`\eta`-:math:`\phi` plane, and color-coordinated with the truth particles they are matched to. Note that :math:`\phi` is a circular variable, so the top of the graph matches to the bottom. The jets that are outlined in solid black are b-tagged, which means that they have properties which strongly indicate that they originate from bottom quarks.
+Here is an example of the above signature in CMS Open Data. 
+Since this is Monte Carlo simulated data, we can look at the particles that the jets originate from. 
+The jets are plotted as circles in the :math:`\eta`-:math:`\phi` plane, and color-coordinated with the truth particles they are matched to. Note that :math:`\phi` is a circular variable, so the top of the graph matches to the bottom. 
+The jets that are outlined in solid black are b-tagged, which means that they have properties which strongly indicate that they originate from bottom quarks.
 
-To look at more events, take a look at **Plot :math:`t\bar{t}` Events**.
+To look at more events, take a look at "Plot :math:`t\bar{t}` Events".
 
 .. image:: images/event3.png
   :width: 80%
@@ -66,7 +77,9 @@ There are a few more details about the cuts, which one can read about in **AGC V
 
 3. Weighting
 ---------------------------------------------------------------
-The above-described algorithm assumes that data samples generated using different channels come into the histogram with equivalent weights. This is not the case, as the relative number of events in each sample does not reflect the rate at which that process occurs in our detected events. So we need to account for the cross-section when processing events. This is the formula for calculating weights:
+The above-described algorithm assumes that data samples generated using different channels come into the histogram with equivalent weights. 
+This is not the case, as the relative number of events in each sample does not reflect the rate at which that process occurs in our detected events. 
+So we need to account for the cross-section when processing events. This is the formula for calculating weights:
 
 .. math::
     
@@ -97,7 +110,8 @@ The cross-section values used are listed below (obtained from `this site <https:
 
 4. Top Mass Reconstruction
 ---------------------------------------------------------------
-To measure the :math:`t\bar{t}` cross-section, we use an observable that approximately reconstructs the top quark mass. This is done using the following steps:
+To measure the :math:`t\bar{t}` cross-section, we use an observable that approximately reconstructs the top quark mass. 
+This is done using the following steps:
 
 #. Filter the events using the criteria explained above (including requiring at least four jets and exactly one lepton)
 #. Calculate all possible combinations of three jets from all jets in each event (utilizes ``ak.combinations``)
@@ -105,7 +119,8 @@ To measure the :math:`t\bar{t}` cross-section, we use an observable that approxi
 #. Choose the combination with the largest combined transverse momentum (:math:`p_T`)
 #. Calculate combined mass of trijet system
 
-Successful top mass reconstruction can be inferred from the below histogram, which is peaked around the top mass (:math:`\approx 173 GeV`). We can also see that our selection criteria worked, since the majority of events in the histogram are from the :math:`t\bar{t}` sample.
+Successful top mass reconstruction can be inferred from the below histogram, which is peaked around the top mass (:math:`\approx 173 GeV`). 
+We can also see that our selection criteria worked, since the majority of events in the histogram are from the :math:`t\bar{t}` sample.
 
 .. image:: images/analysis.png
   :width: 80%
@@ -113,9 +128,15 @@ Successful top mass reconstruction can be inferred from the below histogram, whi
 
 5. Statistical Model
 ---------------------------------------------------------------
-We want to develop a statistical model, parameterized by some physical parameters :math:`\vec{\alpha}`. We have one parameter of interest, the :math:`t\bar{t}` cross-section, and a handful of *nuisance parameters*, which are free physics parameters that are not of interest in this analysis. Changing any nuisance parameter can have an effect on the expected rate of a physics process and/or distribution shapes, leading to systematic uncertainties. In general, we model the effects of changing nuisance parameters by generating Monte Carlo selections for different variations of parameters. Once we have these, we can utilize different interpolation strategies to construct a continuous parameterization. 
+We want to develop a statistical model, parameterized by some physical parameters :math:`\vec{\alpha}`. 
+We have one parameter of interest, the :math:`t\bar{t}` cross-section, and a handful of *nuisance parameters*, which are free physics parameters that are not of interest in this analysis. 
+Changing any nuisance parameter can have an effect on the expected rate of a physics process and/or distribution shapes, leading to systematic uncertainties. 
+In general, we model the effects of changing nuisance parameters by generating Monte Carlo selections for different variations of parameters. 
+Once we have these, we can utilize different interpolation strategies to construct a continuous parameterization. 
 
-Generally, and inclusive of this analysis example, we consider three different variations: one "nominal" parameter setting, where the nominal setting is chosen based on previous experience and studies, one "up" sample, where the parameter is increased by :math:`1\sigma`, and one "down" sample, where the parameter is decreased by :math:`1\sigma`. The standard uncertainties of the parameters often originate from auxiliary measurements, which necessitate the inclusion of additional constraint terms in the statistical model. Using the up/nominal/down measurements, an interpolation can be made (for each bin) so that a model prediction can be provided for any parameter value:
+Generally, and inclusive of this analysis example, we consider three different variations: one "nominal" parameter setting, where the nominal setting is chosen based on previous experience and studies, one "up" sample, where the parameter is increased by :math:`1\sigma`, and one "down" sample, where the parameter is decreased by :math:`1\sigma`. 
+The standard uncertainties of the parameters often originate from auxiliary measurements, which necessitate the inclusion of additional constraint terms in the statistical model. 
+Using the up/nominal/down measurements, an interpolation can be made (for each bin) so that a model prediction can be provided for any parameter value:
 
 .. image:: images/interpolation.png
   :width: 60%
@@ -141,17 +162,29 @@ For more information to statistics in LHC physics, visit `this document <https:/
 
 6. Machine Learning Component
 ---------------------------------------------------------------
-Most modern high energy physics analyses use some form of machine learning (ML), so a machine learning task has been incorporated into the AGC :math:`t\bar{t}` cross-section  measurement to reflect this development. The method described above to reconstruct the top mass attempts to correctly select all three jets on the hadronic side of the collision. Using ML, we can go beyond this task by attempting to correctly assign each jet with its parent parton. This should allow for a more accurate top mass reconstruction as well as access to new observables, such as the angle between the jet on the leptonic side of the collision and the lepton, or the angle between the two W jets. To enable machine learning in the ttbar analysis notebook, one must set ``USE_INFERENCE = True``. 
+Most modern high energy physics analyses use some form of machine learning (ML), so a machine learning task has been incorporated into the AGC :math:`t\bar{t}` cross-section measurement to reflect this development. 
+The method described above to reconstruct the top mass attempts to correctly select all three jets on the hadronic side of the collision. 
+Using ML, we can go beyond this task by attempting to correctly assign each jet with its parent parton. 
+This should allow for a more accurate top mass reconstruction as well as access to new observables, such as the angle between the jet on the leptonic side of the collision and the lepton, or the angle between the two W jets.
+To enable machine learning in the ttbar analysis notebook, one must set ``USE_INFERENCE = True``. 
 
 The strategy used for this jet-parton assignment task is as follows:
 
-In each event, we want to associate four jets to three labels. We want to label two jets as :math:`W` (considering these two to be indistinguishable), one jet as :math:`b_{top-had}` (the top jet on the side of hadronic decay), and one as :math:`b_{top-lep}` (the top jet on the side of leptonic decay). This is visualized in the diagram below:
+In each event, we want to associate four jets to three labels. 
+We want to label two jets as :math:`W` (considering these two to be indistinguishable), one jet as :math:`b_{top-had}` (the top jet on the side of hadronic decay), and one as :math:`b_{top-lep}` (the top jet on the side of leptonic decay). 
+This is visualized in the diagram below:
 
 .. image:: images/ttbar_labels.png
   :width: 80%
   :alt: Diagram of a :math:`t\bar{t}` event with the three machine learning labels for jets.
   
-In each event, we consider each permutation of jets assigned to these labels, restricting to the leading :math:`N` jets. The number of such permutations (assuming the event has at least :math:`N` jets and that :math:`N\geq 4`) is :math:`N!/(2\cdot (N-4)!)`. For example, if there are 4 jets in an event, we consider :math:`4!/2=12` permutations. The :math:`4!` comes from labelling 4 jets, while dividing by 2 accounts for the fact that two of the jets are labelled indistinguishably. If there are more than 4 jets, the remainder are assigned to a fourth category, "other". Jets are also assigned to this category indistinguishably. For example if :math:`N=7` and we have 7 jets in an event, we consider :math:`7!/(2\cdot 3!)=420` permutations, since we assign labels to 7 jets. We assign 2 jets to "W" indistinguishably, then the three remainder to "other" indistinguishably.
+In each event, we consider each permutation of jets assigned to these labels, restricting to the leading :math:`N` jets. 
+The number of such permutations (assuming the event has at least :math:`N` jets and that :math:`N\geq 4`) is :math:`N!/(2\cdot (N-4)!)`. 
+For example, if there are 4 jets in an event, we consider :math:`4!/2=12` permutations. 
+The :math:`4!` comes from labelling 4 jets, while dividing by 2 accounts for the fact that two of the jets are labelled indistinguishably. 
+If there are more than 4 jets, the remainder are assigned to a fourth category, "other". Jets are also assigned to this category indistinguishably. 
+For example if :math:`N=7` and we have 7 jets in an event, we consider :math:`7!/(2\cdot 3!)=420` permutations, since we assign labels to 7 jets. 
+We assign 2 jets to "W" indistinguishably, then the three remainder to "other" indistinguishably.
 
 To vizualize the :math:`N=4` scenario, view the diagram below:
 
@@ -182,13 +215,15 @@ For each permutation, we calculate 20 features:
 #. ``qgl`` of the :math:`b_{top-had}` jet
 #. ``qgl`` of the :math:`b_{top-lep}` jet
 
-For each permutation, all 20 features are fed into a boosted decision tree, which was trained to select correct permutations. After this, the permutation with the highest BDT score is selected as "correct", then we use those jet-parton assignments to calculate the observables of interest.
+For each permutation, all 20 features are fed into a boosted decision tree, which was trained to select correct permutations. 
+After this, the permutation with the highest BDT score is selected as "correct", then we use those jet-parton assignments to calculate the observables of interest.
 
 It is a future goal to move onto a more sophisticated architecture, as the BDT method is restrictive since it becomes computationally expensive for events with high jet multiplicity.
 
 BDT Performance
 ---------------------------------------------------------------
-We can first qualitatively compare the top mass reconstruction by the trijet combination method and the BDT method by comparing their distributions to the truth top mass reconstruction distribution. The events considered here are those in which it is possible to correctly reconstruct all jet-parton assignments in the leading four jets.
+We can first qualitatively compare the top mass reconstruction by the trijet combination method and the BDT method by comparing their distributions to the truth top mass reconstruction distribution. 
+The events considered here are those in which it is possible to correctly reconstruct all jet-parton assignments in the leading four jets.
 
 .. image:: images/topmassreconstruction.png
   :width: 80%
@@ -196,13 +231,16 @@ We can first qualitatively compare the top mass reconstruction by the trijet com
   
 We can see that the result from using the BDT method (green) more closely matches the truth distribution (blue) than the trijet combination method (orange).
 
-If we look into the performance by calculating which jet-parton assignments are predicted correctly, we also see that the BDT method performs better. If we look at the top 6 jets in each event and restrict the set of events to those in which full reconstruction is possible (i.e. all truth labels are present in the top 6 jets), we see that the BDT selects the correct three jets for the top mass reconstruction 60.10% of the time, while the trijet combination method only selects the correct three jets 28.31% of the time.
+If we look into the performance by calculating which jet-parton assignments are predicted correctly, we also see that the BDT method performs better. 
+If we look at the top 6 jets in each event and restrict the set of events to those in which full reconstruction is possible (i.e. all truth labels are present in the top 6 jets), we see that the BDT selects the correct three jets for the top mass reconstruction 60.10% of the time, while the trijet combination method only selects the correct three jets 28.31% of the time.
 
 .. image:: images/bdt_performance_comparison.png
   :width: 80%
   :alt: Comparison of the BDT method to the trijet combination method.
   
-The BDT is also trying to predict more information than the trijet combination method. Instead of finding the three correct jets to use for the reconstructed mass, we want to choose correct labels for four jets in an event. So to ensure that the BDT is performing as it should, we can compare BDT output to random chance. If we again look at the top 6 jets in each event and restrict the set of events to those in which full reconstruction is possible, we see the following:
+The BDT is also trying to predict more information than the trijet combination method. 
+Instead of finding the three correct jets to use for the reconstructed mass, we want to choose correct labels for four jets in an event. So to ensure that the BDT is performing as it should, we can compare BDT output to random chance. 
+If we again look at the top 6 jets in each event and restrict the set of events to those in which full reconstruction is possible, we see the following:
 
 .. image:: images/bdt_performance.png
   :width: 80%

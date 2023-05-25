@@ -41,9 +41,12 @@ The below table gives a brief overview of all AGC versions.
 Datasets
 ================================
 
-The datasets used for the CMS :math:`t\bar{t}` notebook are from the 2015 CMS Open Data release. Versions 0.1.0 and 0.2.0 use ntuples generated using the `Physics Objects Extractor Tool (POET) <https://github.com/cms-opendata-analyses/PhysObjectExtractorTool>`_.
+The datasets used for the CMS :math:`t\bar{t}` notebook are from the 2015 CMS Open Data release. 
+Versions 0.1.0 and 0.2.0 use ntuples generated using the `Physics Objects Extractor Tool (POET) <https://github.com/cms-opendata-analyses/PhysObjectExtractorTool>`_.
 
-All versions >=1.0.0 use NanoAOD instead. The NanoAOD was generated from the 2015 CMS Open Data release using this pull request of CMSSW: `https://github.com/cms-sw/cmssw/pull/39040 <https://github.com/cms-sw/cmssw/pull/39040>`_. To set this up, the following commands should be run::
+All versions >=1.0.0 use NanoAOD instead. 
+The NanoAOD was generated from the 2015 CMS Open Data release using this pull request of CMSSW: `https://github.com/cms-sw/cmssw/pull/39040 <https://github.com/cms-sw/cmssw/pull/39040>`_. 
+To set this up, the following commands should be run::
     
     source /cvmfs/cms.cern.ch/cmsset_default.sh
     scram list CMSSW_10_6_
@@ -65,7 +68,8 @@ For MC, you can use::
 
 The code used to generate and subsequently merge these files is located in the following repository: `https://github.com/ekauffma/produce-nanoAODs <https://github.com/ekauffma/produce-nanoAODs>`_
 
-The data used is the same, regardless of MiniAOD vs NanoAOD. The list of datasets separated by process is included below:
+The data used is the same, regardless of MiniAOD vs NanoAOD. 
+The list of datasets separated by process is included below:
 
 * **ttbar**:
 
