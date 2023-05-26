@@ -41,7 +41,6 @@
 # ### Imports: setting up our environment
 
 # %% tags=[]
-import asyncio
 import logging
 import os
 import time
@@ -59,7 +58,6 @@ import json
 import yaml
 import matplotlib.pyplot as plt
 import numpy as np
-import uproot
 from xgboost import XGBClassifier
 import pyhf
 
