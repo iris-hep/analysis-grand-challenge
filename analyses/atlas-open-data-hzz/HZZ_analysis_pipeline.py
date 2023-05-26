@@ -17,8 +17,6 @@
 # # ATLAS Open Data $H\rightarrow ZZ^\star$ with `ServiceX`, `coffea`, `cabinetry` & `pyhf`
 
 # %%
-import asyncio
-import os
 import re
 import time
 
@@ -35,10 +33,11 @@ from servicex import ServiceXDataset
 
 from coffea import processor
 from coffea.nanoevents.schemas.base import BaseSchema
-import vector; vector.register_awkward()
-
 import utils
 from utils import infofile  # contains cross-section information
+
+import vector
+vector.register_awkward()
 
 utils.clean_up()  # delete output from previous runs of notebook (optional)
 utils.set_logging()  # configure logging output
