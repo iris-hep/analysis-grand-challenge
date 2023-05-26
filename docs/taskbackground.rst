@@ -160,7 +160,7 @@ Here is what the model looks like, before and after the fit is performed:
   :width: 80%
   :alt: The histogram of the reconstructed top mass (:math:`m_{bjj}`) before and after maximum likelihood fit.
 
-For more information to statistics in LHC physics, visit `this document <https://arxiv.org/abs/1503.07622>`_, which aided in writing this quick overview.
+For more information to statistics in LHC physics, visit `this document <https://arxiv.org/abs/1503.07622>`_.
 
 6. Machine Learning Component
 ---------------------------------------------------------------
