@@ -132,6 +132,8 @@ We can also see that our selection criteria worked, since the majority of events
 
 5. Statistical Model
 ---------------------------------------------------------------
+The following description details building a statistical model in the ``HistFactory`` format:
+
 We want to develop a statistical model, parameterized by some physical parameters :math:`\vec{\alpha}`. 
 We have one parameter of interest, the :math:`t\bar{t}` cross-section, and a handful of *nuisance parameters*, which are physics parameters that are not of interest in this analysis. 
 Changing any nuisance parameter can have an effect on the expected rate of a physics process and/or distribution shapes, leading to systematic uncertainties. 
@@ -145,7 +147,7 @@ Using the up/nominal/down measurements, an interpolation can be made (for each b
 .. image:: images/interpolation.png
   :width: 60%
   :alt: Example of interpolation for model predictions, obtained from `CERN-OPEN-2012-016 <https://cds.cern.ch/record/1456844>`_.
-  
+ 
 The above example was obtained from `CERN-OPEN-2012-016 <https://cds.cern.ch/record/1456844>`_.
 
 Using our (pseudo)data, we run a maximum likelihood fit over all parameters to find the best-fit parameter values. The model will be made to have higher agreement with the data while nuisance parameters stay as close to the nominal values as possible. 
