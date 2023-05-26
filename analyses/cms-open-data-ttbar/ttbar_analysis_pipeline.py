@@ -41,7 +41,6 @@
 # ### Imports: setting up our environment
 
 # %% tags=[]
-import asyncio
 import logging
 import os
 import time
@@ -59,7 +58,6 @@ import json
 import yaml
 import matplotlib.pyplot as plt
 import numpy as np
-import uproot
 from xgboost import XGBClassifier
 import pyhf
 
@@ -455,7 +453,7 @@ class TtbarAnalysis(processor.ProcessorABC):
                                 results[even_perm] = self.xgboost_model_odd.predict_proba(
                                     features[even_perm,:])[:, 1]
                             if len(features[np.invert(even_perm)])>0:
-                                results[np.invert(even_perm)] = results_odd = self.xgboost_model_even.predict_proba(
+                                results[np.invert(even_perm)] = self.xgboost_model_even.predict_proba(
                                     features[np.invert(even_perm),:])[:, 1]
 
                         results = ak.unflatten(results, perm_counts)
