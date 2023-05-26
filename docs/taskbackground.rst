@@ -135,7 +135,7 @@ We can also see that our selection criteria worked, since the majority of events
 We want to develop a statistical model, parameterized by some physical parameters :math:`\vec{\alpha}`. 
 We have one parameter of interest, the :math:`t\bar{t}` cross-section, and a handful of *nuisance parameters*, which are physics parameters that are not of interest in this analysis. 
 Changing any nuisance parameter can have an effect on the expected rate of a physics process and/or distribution shapes, leading to systematic uncertainties. 
-In general, we model the effects of changing nuisance parameters by generating Monte Carlo selections for different variations of parameters. 
+In general, we model the effects of changing nuisance parameters by generating Monte Carlo realizations for different variations of parameters. 
 Once we have these, we can utilize different interpolation strategies to construct a continuous parameterization. 
 
 Generally, and inclusive of this analysis example, we consider three different variations: one "nominal" parameter setting, where the nominal setting is chosen based on previous experience and studies, one "up" sample, where the parameter is increased by :math:`1\sigma`, and one "down" sample, where the parameter is decreased by :math:`1\sigma`. 
