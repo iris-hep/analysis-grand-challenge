@@ -251,7 +251,8 @@ def addValuesToDict(args, inputDict, function, numberOfPoints=100, value=0):
     lowerLimit = min(tmpListOfXValues)
     upperLimit = max(tmpListOfXValues)
 
-    forbiddenFunction_Lambda = lambda x: eval(args.forbiddenFunction)
+    def forbiddenFunction_Lambda(x):
+        return eval(args.forbiddenFunction)
     if value == "mirror":
         from scipy.spatial.distance import cdist
 
@@ -328,7 +329,6 @@ def interpolateSurface(
     x = {}  # entry x points
     y = {}  # entry x points
 
-    graphs = {}
     array_data = {}
     for whichContour in tmpListOfContours:
         zValues[whichContour] = [
@@ -361,9 +361,6 @@ def interpolateSurface(
 
             sys.exit(0)
 
-    xi = {}
-    yi = {}
-    zi = {}
     for whichContour in tmpListOfContours:
 
         # Convert everything to numpy arrays
