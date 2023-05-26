@@ -99,15 +99,15 @@ The cross-section values used are listed below (obtained from `this site <https:
 
    * - Process
      - Cross-section [pb]
-   * - ttbar
+   * - ``ttbar``
      - 729.84
-   * - single_top_s_chan
+   * - ``single_top_s_chan``
      - 6.839
-   * - single_top_t_chan
+   * - ``single_top_t_chan``
      - 214.2
-   * - single_top_tW
+   * - ``single_top_tW``
      - 79.3
-   * - wjets
+   * - ``wjets``
      - 61526.7 * 0.253
 
 4. Top Mass Reconstruction
