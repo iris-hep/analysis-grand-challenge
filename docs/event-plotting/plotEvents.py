@@ -28,6 +28,7 @@ import awkward as ak
 import particle
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
+from matplotlib.ticker import FormatStrFormatter, MultipleLocator
 
 # %%
 # file must be nanoAOD
@@ -355,6 +356,12 @@ for iEvt in range(10):
     # set axis labels
     axs[0].set_xlabel("$\eta$")
     axs[0].set_ylabel("$\phi$")
+    
+    # phi axis in units of pi
+    # axs[0].yaxis.set_major_formatter(FormatStrFormatter('%g $\pi$'))
+    # axs[0].yaxis.set_major_locator(MultipleLocator(base=np.pi))
+    axs[0].set_yticks([-np.pi,-3*np.pi/4,-np.pi/2,-np.pi/4,0,np.pi/4,np.pi/2,3*np.pi/4,np.pi])
+    axs[0].set_yticklabels(["$-\pi$","","$-\pi/2$","","0","","$\pi/2$","","$\pi$"])
     
     axs[0].grid(alpha=0.5)
     axs[0].set_title(f"Event #{iEvt}")
