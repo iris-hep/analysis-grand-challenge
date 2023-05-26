@@ -48,7 +48,7 @@ We believe that the AGC can be useful in various contexts:
 We are very interested in seeing (parts of) the AGC implemented in different ways!
 Besides the implementation in this repository, have a look at
 
-- a ROOT RDataFrame-based implementation: [andriiknu/RDF/](https://github.com/andriiknu/RDF/),
+- a ROOT RDataFrame-based implementation: [root-project/analysis-grand-challenge](https://github.com/root-project/analysis-grand-challenge),
 - a pure Julia implementation: [Moelf/LHC_AGC.jl](https://github.com/Moelf/LHC_AGC.jl).
 
 Please get in touch if you have investigated other approaches you would like to share!
