@@ -70,7 +70,7 @@ The tree of the above event looks something like
 To ensure that we retain the highest possible purity of :math:`t\bar{t}` events in the signal region, we make the following cuts:
 
 * Events must contain exactly one lepton, which must have :math:`p_T>30` GeV, :math:`|\eta|<2.1`, and ``sip3d<4`` (significance of 3d impact parameter)
-* Jets must have :math:`p_T>30` GeV, :math:`|\eta|>2.4`, and ``isTightLeptonVeto``
+* Jets must have :math:`p_T>30` GeV and :math:`|\eta|>2.4` as well as satisfy ``isTightLeptonVeto``
 * Events must have at least four jets
 * Events must have exactly one :math:`b`-tagged jet
 
