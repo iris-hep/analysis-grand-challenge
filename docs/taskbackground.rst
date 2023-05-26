@@ -176,7 +176,7 @@ Most modern high energy physics analyses use some form of machine learning (ML),
 The method described above to reconstruct the top mass attempts to correctly select all three jets on the hadronic side of the collision. 
 Using ML, we can go beyond this task by attempting to correctly assign each jet with its parent parton. 
 This should allow for a more accurate top mass reconstruction as well as access to new observables, such as the angle between the jet on the leptonic side of the collision and the lepton, or the angle between the two W jets.
-To enable machine learning in the ttbar analysis notebook, one must set ``USE_INFERENCE = True``. 
+For the IRIS-HEP implementation of this task, to enable machine learning in the ttbar analysis notebook, one must set ``USE_INFERENCE = True``. 
 
 The strategy used for this jet-parton assignment task is as follows:
 
