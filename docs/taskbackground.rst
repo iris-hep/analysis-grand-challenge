@@ -116,7 +116,7 @@ To measure the :math:`t\bar{t}` cross-section, we use an observable that approxi
 This is done using the following steps:
 
 #. Filter the events using the criteria explained above (including requiring at least four jets and exactly one lepton)
-#. Calculate all possible combinations of three jets from all jets in each event (utilizes ``ak.combinations``)
+#. Calculate all possible combinations of three jets from all jets in each event (for example, in our implementation we use ``ak.combinations``)
 #. Ensure that there is at least one b-tagged jet in each candidate combination (``btagCSVV2 > B_TAG_THRESHOLD``)
 #. Choose the combination with the largest combined transverse momentum (:math:`p_T`)
 #. Calculate combined mass of trijet system
