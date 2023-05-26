@@ -1,6 +1,6 @@
 :math:`t\bar{t}` Analysis Background
 ===============================================================
-The section covers the different components of the :math:`t\bar{t}` analysis using `2015 CMS Open Data <https://cms.cern/news/first-cms-open-data-lhc-run-2-released>`_ (see **AGC Versions** section for more information). 
+The section covers the different components of the :math:`t\bar{t}` analysis using `2015 CMS Open Data <https://cms.cern/news/first-cms-open-data-lhc-run-2-released>`_ (see :ref:`versions-description` section for more information). 
 Here is an overview of what is covered in this page:
 
 #. Brief description of the input data.
@@ -43,7 +43,9 @@ Since this is Monte Carlo simulated data, we can look at the particles that the 
 The jets are plotted as circles in the :math:`\eta`-:math:`\phi` plane, and color-coordinated with the truth particles they are matched to. Note that :math:`\phi` is a circular variable, so the top of the graph matches to the bottom. 
 The jets that are outlined in solid black are b-tagged, which means that they have properties which strongly indicate that they originate from bottom quarks.
 
-To look at more events, take a look at "Plot :math:`t\bar{t}` Events".
+To look at more events, take a look at the notebook plotEvents_.
+
+.. _plotEvents: event-plotting/plotEvents.ipynb
 
 .. image:: images/event3.png
   :width: 80%
@@ -72,7 +74,7 @@ To ensure that we retain the highest possible purity of :math:`t\bar{t}` events 
 * Events must have at least four jets
 * Events must have exactly one :math:`b`-tagged jet
 
-There are a few more details about the cuts, which one can read about in **AGC Versions** in the **Cuts** section.
+There are a few more details about the cuts, which one can read about in :ref:`versions-cuts`.
 
 
 3. Weighting
