@@ -117,9 +117,11 @@ This is done using the following steps:
 
 #. Filter the events using the criteria explained above (including requiring at least four jets and exactly one lepton)
 #. Calculate all possible combinations of three jets from all jets in each event (for example, in our implementation we use ``ak.combinations``)
-#. Ensure that there is at least one b-tagged jet in each candidate combination (``btagCSVV2 > B_TAG_THRESHOLD``)
+#. Ensure that there is at least one b-tagged jet in each candidate combination (``btagCSVV2 > B_TAG_THRESHOLD``:sup:`*`)
 #. Choose the combination with the largest combined transverse momentum (:math:`p_T`)
 #. Calculate combined mass of trijet system
+
+:sup:`*` **NOTE:** All jets have an associated ``btagCSVV2`` value, ranging from 0 to 1, which quantifies how likely the jet is come from a b quark. We utilize a threshold value, ``B_TAG_THRESHOLD=0.5``, to accept a jet as "b-tagged".
 
 Successful top mass reconstruction can be inferred from the below histogram, which is peaked around the top mass (:math:`\approx 173 GeV`). 
 We can also see that our selection criteria worked, since the majority of events in the histogram are from the :math:`t\bar{t}` sample.
