@@ -232,6 +232,8 @@ It is a future goal to move onto a more sophisticated architecture, as the BDT m
 
 BDT Performance
 ---------------------------------------------------------------
+The results in this section are specific to the models provided in the `repository /<https://github.com/iris-hep/analysis-grand-challenge/tree/main/analyses/cms-open-data-ttbar/models>`_. The results will differ some with each model-training.
+
 We can first qualitatively compare the top mass reconstruction by the trijet combination method and the BDT method by comparing their distributions to the truth top mass reconstruction distribution. 
 The events considered here are those in which it is possible to correctly reconstruct all jet-parton assignments in the leading four jets.
 
