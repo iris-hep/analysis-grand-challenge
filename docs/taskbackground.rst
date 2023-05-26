@@ -154,7 +154,7 @@ In order to perform a fit with this model, we construct some pseudodata from our
 
     pseudo_data = (all_histograms[:, :, "ttbar", "ME_var"] + all_histograms[:, :, "ttbar", "PS_var"]) / 2  + all_histograms[:, :, "wjets", "nominal"]
 
-Using our pseudodata, we run a maximum likelihood fit over all parameters to find the best-fit parameter values. The model will be made to have higher agreement with the data while nuisance parameters stay as close to the nominal values as possible. 
+Using our pseudodata, we run a maximum likelihood fit over all parameters to find the best-fit parameter values. The fit balances a trade-off between altering the model values to agree with the data and keeping the nuisance parameters as close to the nominal values as possible.
 
 The results of this fit can be seen in the below diagram, which demonstrates how far each parameter was pulled from its nominal value:
 
