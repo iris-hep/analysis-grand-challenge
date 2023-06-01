@@ -185,13 +185,28 @@ This section explains how to calculate the various systematic uncertainties we i
      - Scale jet :math:`p_T` by randomly generated values (normal distribution with :math:`\mu=1.0`, :math:`\sigma=0.05`) 
    * - ``btag_var_i``
      - Event weight variation
-     - All nominal samples
+     - All nominal samples (when populating histograms)
      - Scale the weight of the event by 7.5\% of the ``i``-th jet :math:`p_T` divided by 50 (for the four leading jets, :math:`i\in\{1,2,3,4\}`).
    * - ``scale_var``
      - Event weight variation
      - **W + jets** nominal sample
      - Scale the weight of the event up and down by 2.5\%.
-
+   * - Luminosity
+     - Normalization variation
+     - Histograms (after creation)
+     - Vary normalization up and down by 3\%
+   * - ME variation
+     - :math:`t\bar{t}` variation
+     - :math:`t\bar{t}` sample
+     - replace ``ttbar__nominal`` input files with ``ttbar__ME_var`` files
+   * - PS variation
+     - :math:`t\bar{t}` variation
+     - :math:`t\bar{t}` sample
+     - replace ``ttbar__nominal`` input files with ``ttbar__PS_var`` files
+   * - `t\bar{t}` scale variation
+     - :math:`t\bar{t}` variation
+     - :math:`t\bar{t}` sample
+     - replace ``ttbar__nominal`` input files with ``ttbar__scaleup`` and ``ttbar__scaledown`` files
 
 6. Statistical Model
 ---------------------------------------------------------------
