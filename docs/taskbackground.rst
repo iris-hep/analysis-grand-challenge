@@ -186,7 +186,7 @@ This section explains how to calculate the various systematic uncertainties we i
    * - ``btag_var_i``
      - Event weight variation
      - All nominal samples
-     - Scale the weight of the event by 7.5\% of the i-th jet :math:`p_T` divided by 50.
+     - Scale the weight of the event by 7.5\% of the ``i``-th jet :math:`p_T` divided by 50 (for the four leading jets, :math:`i\in\{1,2,3,4\}`).
    * - ``scale_var``
      - Event weight variation
      - **W + jets** nominal sample
