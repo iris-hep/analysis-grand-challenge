@@ -48,11 +48,11 @@ evt_systs = cs.Correction(
                     content=[
                         cs.CategoryItem(
                             key="up",
-                            value=1.0 + 0.03
+                            value=1.0 + 0.025
                         ),
                         cs.CategoryItem(
                             key="down",
-                            value=1.0 - 0.03
+                            value=1.0 - 0.025
                         ),
                     ],
                     default=1.0
