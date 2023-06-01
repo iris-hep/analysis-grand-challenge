@@ -113,6 +113,26 @@ The cross-section values used are listed below (obtained from `this site <https:
      
 4. Observables to Calculate
 ---------------------------------------------------------------
+The below table gives an overview of the observables and their binning.
+
+.. list-table:: Histogram Observables
+   :widths: 25 15 30 30
+   :header-rows: 1
+
+   * - Region
+     - Name
+     - Binning (Processing Step)
+     - Binning (Modelling Step)
+   * - 4j2b (Control Region)
+     - :math:`H_T`
+     - 25 bins from 50 to 550
+     - 11 bins from 50 to 550
+   * - 4j1b (Signal Region)
+     - :math:`m_{bjj}`
+     - 25 bins from 50 to 550
+     - 11 bins from 50 to 550
+
+
 **4j2b (Control Region)**: Event :math:`H_T`
 
 In the control region, we require there to be at least two b-tagged jets (``btagCSVV2 > B_TAG_THRESHOLD``:sup:`*`) and at least four jets.
