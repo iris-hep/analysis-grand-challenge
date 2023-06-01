@@ -109,15 +109,27 @@ The cross-section values used are listed below (obtained from `this site <https:
      - 79.3
    * - ``wjets``
      - 61526.7 * 0.253
-
-4. Top Mass Reconstruction
+     
+     
+4. Observables to Calculate
 ---------------------------------------------------------------
-To measure the :math:`t\bar{t}` cross-section, we use an observable that approximately reconstructs the top quark mass. 
+**4j2b (Control Region)**: Event :math:`H_T`
+
+In the control region, we require there to be at least two b-tagged jets (``btagCSVV2 > B_TAG_THRESHOLD``:sup:`*`) and at least four jets.
+
+The observable in this region is the event :math:`H_T`, which is the sum of the :math:`p_T` of all jets in each event.
+
+
+**4j1b (Signal Region)**: :math:`m_{bjj}` (Reconstructed top mass)
+
+In the signal region, we require there to be exactly one b-tagged jet (``btagCSVV2 > B_TAG_THRESHOLD``:sup:`*`) and at least four jets.
+
+To measure the :math:`t\bar{t}` cross-section, we use an observable that approximately reconstructs the top quark mass.
 This is done using the following steps:
 
 #. Filter the events using the criteria explained above (including requiring at least four jets and exactly one lepton)
 #. Calculate all possible combinations of three jets from all jets in each event (for example, in our implementation we use ``ak.combinations``)
-#. Ensure that there is at least one b-tagged jet in each candidate combination (``btagCSVV2 > B_TAG_THRESHOLD``:sup:`*`)
+#. Ensure that there is at least one b-tagged jet 
 #. Choose the combination with the largest combined transverse momentum (:math:`p_T`)
 #. Calculate combined mass of trijet system
 
@@ -130,7 +142,38 @@ We can also see that our selection criteria worked, since the majority of events
   :width: 80%
   :alt: Top mass distribution demonstrating successful top mass reconstruction.
 
-5. Statistical Model
+
+5. Systematic Uncertainties
+---------------------------------------------------------------
+This section explains how to calculate the various systematic uncertainties we incorporate into our model. Some of these affect the kinematics of the event, so the observables will need to be calculated for each variation.
+
+.. list-table:: Systematic Uncertainties
+   :widths: 20 20 20 40
+   :header-rows: 1
+
+   * - Name
+     - Type
+     - Where to apply
+     - Formula
+   * - ``pt_scale_up``
+     - Jet kinematics variation
+     - All nominal samples
+     - Scale jet :math:`p_T` by 1.03
+   * - ``pt_res_up``
+     - Jet kinematics variation
+     - All nominal samples
+     - Scale jet :math:`p_T` by randomly generated values (normal distribution with :math:`\mu=1.0`, :math:`\sigma=0.05`) 
+   * - ``btag_var_i``
+     - Event weight variation
+     - All nominal samples
+     - Scale the weight of the event by 7.5\% of the i-th jet :math:`p_T` divided by 50.
+   * - ``scale_var``
+     - Event weight variation
+     - **W + jets** nominal sample
+     - Scale the weight of the event up and down by 2.5\%.
+
+
+6. Statistical Model
 ---------------------------------------------------------------
 The following description details building a statistical model in the ``HistFactory`` format:
 
@@ -170,7 +213,7 @@ Here is what the model looks like, before and after the fit is performed:
 
 For more information to statistics in LHC physics, visit `this document <https://arxiv.org/abs/1503.07622>`_.
 
-6. Machine Learning Component
+7. Machine Learning Component
 ---------------------------------------------------------------
 Most modern high energy physics analyses use some form of machine learning (ML), so a machine learning task has been incorporated into the AGC :math:`t\bar{t}` cross-section measurement to reflect this development. 
 The method described above to reconstruct the top mass attempts to correctly select all three jets on the hadronic side of the collision. 
