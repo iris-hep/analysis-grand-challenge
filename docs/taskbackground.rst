@@ -175,11 +175,11 @@ This section explains how to calculate the various systematic uncertainties we i
      - Type
      - Where to apply
      - Formula
-   * - ``pt_scale_up``
+   * - ``pt_scale``
      - Jet kinematics variation
      - All nominal samples
-     - Scale jet :math:`p_T` by 1.03
-   * - ``pt_res_up``
+     - Scale jet :math:`p_T` up and down by 3\%
+   * - ``pt_res``
      - Jet kinematics variation
      - All nominal samples
      - Scale jet :math:`p_T` by randomly generated values (normal distribution with :math:`\mu=1.0`, :math:`\sigma=0.05`) 
