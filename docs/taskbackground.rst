@@ -165,7 +165,7 @@ We can also see that our selection criteria worked, since the majority of events
 
 5. Systematic Uncertainties
 ---------------------------------------------------------------
-This section explains how to calculate the various systematic uncertainties we incorporate into our model. Some of these affect the kinematics of the event, so the observables will need to be calculated for each variation.
+This section explains how to calculate the various systematic uncertainties we incorporate into our model. Some of these affect the kinematics of the event, so the observables will need to be calculated for each variation. Note that one-sided variations must be symmetrized.
 
 .. list-table:: Systematic Uncertainties
    :widths: 20 20 20 40
@@ -198,19 +198,19 @@ This section explains how to calculate the various systematic uncertainties we i
    * - ME variation
      - :math:`t\bar{t}` variation
      - :math:`t\bar{t}` sample
-     - replace ``ttbar__nominal`` input files with ``ttbar__ME_var`` files
+     - replace ``ttbar__nominal`` input files with ``ttbar__ME_var`` files (one-sided variation)
    * - PS variation
      - :math:`t\bar{t}` variation
      - :math:`t\bar{t}` sample
-     - replace ``ttbar__nominal`` input files with ``ttbar__PS_var`` files
-   * - `t\bar{t}` scale variation
+     - replace ``ttbar__nominal`` input files with ``ttbar__PS_var`` files (one-sided variation)
+   * - :math:`t\bar{t}` scale variation
      - :math:`t\bar{t}` variation
      - :math:`t\bar{t}` sample
      - replace ``ttbar__nominal`` input files with ``ttbar__scaleup`` and ``ttbar__scaledown`` files
 
 6. Statistical Model
 ---------------------------------------------------------------
-The following description details building a statistical model in the ``HistFactory`` format:
+The following description details building a statistical model in the ``HistFactory`` format. This format is documented `here <https://root.cern/doc/master/group__HistFactory.html>`_ (``ROOT``) and `here <https://pyhf.readthedocs.io/en/latest/intro.html#histfactory>`_ (``pyhf``).
 
 We want to develop a statistical model, parameterized by some physical parameters :math:`\vec{\alpha}`. 
 We have one parameter of interest, the :math:`t\bar{t}` cross-section, and a handful of *nuisance parameters*, which are physics parameters that are not of interest in this analysis. 
