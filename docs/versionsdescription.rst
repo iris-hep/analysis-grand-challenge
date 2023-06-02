@@ -1,3 +1,5 @@
+.. _versions-description:
+
 AGC Versions
 ================================
 
@@ -36,14 +38,17 @@ The below table gives a brief overview of all AGC versions.
      - 
      - 
      - BDT to predict jet-parton assignment in :math:`t\bar{t}` events
-     -  
+     - 
 
 Datasets
 ================================
 
-The datasets used for the CMS :math:`t\bar{t}` notebook are from the 2015 CMS Open Data release. Versions 0.1.0 and 0.2.0 use ntuples generated using the `Physics Objects Extractor Tool (POET) <https://github.com/cms-opendata-analyses/PhysObjectExtractorTool>`_.
+The datasets used for the CMS :math:`t\bar{t}` notebook are from the 2015 CMS Open Data release. 
+Versions 0.1.0 and 0.2.0 use ntuples generated using the `Physics Objects Extractor Tool (POET) <https://github.com/cms-opendata-analyses/PhysObjectExtractorTool>`_.
 
-All versions >=1.0.0 use NanoAOD instead. The NanoAOD was generated from the 2015 CMS Open Data release using this pull request of CMSSW: `https://github.com/cms-sw/cmssw/pull/39040 <https://github.com/cms-sw/cmssw/pull/39040>`_. To set this up, the following commands should be run::
+All versions >=1.0.0 use NanoAOD instead. 
+The NanoAOD was generated from the 2015 CMS Open Data release using this pull request of CMSSW: `https://github.com/cms-sw/cmssw/pull/39040 <https://github.com/cms-sw/cmssw/pull/39040>`_. 
+To set this up, the following commands should be run::
     
     source /cvmfs/cms.cern.ch/cmsset_default.sh
     scram list CMSSW_10_6_
@@ -65,7 +70,8 @@ For MC, you can use::
 
 The code used to generate and subsequently merge these files is located in the following repository: `https://github.com/ekauffma/produce-nanoAODs <https://github.com/ekauffma/produce-nanoAODs>`_
 
-The data used is the same, regardless of MiniAOD vs NanoAOD. The list of datasets separated by process is included below:
+The data used is the same, regardless of MiniAOD vs NanoAOD. 
+The list of datasets separated by process is included below:
 
 * **ttbar**:
 
@@ -149,6 +155,8 @@ The data used is the same, regardless of MiniAOD vs NanoAOD. The list of dataset
 More information about datasets can be found in `analysis-grand-challenge/datasets/cms-open-data-2015/ <https://github.com/iris-hep/analysis-grand-challenge/tree/main/datasets/cms-open-data-2015>`_.
 
 
+.. _versions-cuts:
+
 Cuts
 ================================
 
@@ -169,7 +177,7 @@ This is modified to better reflect common practices in CMS in subsequent version
 * For electrons, we also require ``cutBased==4`` (tight)
 * For muons, we also require ``tightId`` and ``pfRelIso04_all<0.15`` (PF relative isolation dR=0.4, total (deltaBeta corrections))
 * Events must contain exactly one lepton
-* Jets must have :math:`p_T>30` GeV, :math:`|\eta|>2.4`, and ``isTightLeptonVeto``
+* Jets must have :math:`p_T>30` GeV and :math:`|\eta|>2.4` as well as satisfy ``isTightLeptonVeto``
 * Events must have at least four jets
 * Jets are considered :math:`b`-tagged if they have a :math:`b`-tag score over `B_TAG_THRESHOLD=0.5`.
 * Events must have at least one :math:`b`-tagged jet
