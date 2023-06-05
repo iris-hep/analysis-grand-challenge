@@ -58,7 +58,7 @@ if __name__ == "__main__":
         histos = as_dict(f)
 
     if args.dump_json:
-        print(json.dumps(histos))
+        print(json.dumps(histos, indent=2))
         sys.exit(0)
 
     with open(args.reference) as reference:
