@@ -1,6 +1,7 @@
 # Compare the content of histograms produced by ttbar_analysis_pipeline with a reference file.
 # A reference file for N_FILES_MAX_PER_SAMPLE=1 is available in directory `reference/`.
 
+from __future__ import annotations
 import argparse
 from collections import defaultdict
 import json
