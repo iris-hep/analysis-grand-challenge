@@ -93,13 +93,13 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 # %% tags=[]
 ### GLOBAL CONFIGURATION
 # input files per process, set to e.g. 10 (smaller number = faster)
-N_FILES_MAX_PER_SAMPLE = 1
+N_FILES_MAX_PER_SAMPLE = 5
 
 # enable Dask
 USE_DASK = True
 
 # enable ServiceX
-USE_SERVICEX = True
+USE_SERVICEX = False
 
 ### LOAD OTHER CONFIGURATION VARIABLES
 with open("config.yaml") as config_file:
