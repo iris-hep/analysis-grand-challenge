@@ -42,3 +42,12 @@ If you wish to create a new notebook (`notebook.ipynb`) and pair it with a .py f
 ```
 jupytext --set-formats ipynb,py:percent notebook.ipynb
 ```
+
+#### Validating outputs
+
+The `validate_histograms.py` script can be used to check that the histograms produced by the analysis are consistent with expectations.
+To use it, simply call `python validate_histograms.py --reference reference/histos_1_file_per_process.json`, where the last
+argument is the appropriate reference file for the number of files per process and the kind of run that has been performed.
+For full usage help see the output of `python validate_histograms.py --help`.
+
+`validate_histograms.py` can also be used to create new references by passing the `--dump-json` option.
