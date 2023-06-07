@@ -22,18 +22,13 @@ def parse_args() -> argparse.Namespace:
 # Only the highest namecycle for every histogram is considered, and cycles are stripped from the histogram names.
 def as_dict(f: uproot.ReadOnlyDirectory) -> dict[str, dict]:
     histos = defaultdict(dict)
-    cycles: dict(str, int) = {}
-    for k, v in f.items():
-        assert isinstance(v, uproot.behaviors.TH1.Histogram)
-        # this assumes that the rightmost ";" (if any) comes before a namecycle
-        name, *cycle = k.rsplit(";", 1)
-        cycle = int(cycle[0]) if len(cycle) > 0 else -1
-        if name in histos and cycles["cycle"] > cycle:
-            continue # found a lower cycle for a histogram we already have
-
-        cycles[name] = cycle
-        histos[name]["edges"] = v.axis().edges().tolist()
-        histos[name]["contents"] = v.counts(flow=True).tolist()
+    # this assumes that the rightmost ";" (if any) comes before a namecycle
+    names = set(k.rsplit(";", 1)[0] for k in f)
+    for name in names:
+        h = f[name]
+        assert isinstance(h, uproot.behaviors.TH1.Histogram)
+        histos[name]["edges"] = h.axis().edges().tolist()
+        histos[name]["contents"] = h.counts(flow=True).tolist()
     return histos
 
 def validate(histos: dict, reference: dict) -> dict[str, list[str]]:
