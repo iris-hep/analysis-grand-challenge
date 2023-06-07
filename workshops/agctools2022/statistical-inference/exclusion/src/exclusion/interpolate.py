@@ -179,17 +179,6 @@ def harvestToDict(args, inputJSON, tmpListOfContours=None):
 
     # for sample in inputJSON:
     for sample in inputJSON.values():
-
-        ## Allowing filtering of entries via a constraints file
-        if args.fixedParamsFile:
-            failConstraintCutList = [
-                sample[str(constrainedVar)] != constrainedVal
-                for (constrainedVar, constrainedVal) in constraintsDict.iteritems()
-            ]
-
-            if any(failConstraintCutList):
-                continue
-
         try:
             sampleParams = (
                 float(sample[args.xVariable]),
@@ -556,14 +545,6 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--logY", help="use log10 of y variable", action="store_true", default=False
-    )
-
-    parser.add_argument(
-        "--fixedParamsFile",
-        "-f",
-        type=str,
-        help="give a json file with key=variable and value=value. e.g. use for pinning down third parameter in harvest list",
-        default="",
     )
     parser.add_argument(
         "--forbiddenFunction",
