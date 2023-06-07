@@ -1,5 +1,9 @@
 import json
 import logging
+from pathlib import Path
+import os
+import urllib
+from tqdm import tqdm
 
 import hist
 import matplotlib as mpl
@@ -49,7 +53,20 @@ def set_style():
     plt.rcParams['text.color'] = "222222"
 
 
-def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name=""):
+# If local_data_cache is a writable path, this function will download any missing file into it and
+# then return file paths corresponding to these local copies.
+def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", local_data_cache=None):
+    if af_name == "ssl-dev":
+        if use_xcache:
+            raise RuntimeError("`use_xcache` and `af_name='ssl-dev'` are incompatible. Please only use one of them.")
+        if local_data_cache is not None:
+            raise RuntimeError("`af_name='ssl-dev'` and `local_data_cache` are incompatible. Please only use one of them.")
+
+    if local_data_cache is not None:
+        local_data_cache = Path(local_data_cache)
+        if not local_data_cache.exists() or not os.access(local_data_cache, os.W_OK):
+            raise RuntimeError(f"local_data_cache directory {local_data_cache} does not exist or is not writable.")
+
     # using https://atlas-groupdata.web.cern.ch/atlas-groupdata/dev/AnalysisTop/TopDataPreparation/XSection-MC15-13TeV.data
     # for reference
     # x-secs are in pb
@@ -80,14 +97,50 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name=""):
             file_paths = [f["path"] for f in file_list]
             if use_xcache:
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094", "root://red-xcache1.unl.edu") for f in file_paths]
-            if af_name == "ssl-dev":
+            elif af_name == "ssl-dev":
                 # point to local files on /data
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/", "/data/alheld/") for f in file_paths]
+            if local_data_cache is not None:
+                local_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/", f"{local_data_cache.absolute()}/") for f in file_paths]
+                for remote, local in zip(file_paths, local_paths):
+                    if not Path(local).exists():
+                        download_file(remote, local)
+                file_paths = local_paths
             nevts_total = sum([f["nevts"] for f in file_list])
             metadata = {"process": process, "variation": variation, "nevts": nevts_total, "xsec": xsec_info[process]}
             fileset.update({f"{process}__{variation}": {"files": file_paths, "metadata": metadata}})
 
     return fileset
+
+
+def tqdm_urlretrieve_hook(t):
+    """From https://github.com/tqdm/tqdm/blob/master/examples/tqdm_wget.py ."""
+    last_b = [0]
+
+    def update_to(b=1, bsize=1, tsize=None):
+        """
+        b  : int, optional
+            Number of blocks transferred so far [default: 1].
+        bsize  : int, optional
+            Size of each block (in tqdm units) [default: 1].
+        tsize  : int, optional
+            Total size (in tqdm units). If [default: None] or -1,
+            remains unchanged.
+        """
+        if tsize not in (None, -1):
+            t.total = tsize
+        displayed = t.update((b - last_b[0]) * bsize)
+        last_b[0] = b
+        return displayed
+
+    return update_to
+
+
+def download_file(url, out_file):
+    out_path = Path(out_file)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=out_path.name) as t:
+        urllib.request.urlretrieve(url, out_path.absolute(), reporthook=tqdm_urlretrieve_hook(t))
 
 
 def save_histograms(all_histograms, fileset, filename):
