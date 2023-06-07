@@ -27,7 +27,6 @@ import awkward as ak
 import particle
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
-from matplotlib.ticker import FormatStrFormatter, MultipleLocator
 
 # %%
 # file must be nanoAOD
