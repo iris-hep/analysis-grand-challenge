@@ -1,5 +1,5 @@
-import asyncio
 import json
+import logging
 
 import hist
 import matplotlib as mpl
@@ -16,13 +16,14 @@ def get_client(af="coffea_casa"):
         client = Client("tls://localhost:8786")
 
     elif af == "EAF":
-        from lpcdaskgateway import LPCGateway
+        from htcdaskgateway import HTCGateway
 
-        gateway = LPCGateway()
+        gateway = HTCGateway()
         cluster = gateway.new_cluster()
         cluster.scale(10)
         print("Please allow up to 60 seconds for HTCondor worker jobs to start")
-        print(f"Cluster dashboard: {str(cluster.dashboard_link)}")
+        print(f"Cluster dashboard: https://dask-gateway.fnal.gov/clusters/{str(cluster.name)}/status")
+
 
         client = cluster.get_client()
 
@@ -415,14 +416,14 @@ def plot_data_mc(model_prediction_prefit, model_prediction_postfit, data, config
 
         n_zero_pred_prefit = sum(total_yield_prefit == 0.0)  # number of bins with zero predicted yields
         if n_zero_pred_prefit > 0:
-            log.warning(f"(PREFIT) predicted yield is zero in {n_zero_pred_prefit} bin(s), excluded from ratio plot")
+            logging.warning(f"(PREFIT) predicted yield is zero in {n_zero_pred_prefit} bin(s), excluded from ratio plot")
         nonzero_model_yield_prefit = total_yield_prefit != 0.0
         if np.any(total_yield_prefit < 0.0):
             raise ValueError(f"(PREFIT) {label_prefit} total model yield has negative bin(s): {total_yield_prefit.tolist()}")
         
         n_zero_pred_postfit = sum(total_yield_postfit == 0.0)  # number of bins with zero predicted yields
         if n_zero_pred_postfit > 0:
-            log.warning(f"(POSTFIT) predicted yield is zero in {n_zero_pred_postfit} bin(s), excluded from ratio plot")
+            logging.warning(f"(POSTFIT) predicted yield is zero in {n_zero_pred_postfit} bin(s), excluded from ratio plot")
         nonzero_model_yield_postfit = total_yield_postfit != 0.0
         if np.any(total_yield_postfit < 0.0):
             raise ValueError(f"(POSTFIT) {label_postfit} total model yield has negative bin(s): {total_yield_postfit.tolist()}")
