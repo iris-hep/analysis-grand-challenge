@@ -125,7 +125,3 @@ def plot_contour(ax, results, **kwargs):
         )
 
     return ax
-
-
-if __name__ == "__main__":
-    main()

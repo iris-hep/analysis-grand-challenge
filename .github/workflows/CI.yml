@@ -4,11 +4,16 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: 3
 
 jobs:
-
-  test:
+  sphinx:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,3 +25,11 @@ jobs:
         run: |
           pip install -r docs/requirements.txt
           sphinx-build docs docs/_build
+
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: jpetrucciani/ruff-check@main

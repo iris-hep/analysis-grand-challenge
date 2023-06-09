@@ -418,7 +418,8 @@ class TtbarAnalysis(processor.ProcessorABC):
                     trijet_mass = trijet["p4"][ak.argmax(trijet.p4.pt, axis=1, keepdims=True)].mass
                     observable = ak.flatten(trijet_mass)
 
-                    if sum(region_selection)==0: continue
+                    if sum(region_selection)==0:
+                        continue
 
                     if self.use_inference:
                         features, perm_counts = get_features(region_jets, region_elecs, region_muons, self.permutations_dict)

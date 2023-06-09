@@ -1,0 +1,3 @@
+[tool.ruff]
+# ignore too long lines and ; at the end of a line
+ignore = ["E501", "E703"]

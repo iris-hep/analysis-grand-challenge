@@ -20,7 +20,6 @@
 
 # %%
 # IMPORTS
-import uproot
 from coffea.nanoevents import NanoEventsFactory
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,7 +27,6 @@ import awkward as ak
 import particle
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
-from matplotlib.ticker import FormatStrFormatter, MultipleLocator
 
 # %%
 # file must be nanoAOD
@@ -190,7 +188,7 @@ for iEvt in range(10):
                         fontsize=10)
         
             # if parent exists
-            if not plotting_candidates[iEvt][i].distinctParent is None and not plotting_candidates[iEvt][i].genPartIdxMother==-1:
+            if plotting_candidates[iEvt][i].distinctParent is not None and not plotting_candidates[iEvt][i].genPartIdxMother==-1:
                 
                 # if in range
                 if np.abs(plotting_candidates[iEvt][i].distinctParent.eta)<avg_jet_eta+4:
@@ -272,11 +270,12 @@ for iEvt in range(10):
                 circle2 = plt.Circle((jet.eta, jet.phi+2*np.pi), 0.4, facecolor=None, edgecolor = 'k', 
                                      linestyle='solid', fill=False)
                 axs[0].add_patch(circle2)
-            else: circle2 = None
+            else:
+                circle2 = None
             
             axs[0].add_patch(circle)
             
-        if not nearest_genpart[iEvt][i] is None:
+        if nearest_genpart[iEvt][i] is not None:
             axs[0].plot(nearest_genpart[iEvt][i].eta,nearest_genpart[iEvt][i].phi,'o',color=jetcolors[i])
             axs[0].text(nearest_genpart[iEvt][i].eta+0.05,nearest_genpart[iEvt][i].phi+0.05,
                         f"{particle.Particle.from_pdgid(nearest_genpart[iEvt][i].pdgId).name}", 
@@ -284,7 +283,7 @@ for iEvt in range(10):
             axs[0].plot(nearest_genpart[iEvt][i].eta,nearest_genpart[iEvt][i].phi-2*np.pi,'o',color=jetcolors[i])
             axs[0].plot(nearest_genpart[iEvt][i].eta,nearest_genpart[iEvt][i].phi+2*np.pi,'o',color=jetcolors[i])
             
-            if not nearest_parent[iEvt][i] is None:
+            if nearest_parent[iEvt][i] is not None:
                 axs[0].plot(nearest_parent[iEvt][i].eta,nearest_parent[iEvt][i].phi,'*',color=jetcolors[i])
                 axs[0].text(nearest_parent[iEvt][i].eta+0.05,nearest_parent[iEvt][i].phi+0.05,
                             f"{particle.Particle.from_pdgid(nearest_parent[iEvt][i].pdgId).name}", 
