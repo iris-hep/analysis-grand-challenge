@@ -531,7 +531,9 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 
 # %% tags=[]
 def get_query(source: ObjectStream) -> ObjectStream:
-    """Query for event / column selection: >=4j >=1b, ==1 lep with pT>30 GeV + additional cuts, return relevant columns
+    """Query for event / column selection: >=4j >=1b, ==1 lep with pT>30 GeV + additional cuts, 
+    return relevant columns
+    *NOTE* jet pT cut is set lower to account for systematic variations to jet pT
     """
     cuts = source.Where(lambda e: {"pt": e.Electron_pt, 
                                "eta": e.Electron_eta, 
@@ -553,7 +555,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
                         .Where(lambda f: {"pt": f.Jet_pt, 
                                           "eta": f.Jet_eta,
                                           "jetId": f.Jet_jetId}.Zip()\
-                               .Where(lambda jet: (jet.pt > 30 
+                               .Where(lambda jet: (jet.pt > 25 
                                                    and abs(jet.eta) < 2.4 
                                                    and jet.jetId == 6)).Count() >= 4)\
                         .Where(lambda g: {"pt": g.Jet_pt, 
@@ -561,7 +563,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
                                           "btagCSVV2": g.Jet_btagCSVV2,
                                           "jetId": g.Jet_jetId}.Zip()\
                         .Where(lambda jet: (jet.btagCSVV2 >= 0.5 
-                                            and jet.pt > 30
+                                            and jet.pt > 25
                                             and abs(jet.eta) < 2.4) 
                                             and jet.jetId == 6).Count() >= 1)
     selection = cuts.Select(lambda h: {"Electron_pt": h.Electron_pt,
