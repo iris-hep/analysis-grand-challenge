@@ -591,7 +591,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
     if USE_INFERENCE:
         return selection
     
-    # some branches are only needed if USE_INFERENCE is turned on
+    # some branches are not needed if USE_INFERENCE is turned off
     return selection.Select(lambda h: {"Electron_pt": h.Electron_pt,
                                        "Electron_eta": h.Electron_eta,
                                        "Electron_cutBased": h.Electron_cutBased,
