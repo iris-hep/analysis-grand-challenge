@@ -650,7 +650,8 @@ if USE_INFERENCE:
             histtype="fill", 
             linewidth=1, 
             edgecolor="grey", 
-            ax=axs[row,column])
+            ax=axs[row,column]
+        )
         axs[row, column].legend(frameon=False)
     fig.show()
 
@@ -661,9 +662,14 @@ if USE_INFERENCE:
 # This also builds pseudo-data by combining events from the various simulation setups we have processed.
 
 # %% tags=[]
-utils.save_histograms(all_histograms['hist'], fileset, "histograms.root")
+utils.file_output.save_histograms(all_histograms['hist'], 
+                                  fileset, 
+                                  "histograms.root", 
+                                  ["4j1b", "4j2b"])
 if USE_INFERENCE:
-    utils.save_ml_histograms(all_histograms['ml_hist_dict'], fileset, "histograms_ml.root", config)
+    utils.file_output.save_histograms(all_histograms['ml_hist_dict'], 
+                                      fileset, "histograms_ml.root", 
+                                      utils.config["ml"]["file_output"])
 
 # %% [markdown]
 # ### Statistical inference
