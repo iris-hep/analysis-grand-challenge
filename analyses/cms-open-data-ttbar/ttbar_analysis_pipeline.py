@@ -238,7 +238,7 @@ class TtbarAnalysis(processor.ProcessorABC):
         # cannot attach pT variations to events.jet, so attach to events directly
         # and subsequently scale pT by these scale factors
         events["pt_scale_up"] = 1.03
-        events["pt_res_up"] = jet_pt_resolution(events.Jet.pt)
+        events["pt_res_up"] = utils.systematics.jet_pt_resolution(events.Jet.pt)
 
         syst_variations = ["nominal"]
         jet_kinematic_systs = ["pt_scale_up", "pt_res_up"]
@@ -402,7 +402,11 @@ class TtbarAnalysis(processor.ProcessorABC):
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
 # %% tags=[]
-fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False, af_name=config["benchmarking"]["AF_NAME"])  # local files on /data for ssl-dev
+fileset = utils.file_input.construct_fileset(
+    N_FILES_MAX_PER_SAMPLE, 
+    use_xcache=False, 
+    af_name=utils.config["benchmarking"]["AF_NAME"],
+)  # local files on /data for ssl-dev
 
 print(f"processes in fileset: {list(fileset.keys())}")
 print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files'][0]}, ...],")
@@ -533,7 +537,7 @@ if USE_SERVICEX:
 # %% tags=[]
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 if USE_DASK:
-    executor = processor.DaskExecutor(client=utils.get_client(af=config["global"]["AF"]))
+    executor = processor.DaskExecutor(client=utils.client.get_client(af=config["global"]["AF"]))
 else:
     executor = processor.FuturesExecutor(workers=config["benchmarking"]["NUM_CORES"])
 
