@@ -52,6 +52,7 @@ import correctionlib
 from coffea import processor
 from coffea.nanoevents import NanoAODSchema
 from coffea.analysis_tools import PackedSelection
+import copy
 from func_adl import ObjectStream
 from func_adl_servicex import ServiceXSourceUpROOT
 import hist
@@ -187,13 +188,15 @@ class TtbarAnalysis(processor.ProcessorABC):
             return self.only_do_IO(events)
 
         # create copies of histogram objects
-        hist_dict = {}
-        for region in ["4j1b", "4j2b"]:
-            hist_dict[region] = self.hist_dict[region].copy()
+        # hist_dict = {}
+        # for region in ["4j1b", "4j2b"]:
+        #     hist_dict[region] = self.hist_dict[region].copy()
+        hist_dict = copy.deepcopy(self.hist_dict)
         if self.use_inference:
-            ml_hist_dict = {}
-            for i in range(len(utils.config["ml"]["FEATURE_NAMES"])):
-                ml_hist_dict[utils.config["ml"]["FEATURE_NAMES"][i]] = self.ml_hist_dict[utils.config["ml"]["FEATURE_NAMES"][i]].copy()
+            ml_hist_dict = copy.deepcopy(self.ml_hist_dict)
+            # ml_hist_dict = {}
+            # for i in range(len(utils.config["ml"]["FEATURE_NAMES"])):
+            #     ml_hist_dict[utils.config["ml"]["FEATURE_NAMES"][i]] = self.ml_hist_dict[utils.config["ml"]["FEATURE_NAMES"][i]].copy()
 
         process = events.metadata["process"]  # "ttbar" etc.
         variation = events.metadata["variation"]  # "nominal" etc.
