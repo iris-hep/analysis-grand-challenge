@@ -1,7 +1,7 @@
 import awkward as ak
 import numpy as np
 from xgboost import XGBClassifier
-from utils.load_config import config
+from .config import config
 
 # local loading of ML models
 model_even = None
