@@ -124,20 +124,14 @@ class TtbarAnalysis(processor.ProcessorABC):
     def __init__(self, use_dask, use_inference, use_triton):
 
         # initialize dictionary of hists for signal and control region
-        num_bins = 25
-        bin_low = 50
-        bin_high = 550
-        name = "observable"
-        label = "observable [GeV]"
-        
         self.hist_dict = {}
         for region in ["4j1b", "4j2b"]:
             self.hist_dict[region] = (
-                hist.Hist.new.Reg(num_bins, 
-                                  bin_low, 
-                                  bin_high, 
-                                  name=name, 
-                                  label=label)
+                hist.Hist.new.Reg(utils.config["global"]["NUM_BINS"], 
+                                  utils.config["global"]["BIN_LOW"], 
+                                  utils.config["global"]["BIN_HIGH"], 
+                                  name="observable", 
+                                  label="observable [GeV]")
                 .StrCat([], name="process", label="Process", growth=True)
                 .StrCat([], name="variation", label="Systematic variation", growth=True)
                 .Weight()
@@ -154,7 +148,7 @@ class TtbarAnalysis(processor.ProcessorABC):
             self.ml_hist_dict = {}
             for i in range(len(utils.config["ml"]["FEATURE_NAMES"])):
                 self.ml_hist_dict[utils.config["ml"]["FEATURE_NAMES"][i]] = (
-                    hist.Hist.new.Reg(num_bins,
+                    hist.Hist.new.Reg(utils.config["global"]["NUM_BINS"],
                                       utils.config["ml"]["BIN_LOW"][i],
                                       utils.config["ml"]["BIN_HIGH"][i],
                                       name="observable",
