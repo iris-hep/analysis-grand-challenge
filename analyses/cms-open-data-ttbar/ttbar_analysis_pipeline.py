@@ -47,6 +47,7 @@ import time
 
 import awkward as ak
 import cabinetry
+import cloudpickle
 import correctionlib
 from coffea import processor
 from coffea.nanoevents import NanoAODSchema
@@ -90,7 +91,7 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 # %% tags=[]
 ### GLOBAL CONFIGURATION
 # input files per process, set to e.g. 10 (smaller number = faster)
-N_FILES_MAX_PER_SAMPLE = 5
+N_FILES_MAX_PER_SAMPLE = 1
 
 # enable Dask
 USE_DASK = True
@@ -133,7 +134,7 @@ class TtbarAnalysis(processor.ProcessorABC):
         
         self.hist_dict = {}
         for region in ["4j1b", "4j2b"]:
-            hist_dict[region] = (
+            self.hist_dict[region] = (
                 hist.Hist.new.Reg(num_bins, 
                                   bin_low, 
                                   bin_high, 
@@ -191,7 +192,7 @@ class TtbarAnalysis(processor.ProcessorABC):
             hist_dict[region] = self.hist_dict[region].copy()
         if self.use_inference:
             ml_hist_dict = {}
-            for i in range(len(self.feature_names)):
+            for i in range(len(utils.config["ml"]["FEATURE_NAMES"])):
                 ml_hist_dict[utils.config["ml"]["FEATURE_NAMES"][i]] = self.ml_hist_dict[utils.config["ml"]["FEATURE_NAMES"][i]].copy()
 
         process = events.metadata["process"]  # "ttbar" etc.
@@ -526,11 +527,17 @@ if USE_SERVICEX:
 # %% tags=[]
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 if USE_DASK:
-    executor = processor.DaskExecutor(client=utils.client.get_client(af=config["global"]["AF"]))
+    cloudpickle.register_pickle_by_value(utils) # serialize methods and objects in utils so that they can be accessed within the coffea processor
+    executor = processor.DaskExecutor(client=utils.client.get_client(af=utils.config["global"]["AF"]))
 else:
-    executor = processor.FuturesExecutor(workers=config["benchmarking"]["NUM_CORES"])
+    executor = processor.FuturesExecutor(workers=utils.config["benchmarking"]["NUM_CORES"])
 
-run = processor.Runner(executor=executor, schema=NanoAODSchema, savemetrics=True, metadata_cache={}, chunksize=config["benchmarking"]["CHUNKSIZE"])
+run = processor.Runner(
+    executor=executor, 
+    schema=NanoAODSchema, 
+    savemetrics=True, 
+    metadata_cache={}, 
+    chunksize=utils.config["benchmarking"]["CHUNKSIZE"])
 
 if USE_SERVICEX:
     treename = "servicex"
