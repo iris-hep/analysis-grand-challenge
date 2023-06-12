@@ -7,7 +7,7 @@ config = {
     },
     "benchmarking": {
         # chunk size to use
-        "CHUNKSIZE": 100000,
+        "CHUNKSIZE": 200000,
         ### metadata to propagate through to metrics ###
         # "ssl-dev" allows for the switch to local data on /data
         "AF_NAME": "coffea_casa",

@@ -92,10 +92,10 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 # %% tags=[]
 ### GLOBAL CONFIGURATION
 # input files per process, set to e.g. 10 (smaller number = faster)
-N_FILES_MAX_PER_SAMPLE = 1
+N_FILES_MAX_PER_SAMPLE = 5
 
 # enable Dask
-USE_DASK = False
+USE_DASK = True
 
 # enable ServiceX
 USE_SERVICEX = False
@@ -106,7 +106,7 @@ USE_SERVICEX = False
 USE_INFERENCE = True
 
 # enable inference using NVIDIA Triton server
-USE_TRITON = True
+USE_TRITON = False
 
 
 # %% [markdown]
@@ -555,35 +555,7 @@ print(f"\nexecution took {exec_time:.2f} seconds")
 
 # %%
 # track metrics
-dataset_source = "/data" if fileset["ttbar__nominal"]["files"][0].startswith("/data") else "https://xrootd-local.unl.edu:1094" # TODO: xcache support
-metrics.update({
-    "walltime": exec_time,
-    "num_workers": config["benchmarking"]["NUM_CORES"],
-    "af": config["benchmarking"]["AF_NAME"],
-    "dataset_source": dataset_source,
-    "use_dask": USE_DASK,
-    "use_servicex": USE_SERVICEX,
-    "systematics": config["benchmarking"]["SYSTEMATICS"],
-    "n_files_max_per_sample": N_FILES_MAX_PER_SAMPLE,
-    "cores_per_worker": config["benchmarking"]["CORES_PER_WORKER"],
-    "chunksize": config["benchmarking"]["CHUNKSIZE"],
-    "disable_processing": config["benchmarking"]["DISABLE_PROCESSING"],
-    "io_file_percent": config["benchmarking"]["IO_FILE_PERCENT"]
-})
-
-# save metrics to disk
-if not os.path.exists("metrics"):
-    os.makedirs("metrics")
-timestamp = time.strftime('%Y%m%d-%H%M%S')
-af_name = metrics["af"]
-metric_file_name = f"metrics/{af_name}-{timestamp}.json"
-with open(metric_file_name, "w") as f:
-    f.write(json.dumps(metrics))
-
-print(f"metrics saved as {metric_file_name}")
-#print(f"event rate per worker (full execution time divided by NUM_CORES={NUM_CORES}): {metrics['entries'] / NUM_CORES / exec_time / 1_000:.2f} kHz")
-print(f"event rate per worker (pure processtime): {metrics['entries'] / metrics['processtime'] / 1_000:.2f} kHz")
-print(f"amount of data read: {metrics['bytesread']/1000**2:.2f} MB")  # likely buggy: https://github.com/CoffeaTeam/coffea/issues/717
+utils.metrics.track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_MAX_PER_SAMPLE)
 
 # %% [markdown]
 # ### Inspecting the produced histograms
@@ -592,15 +564,15 @@ print(f"amount of data read: {metrics['bytesread']/1000**2:.2f} MB")  # likely b
 # We built histograms in two phase space regions, for multiple physics processes and systematic variations.
 
 # %% tags=[]
-utils.set_style()
+utils.plotting.set_style()
 
-all_histograms["hist"][120j::hist.rebin(2), "4j1b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1, edgecolor="grey")
+all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1, edgecolor="grey")
 plt.legend(frameon=False)
 plt.title("$\geq$ 4 jets, 1 b-tag")
 plt.xlabel("$H_T$ [GeV]");
 
 # %% tags=[]
-all_histograms["hist"][:, "4j2b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1,edgecolor="grey")
+all_histograms["hist_dict"]["4j2b"][:, :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1,edgecolor="grey")
 plt.legend(frameon=False)
 plt.title("$\geq$ 4 jets, $\geq$ 2 b-tags")
 plt.xlabel("$m_{bjj}$ [GeV]");
@@ -616,20 +588,20 @@ plt.xlabel("$m_{bjj}$ [GeV]");
 
 # %% tags=[]
 # b-tagging variations
-all_histograms["hist"][120j::hist.rebin(2), "4j1b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
-all_histograms["hist"][120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_0_up"].plot(label="NP 1", linewidth=2)
-all_histograms["hist"][120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_1_up"].plot(label="NP 2", linewidth=2)
-all_histograms["hist"][120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_2_up"].plot(label="NP 3", linewidth=2)
-all_histograms["hist"][120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_3_up"].plot(label="NP 4", linewidth=2)
+all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), "ttbar", "nominal"].plot(label="nominal", linewidth=2)
+all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), "ttbar", "btag_var_0_up"].plot(label="NP 1", linewidth=2)
+all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), "ttbar", "btag_var_1_up"].plot(label="NP 2", linewidth=2)
+all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), "ttbar", "btag_var_2_up"].plot(label="NP 3", linewidth=2)
+all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), "ttbar", "btag_var_3_up"].plot(label="NP 4", linewidth=2)
 plt.legend(frameon=False)
 plt.xlabel("$H_T$ [GeV]")
 plt.title("b-tagging variations");
 
 # %% tags=[]
 # jet energy scale variations
-all_histograms["hist"][:, "4j2b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
-all_histograms["hist"][:, "4j2b", "ttbar", "pt_scale_up"].plot(label="scale up", linewidth=2)
-all_histograms["hist"][:, "4j2b", "ttbar", "pt_res_up"].plot(label="resolution up", linewidth=2)
+all_histograms["hist_dict"]["4j2b"][:, "ttbar", "nominal"].plot(label="nominal", linewidth=2)
+all_histograms["hist_dict"]["4j2b"][:, "ttbar", "pt_scale_up"].plot(label="scale up", linewidth=2)
+all_histograms["hist_dict"]["4j2b"][:, "ttbar", "pt_res_up"].plot(label="resolution up", linewidth=2)
 plt.legend(frameon=False)
 plt.xlabel("$m_{bjj}$ [Gev]")
 plt.title("Jet energy variations");
@@ -638,14 +610,14 @@ plt.title("Jet energy variations");
 # ML inference variables
 if USE_INFERENCE:
     fig, axs = plt.subplots(10,2,figsize=(14,40))
-    for i in range(len(config["ml"]["FEATURE_NAMES"])):
+    for i in range(len(utils.config["ml"]["FEATURE_NAMES"])):
         if i<10: 
             column=0
             row=i
         else: 
             column=1
             row=i-10
-        all_histograms['ml_hist_dict'][f'hist_{config["ml"]["FEATURE_NAMES"][i]}'][:, :, "nominal"].stack("process").project("observable").plot(
+        all_histograms['ml_hist_dict'][utils.config["ml"]["FEATURE_NAMES"][i]][:, :, "nominal"].stack("process").project("observable").plot(
             stack=True, 
             histtype="fill", 
             linewidth=1, 
@@ -662,14 +634,16 @@ if USE_INFERENCE:
 # This also builds pseudo-data by combining events from the various simulation setups we have processed.
 
 # %% tags=[]
-utils.file_output.save_histograms(all_histograms['hist'], 
+utils.file_output.save_histograms(all_histograms['hist_dict'], 
                                   fileset, 
                                   "histograms.root", 
                                   ["4j1b", "4j2b"])
 if USE_INFERENCE:
     utils.file_output.save_histograms(all_histograms['ml_hist_dict'], 
-                                      fileset, "histograms_ml.root", 
-                                      utils.config["ml"]["file_output"])
+                                      fileset, 
+                                      "histograms_ml.root", 
+                                      utils.config["ml"]["FEATURE_NAMES"], 
+                                      rebin=False)
 
 # %% [markdown]
 # ### Statistical inference
@@ -714,22 +688,9 @@ print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {f
 
 # %%
 model_prediction = cabinetry.model_utils.prediction(model)
-figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=config)
-figs[0]["figure"]
-
-# %% tags=[]
-figs[1]["figure"]
-
-# %% [markdown]
-# We can see very good post-fit agreement.
-
-# %% tags=[]
 model_prediction_postfit = cabinetry.model_utils.prediction(model, fit_results=fit_results)
-figs = cabinetry.visualize.data_mc(model_prediction_postfit, data, close_figure=True, config=config)
-figs[0]["figure"]
-
-# %% tags=[]
-figs[1]["figure"]
+figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=config)
+utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data, config)
 
 # %% [markdown]
 # ### ML Validation
@@ -770,7 +731,7 @@ if USE_INFERENCE:
 
 # %% tags=[]
 if USE_INFERENCE:
-    figs = utils.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
+    utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
 
 # %% [markdown]
 # ### What is next?
