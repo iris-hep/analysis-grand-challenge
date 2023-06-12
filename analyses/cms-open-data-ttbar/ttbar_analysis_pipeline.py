@@ -95,7 +95,7 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 N_FILES_MAX_PER_SAMPLE = 1
 
 # enable Dask
-USE_DASK = True
+USE_DASK = False
 
 # enable ServiceX
 USE_SERVICEX = False
@@ -106,7 +106,7 @@ USE_SERVICEX = False
 USE_INFERENCE = True
 
 # enable inference using NVIDIA Triton server
-USE_TRITON = False
+USE_TRITON = True
 
 
 # %% [markdown]
@@ -205,18 +205,8 @@ class TtbarAnalysis(processor.ProcessorABC):
             xsec_weight = 1
 
         # setup triton gRPC client
-        if self.use_inference:
-            if self.use_triton:
-                import tritonclient.grpc as grpcclient
-
-                triton_client = grpcclient.InferenceServerClient(url=utils.config["ml"]["TRITON_URL"])
-                model_metadata = triton_client.get_model_metadata(
-                    utils.config["ml"]["MODEL_NAME"],
-                    utils.config["ml"]["MODEL_VERSION_EVEN"],
-                )
-                input_name = model_metadata.inputs[0].name
-                dtype = model_metadata.inputs[0].datatype
-                output_name = model_metadata.outputs[0].name
+        if self.use_inference and self.use_triton:
+            triton_client = utils.client.get_triton_client(utils.config["ml"]["TRITON_URL"])
 
 
         #### systematics

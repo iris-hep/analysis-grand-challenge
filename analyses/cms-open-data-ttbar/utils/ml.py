@@ -41,21 +41,10 @@ def get_permutations_dict(MAX_N_JETS, include_labels=False, include_eval_mat=Fal
         combos = ak.combinations(ak.Array(range(4)), 2, axis=0)
         different = unzipped[combos[0]["0"]] != unzipped[combos[0]["1"]]
         for i in range(1, len(combos)):
-            different = different & (
-                unzipped[combos[i]["0"]] != unzipped[combos[i]["1"]]
-            )
+            different = different & (unzipped[combos[i]["0"]] != unzipped[combos[i]["1"]])
+        permutations = ak.zip([test[unzipped[i][different]] for i in range(len(unzipped))], depth_limit=1).tolist()
 
-        permutations = ak.zip(
-            [test[unzipped[i][different]] for i in range(len(unzipped))], depth_limit=1
-        ).tolist()
-
-        permutations = ak.concatenate(
-            [
-                test[unzipped[i][different]][..., np.newaxis]
-                for i in range(len(unzipped))
-            ],
-            axis=1,
-        ).to_list()
+        permutations = ak.concatenate([test[unzipped[i][different]][..., np.newaxis] for i in range(len(unzipped))], axis=1).to_list()
 
         permutations_dict[n] = permutations
 
@@ -82,7 +71,6 @@ def get_permutations_dict(MAX_N_JETS, include_labels=False, include_eval_mat=Fal
                 res.append(idx)
         labels_dict[n] = np.array(labels_dict[n])[res].tolist()
         permutations_dict[n] = np.array(permutations_dict[n])[res].tolist()
-        print("number of permutations for n=", n, ": ", len(permutations_dict[n]))
 
     if include_labels and not include_eval_mat:
         return permutations_dict, labels_dict
@@ -93,18 +81,13 @@ def get_permutations_dict(MAX_N_JETS, include_labels=False, include_eval_mat=Fal
         evaluation_matrices = {}  # overall event score
 
         for n in range(4, MAX_N_JETS + 1):
-            evaluation_matrix = np.zeros(
-                (len(permutations_dict[n]), len(permutations_dict[n]))
-            )
+            evaluation_matrix = np.zeros((len(permutations_dict[n]), len(permutations_dict[n])))
 
             for i in range(len(permutations_dict[n])):
                 for j in range(len(permutations_dict[n])):
-                    evaluation_matrix[i, j] = sum(
-                        np.equal(labels_dict[n][i], labels_dict[n][j])
-                    )
+                    evaluation_matrix[i, j] = sum(np.equal(labels_dict[n][i], labels_dict[n][j]))
 
             evaluation_matrices[n] = evaluation_matrix / 4
-            print("calculated evaluation matrix for n=", n)
 
         return permutations_dict, labels_dict, evaluation_matrices
 
@@ -142,56 +125,31 @@ def get_features(jets, electrons, muons, max_n_jets=6):
     # grab lepton info
     leptons = ak.flatten(ak.concatenate((electrons, muons), axis=1), axis=-1)
 
-    feature_count = 0
-
     # delta R between b_toplep and lepton
-    features[:, 0] = ak.flatten(
-        np.sqrt(
-            (leptons.eta - jets[perms[..., 3]].eta) ** 2
-            + (leptons.phi - jets[perms[..., 3]].phi) ** 2
-        )
-    ).to_numpy()
+    features[:, 0] = ak.flatten(np.sqrt((leptons.eta - jets[perms[..., 3]].eta) ** 2
+                                        + (leptons.phi - jets[perms[..., 3]].phi) ** 2)).to_numpy()
 
     # delta R between the two W
-    features[:, 1] = ak.flatten(
-        np.sqrt(
-            (jets[perms[..., 0]].eta - jets[perms[..., 1]].eta) ** 2
-            + (jets[perms[..., 0]].phi - jets[perms[..., 1]].phi) ** 2
-        )
-    ).to_numpy()
+    features[:, 1] = ak.flatten(np.sqrt((jets[perms[..., 0]].eta - jets[perms[..., 1]].eta) ** 2
+                                        + (jets[perms[..., 0]].phi - jets[perms[..., 1]].phi) ** 2)).to_numpy()
 
     # delta R between W and b_tophad
-    features[:, 2] = ak.flatten(
-        np.sqrt(
-            (jets[perms[..., 0]].eta - jets[perms[..., 2]].eta) ** 2
-            + (jets[perms[..., 0]].phi - jets[perms[..., 2]].phi) ** 2
-        )
-    ).to_numpy()
-    features[:, 3] = ak.flatten(
-        np.sqrt(
-            (jets[perms[..., 1]].eta - jets[perms[..., 2]].eta) ** 2
-            + (jets[perms[..., 1]].phi - jets[perms[..., 2]].phi) ** 2
-        )
-    ).to_numpy()
+    features[:, 2] = ak.flatten(np.sqrt((jets[perms[..., 0]].eta - jets[perms[..., 2]].eta) ** 2
+                                        + (jets[perms[..., 0]].phi - jets[perms[..., 2]].phi) ** 2)).to_numpy()
+    features[:, 3] = ak.flatten(np.sqrt((jets[perms[..., 1]].eta - jets[perms[..., 2]].eta) ** 2
+                                        + (jets[perms[..., 1]].phi - jets[perms[..., 2]].phi) ** 2)).to_numpy()
 
     # combined mass of b_toplep and lepton
     features[:, 4] = ak.flatten((leptons + jets[perms[..., 3]]).mass).to_numpy()
 
     # combined mass of W
-    features[:, 5] = ak.flatten(
-        (jets[perms[..., 0]] + jets[perms[..., 1]]).mass
-    ).to_numpy()
+    features[:, 5] = ak.flatten((jets[perms[..., 0]] + jets[perms[..., 1]]).mass).to_numpy()
 
     # combined mass of W and b_tophad
-    features[:, 6] = ak.flatten(
-        (jets[perms[..., 0]] + jets[perms[..., 1]] + jets[perms[..., 2]]).mass
-    ).to_numpy()
+    features[:, 6] = ak.flatten((jets[perms[..., 0]] + jets[perms[..., 1]] + jets[perms[..., 2]]).mass).to_numpy()
 
-    feature_count += 1
     # combined pT of W and b_tophad
-    features[:, 7] = ak.flatten(
-        (jets[perms[..., 0]] + jets[perms[..., 1]] + jets[perms[..., 2]]).pt
-    ).to_numpy()
+    features[:, 7] = ak.flatten((jets[perms[..., 0]] + jets[perms[..., 1]] + jets[perms[..., 2]]).pt).to_numpy()
 
     # pt of every jet
     features[:, 8] = ak.flatten(jets[perms[..., 0]].pt).to_numpy()
@@ -224,9 +182,15 @@ def get_inference_results_local(features, even, model_even, model_odd):
     return results
 
 
-def get_inference_results_triton(
-    features, even, triton_client, MODEL_NAME, MODEL_VERS_EVEN, MODEL_VERS_ODD
-):
+def get_inference_results_triton(features, even, triton_client, MODEL_NAME, 
+                                 MODEL_VERS_EVEN, MODEL_VERS_ODD):
+    
+    model_metadata = triton_client.get_model_metadata(MODEL_NAME, MODEL_VERS_EVEN)
+    
+    input_name = model_metadata.inputs[0].name
+    dtype = model_metadata.inputs[0].datatype
+    output_name = model_metadata.outputs[0].name
+    
     results = np.zeros(features.shape[0])
 
     import tritonclient.grpc as grpcclient

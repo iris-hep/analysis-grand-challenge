@@ -24,3 +24,10 @@ def get_client(af="coffea_casa"):
         raise NotImplementedError(f"unknown analysis facility: {af}")
 
     return client
+
+def get_triton_client(triton_url):
+    
+    import tritonclient.grpc as grpcclient
+    triton_client = grpcclient.InferenceServerClient(url=triton_url)
+    
+    return triton_client
