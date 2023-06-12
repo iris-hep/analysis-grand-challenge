@@ -55,7 +55,6 @@ from func_adl import ObjectStream
 from func_adl_servicex import ServiceXSourceUpROOT
 import hist
 import json
-import yaml
 import matplotlib.pyplot as plt
 import numpy as np
 from xgboost import XGBClassifier
@@ -89,13 +88,7 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 # The input files are all in the 1–3 GB range.
 
 # %% tags=[]
-### ML-INFERENCE SETTINGS
-
-# enable ML inference
-USE_INFERENCE = True
-
-# enable inference using NVIDIA Triton server
-USE_TRITON = False### GLOBAL CONFIGURATION
+### GLOBAL CONFIGURATION
 # input files per process, set to e.g. 10 (smaller number = faster)
 N_FILES_MAX_PER_SAMPLE = 5
 
@@ -104,10 +97,6 @@ USE_DASK = True
 
 # enable ServiceX
 USE_SERVICEX = False
-
-### LOAD OTHER CONFIGURATION VARIABLES
-with open("config.yaml") as config_file:
-    config = yaml.safe_load(config_file)
 
 ### ML-INFERENCE SETTINGS
 
