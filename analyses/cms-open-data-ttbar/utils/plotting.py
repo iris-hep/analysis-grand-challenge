@@ -1,3 +1,4 @@
+import logging
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -248,7 +249,7 @@ def plot_data_mc(model_prediction_prefit, model_prediction_postfit, data, config
             total_yield_prefit == 0.0
         )  # number of bins with zero predicted yields
         if n_zero_pred_prefit > 0:
-            log.warning(
+            logging.warning(
                 f"(PREFIT) predicted yield is zero in {n_zero_pred_prefit} bin(s), excluded from ratio plot"
             )
         nonzero_model_yield_prefit = total_yield_prefit != 0.0
@@ -261,7 +262,7 @@ def plot_data_mc(model_prediction_prefit, model_prediction_postfit, data, config
             total_yield_postfit == 0.0
         )  # number of bins with zero predicted yields
         if n_zero_pred_postfit > 0:
-            log.warning(
+            logging.warning(
                 f"(POSTFIT) predicted yield is zero in {n_zero_pred_postfit} bin(s), excluded from ratio plot"
             )
         nonzero_model_yield_postfit = total_yield_postfit != 0.0

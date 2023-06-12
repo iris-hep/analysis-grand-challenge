@@ -42,7 +42,6 @@
 
 # %% tags=[]
 import logging
-import os
 import time
 
 import awkward as ak
@@ -56,10 +55,8 @@ import copy
 from func_adl import ObjectStream
 from func_adl_servicex import ServiceXSourceUpROOT
 import hist
-import json
 import matplotlib.pyplot as plt
 import numpy as np
-from xgboost import XGBClassifier
 import pyhf
 
 import utils  # contains code for bookkeeping and cosmetics, as well as some boilerplate

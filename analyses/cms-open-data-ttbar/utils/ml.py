@@ -176,7 +176,7 @@ def get_inference_results_local(features, even, model_even, model_odd):
     if len(features[even]) > 0:
         results[even] = model_odd.predict_proba(features[even, :])[:, 1]
     if len(features[np.invert(even)]) > 0:
-        results[np.invert(even)] = results_odd = model_even.predict_proba(
+        results[np.invert(even)] = model_even.predict_proba(
             features[np.invert(even), :]
         )[:, 1]
     return results

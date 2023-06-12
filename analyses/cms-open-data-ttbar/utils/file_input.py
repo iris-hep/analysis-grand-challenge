@@ -1,5 +1,7 @@
 import json
 import numpy as np
+import os
+from pathlib import Path
 from servicex import ServiceXDataset
 
 # If local_data_cache is a writable path, this function will download any missing file into it and
@@ -60,6 +62,12 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", loca
             fileset.update({f"{process}__{variation}": {"files": file_paths, "metadata": metadata}})
 
     return fileset
+
+def download_file(url, out_file):
+    out_path = Path(out_file)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=out_path.name) as t:
+        urllib.request.urlretrieve(url, out_path.absolute(), reporthook=tqdm_urlretrieve_hook(t))
 
 class ServiceXDatasetGroup():
     def __init__(self, fileset, backend_name="uproot", ignore_cache=False):
