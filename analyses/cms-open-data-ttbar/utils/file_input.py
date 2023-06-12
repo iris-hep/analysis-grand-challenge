@@ -3,6 +3,8 @@ import numpy as np
 import os
 from pathlib import Path
 from servicex import ServiceXDataset
+import tqdm
+import urllib
 
 # If local_data_cache is a writable path, this function will download any missing file into it and
 # then return file paths corresponding to these local copies.
@@ -62,6 +64,30 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", loca
             fileset.update({f"{process}__{variation}": {"files": file_paths, "metadata": metadata}})
 
     return fileset
+
+
+def tqdm_urlretrieve_hook(t):
+    """From https://github.com/tqdm/tqdm/blob/master/examples/tqdm_wget.py ."""
+    last_b = [0]
+
+    def update_to(b=1, bsize=1, tsize=None):
+        """
+        b  : int, optional
+            Number of blocks transferred so far [default: 1].
+        bsize  : int, optional
+            Size of each block (in tqdm units) [default: 1].
+        tsize  : int, optional
+            Total size (in tqdm units). If [default: None] or -1,
+            remains unchanged.
+        """
+        if tsize not in (None, -1):
+            t.total = tsize
+        displayed = t.update((b - last_b[0]) * bsize)
+        last_b[0] = b
+        return displayed
+
+    return update_to
+
 
 def download_file(url, out_file):
     out_path = Path(out_file)
