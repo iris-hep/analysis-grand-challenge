@@ -89,7 +89,13 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 # The input files are all in the 1–3 GB range.
 
 # %% tags=[]
-### GLOBAL CONFIGURATION
+### ML-INFERENCE SETTINGS
+
+# enable ML inference
+USE_INFERENCE = True
+
+# enable inference using NVIDIA Triton server
+USE_TRITON = False### GLOBAL CONFIGURATION
 # input files per process, set to e.g. 10 (smaller number = faster)
 N_FILES_MAX_PER_SAMPLE = 5
 
@@ -110,13 +116,6 @@ USE_INFERENCE = True
 
 # enable inference using NVIDIA Triton server
 USE_TRITON = False
-
-### LOAD OTHER CONFIGURATION VARIABLES
-with open("config.yaml") as config_file:
-    config = yaml.safe_load(config_file)
-
-config["ml"]["USE_INFERENCE"] = USE_INFERENCE
-config["ml"]["USE_TRITON"] = USE_TRITON
 
 # %% [markdown]
 # ### Machine Learning Task
@@ -591,7 +590,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
     if USE_INFERENCE:
         return selection
     
-    # some branches are not needed if USE_INFERENCE is turned off
+    # some branches are only needed if USE_INFERENCE is turned on
     return selection.Select(lambda h: {"Electron_pt": h.Electron_pt,
                                        "Electron_eta": h.Electron_eta,
                                        "Electron_cutBased": h.Electron_cutBased,
