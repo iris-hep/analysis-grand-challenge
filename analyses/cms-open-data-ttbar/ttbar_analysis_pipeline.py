@@ -227,7 +227,7 @@ class TtbarAnalysis(processor.ProcessorABC):
                     selected_jets_region = selected_jets[region_filter]
                     # use HT (scalar sum of jet pT) as observable
                     pt_var_modifier = (
-                        events[event_filters][region_filter][pt_var]
+                        events[pt_var][event_filters][region_filter]
                         if "res" not in pt_var
                         else events[pt_var][jet_filter][event_filters][region_filter]
                     )
@@ -236,9 +236,24 @@ class TtbarAnalysis(processor.ProcessorABC):
                 elif region == "4j2b":
                     region_filter = ak.sum(selected_jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2
                     selected_jets_region = selected_jets[region_filter]
+                    
+                    pt_var_modifier = (
+                        events[pt_var][event_filters][region_filter]
+                        if "res" not in pt_var
+                        else events[pt_var][jet_filter][event_filters][region_filter]
+                    )
+                    
+                    # overwrite jets object with modified pT (handled by correctionlib in later versions)
+                    selected_jets_region = ak.zip(
+                        {"pt": selected_jets_region.pt * pt_var_modifier,
+                         "eta": selected_jets_region.eta,
+                         "phi": selected_jets_region.phi,
+                         "mass": selected_jets_region.mass,
+                         "btagCSVV2": selected_jets_region.btagCSVV2},
+                        with_name="PtEtaPhiMLorentzVector"
+                    )
 
                     # reconstruct hadronic top as bjj system with largest pT
-                    # the jet energy scale / resolution effect is not propagated to this observable at the moment
                     trijet = ak.combinations(selected_jets_region, 3, fields=["j1", "j2", "j3"])  # trijet candidates
                     trijet["p4"] = trijet.j1 + trijet.j2 + trijet.j3  # calculate four-momentum of tri-jet system
                     trijet["max_btag"] = np.maximum(trijet.j1.btagCSVV2, np.maximum(trijet.j2.btagCSVV2, trijet.j3.btagCSVV2))
