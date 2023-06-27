@@ -1,6 +1,8 @@
 import asyncio
 import json
 
+import cabinetry
+from cabinetry.contrib import histogram_reader
 import hist
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -97,31 +99,31 @@ def save_histograms(all_histograms, fileset, filename):
 
     with uproot.recreate(filename) as f:
         for region in ["4j1b", "4j2b"]:
-            f[f"{region}_pseudodata"] = pseudo_data[120j::hist.rebin(2), region]
+            f[f"{region}_pseudodata"] = pseudo_data[:, region]
             for sample in nominal_samples:
                 sample_name = sample.split("__")[0]
-                f[f"{region}_{sample_name}"] = all_histograms[120j::hist.rebin(2), region, sample_name, "nominal"]
+                f[f"{region}_{sample_name}"] = all_histograms[:, region, sample_name, "nominal"]
 
                 # b-tagging variations
                 for i in range(4):
                     for direction in ["up", "down"]:
                         variation_name = f"btag_var_{i}_{direction}"
-                        f[f"{region}_{sample_name}_{variation_name}"] = all_histograms[120j::hist.rebin(2), region, sample_name, variation_name]
+                        f[f"{region}_{sample_name}_{variation_name}"] = all_histograms[:, region, sample_name, variation_name]
 
                 # jet energy scale variations
                 for variation_name in ["pt_scale_up", "pt_res_up"]:
-                    f[f"{region}_{sample_name}_{variation_name}"] = all_histograms[120j::hist.rebin(2), region, sample_name, variation_name]
+                    f[f"{region}_{sample_name}_{variation_name}"] = all_histograms[:, region, sample_name, variation_name]
 
             # ttbar modeling
-            f[f"{region}_ttbar_ME_var"] = all_histograms[120j::hist.rebin(2), region, "ttbar", "ME_var"]
-            f[f"{region}_ttbar_PS_var"] = all_histograms[120j::hist.rebin(2), region, "ttbar", "PS_var"]
+            f[f"{region}_ttbar_ME_var"] = all_histograms[:, region, "ttbar", "ME_var"]
+            f[f"{region}_ttbar_PS_var"] = all_histograms[:, region, "ttbar", "PS_var"]
 
-            f[f"{region}_ttbar_scaledown"] = all_histograms[120j :: hist.rebin(2), region, "ttbar", "scaledown"]
-            f[f"{region}_ttbar_scaleup"] = all_histograms[120j :: hist.rebin(2), region, "ttbar", "scaleup"]
+            f[f"{region}_ttbar_scaledown"] = all_histograms[:, region, "ttbar", "scaledown"]
+            f[f"{region}_ttbar_scaleup"] = all_histograms[:, region, "ttbar", "scaleup"]
 
             # W+jets scale
-            f[f"{region}_wjets_scale_var_down"] = all_histograms[120j :: hist.rebin(2), region, "wjets", "scale_var_down"]
-            f[f"{region}_wjets_scale_var_up"] = all_histograms[120j :: hist.rebin(2), region, "wjets", "scale_var_up"]
+            f[f"{region}_wjets_scale_var_down"] = all_histograms[:, region, "wjets", "scale_var_down"]
+            f[f"{region}_wjets_scale_var_up"] = all_histograms[:, region, "wjets", "scale_var_up"]
 
 
 class ServiceXDatasetGroup():
@@ -153,3 +155,25 @@ class ServiceXDatasetGroup():
             files_per_process.update({process: all_files[parent_key[self.filelist[:,1]==process]]})
 
         return files_per_process
+
+
+def get_cabinetry_rebinning_router(config, rebinning):
+    # perform re-binning in cabinetry by providing a custom function reading histograms
+    # will eventually be replaced via https://github.com/scikit-hep/cabinetry/issues/412
+    rebinning_router = cabinetry.route.Router()
+
+    # this reimplements some of cabinetry.templates.collect
+    general_path = config["General"]["InputPath"]
+    variation_path = config["General"].get("VariationPath", None)
+
+    # define a custom template builder function that is executed for data samples
+    @rebinning_router.register_template_builder()
+    def build_data_hist(region, sample, systematic, template):
+        # get path to histogram
+        histo_path = cabinetry.templates.collector._histo_path(general_path, variation_path, region, sample, systematic, template)
+        h = hist.Hist(histogram_reader.with_uproot(histo_path))  # turn from boost-histogram into hist
+        # perform re-binning
+        h = h[rebinning]
+        return h
+
+    return rebinning_router
