@@ -227,7 +227,7 @@ class TtbarAnalysis(processor.ProcessorABC):
                     selected_jets_region = selected_jets[region_filter]
                     # use HT (scalar sum of jet pT) as observable
                     pt_var_modifier = (
-                        events[event_filters][region_filter][pt_var]
+                        events[pt_var][event_filters][region_filter]
                         if "res" not in pt_var
                         else events[pt_var][jet_filter][event_filters][region_filter]
                     )
@@ -238,7 +238,7 @@ class TtbarAnalysis(processor.ProcessorABC):
                     selected_jets_region = selected_jets[region_filter]
                     
                     pt_var_modifier = (
-                        events[event_filters][region_filter][pt_var]
+                        events[pt_var][event_filters][region_filter]
                         if "res" not in pt_var
                         else events[pt_var][jet_filter][event_filters][region_filter]
                     )
