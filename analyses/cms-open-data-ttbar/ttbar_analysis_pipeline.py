@@ -503,12 +503,19 @@ utils.save_histograms(all_histograms, fileset, "histograms.root")
 # %% [markdown]
 # ### Statistical inference
 #
+# We are going to perform a re-binning for the statistical inference.
+# This is planned to be conveniently provided via cabinetry (see [cabinetry#412](https://github.com/scikit-hep/cabinetry/issues/412), but in the meantime we can achieve this via [template building overrides](https://cabinetry.readthedocs.io/en/latest/advanced.html#overrides-for-template-building).
+# The implementation is provided in a function in `utils/`.
+#
 # A statistical model has been defined in `config.yml`, ready to be used with our output.
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
 # %% tags=[]
 config = cabinetry.configuration.load("cabinetry_config.yml")
-cabinetry.templates.collect(config)
+
+# rebinning: lower edge 110 GeV, merge bins 2->1
+rebinning_router = utils.get_cabinetry_rebinning_router(config, rebinning=slice(110j, None, hist.rebin(2)))
+cabinetry.templates.build(config, router=rebinning_router)
 cabinetry.templates.postprocess(config)  # optional post-processing (e.g. smoothing)
 ws = cabinetry.workspace.build(config)
 cabinetry.workspace.save(ws, "workspace.json")
