@@ -133,7 +133,7 @@ The below table gives an overview of the observables and their binning.
      - 11 bins from 110 GeV to 550 GeV
 
 25 bins should be used for histogram production.
-The statistical model should be built with less bins and a different lower bin edge for the histogram.
+The statistical model should be built with less bins and a different lower bin edge for the histograms.
 This simulates a scenario where analyzers may want to evaluate their model with a finer granularity but subsequently merge bins for inference to avoid statistical fluctuations.
 
 **4j2b (Control Region)**: Event :math:`H_T`
