@@ -122,16 +122,19 @@ The below table gives an overview of the observables and their binning.
    * - Region
      - Name
      - Binning (Processing Step)
-     - Binning (Modelling Step)
+     - Binning (Statistical inference)
    * - 4j2b (Control Region)
      - :math:`H_T`
-     - 25 bins from 50 to 550
-     - 11 bins from 50 to 550
+     - 25 bins from 50 GeV to 550 GeV
+     - 11 bins from 110 GeV to 550 GeV
    * - 4j1b (Signal Region)
      - :math:`m_{bjj}`
-     - 25 bins from 50 to 550
-     - 11 bins from 50 to 550
+     - 25 bins from 50 GeV to 550 GeV
+     - 11 bins from 110 GeV to 550 GeV
 
+25 bins should be used for histogram production.
+The statistical model should be built with less bins and a different lower bin edge for the histograms.
+This simulates a scenario where analyzers may want to evaluate their model with a finer granularity but subsequently merge bins for inference to avoid statistical fluctuations.
 
 **4j2b (Control Region)**: Event :math:`H_T`
 
