@@ -16,7 +16,8 @@ This directory is focused on running the CMS Open Data $t\bar{t}$ analysis throu
 | ttbar_analysis_pipeline.ipynb | Notebook version of the analysis.                                                                                                               |
 | ttbar_analysis_pipeline.py    | Python script version of the analysis (linked to notebook via `jupytext`)                                                                       |
 | models/                       | Contains models used for ML inference task (when `USE_TRITON = False`)                                                                          |
-| utils/                        | Contains config file for notebook. Contains code for bookkeeping and cosmetics, as well as some boilerplate. Also contains images used in notebooks.                               |
+| utils/                        | Contains code for bookkeeping and cosmetics, as well as some boilerplate. Also contains images used in notebooks.                               |
+| utils/config.py               | This is a general config file to handle different options for running the analysis.                               |
 
 #### Instructions for paired notebook
 
