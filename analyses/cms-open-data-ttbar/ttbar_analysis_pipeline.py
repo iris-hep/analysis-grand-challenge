@@ -121,7 +121,7 @@ USE_TRITON = False
 
 # %% tags=[]
 class TtbarAnalysis(processor.ProcessorABC):
-    def __init__(self, use_dask, use_inference, use_triton):
+    def __init__(self, use_inference, use_triton):
 
         # initialize dictionary of hists for signal and control region
         self.hist_dict = {}
@@ -137,7 +137,6 @@ class TtbarAnalysis(processor.ProcessorABC):
                 .Weight()
             )
         
-        self.use_dask = use_dask
         self.cset = correctionlib.CorrectionSet.from_file("corrections.json")
         self.use_inference = use_inference
         
@@ -538,7 +537,7 @@ t0 = time.monotonic()
 all_histograms, metrics = run(
     fileset, 
     treename, 
-    processor_instance=TtbarAnalysis(USE_DASK, USE_INFERENCE, USE_TRITON)
+    processor_instance=TtbarAnalysis(USE_INFERENCE, USE_TRITON)
 )
 exec_time = time.monotonic() - t0
 
