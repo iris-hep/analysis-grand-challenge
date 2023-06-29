@@ -7,7 +7,6 @@ This directory is focused on running the CMS Open Data $t\bar{t}$ analysis throu
 | GetIOBranches.py              | This script uses `nanoaod_branch_ratios.json` to calculate a list of branches to read in specific fractions of data for I/O benchmarking tests. |
 | cabinetry_config.yml          | This is a config file for `cabinetry`, which is used to build a statistical workspace.                                                          |
 | cabinetry_config_ml.yml       | This is another `cabinetry` config file, but specifically for the Machine Learning observables.                                                 |
-| config.yml                    | This is a general config file to handle different options for running the analysis.                                                             |
 | coffea.ipynb                  | This was the old name of the `ttbar_analysis_pipeline.ipynb` notebook (moved to avoid confusion with `coffea` library)                          |
 | corrections.json              | `correctionlib` file to handle correction factors in the $t\bar{t}$ analysis.                                                                   |
 | make_corrections_json.py      | Python script used to write `corrections.json`                                                                                                  |
@@ -18,6 +17,7 @@ This directory is focused on running the CMS Open Data $t\bar{t}$ analysis throu
 | ttbar_analysis_pipeline.py    | Python script version of the analysis (linked to notebook via `jupytext`)                                                                       |
 | models/                       | Contains models used for ML inference task (when `USE_TRITON = False`)                                                                          |
 | utils/                        | Contains code for bookkeeping and cosmetics, as well as some boilerplate. Also contains images used in notebooks.                               |
+| utils/config.py               | This is a general config file to handle different options for running the analysis.                               |
 
 #### Instructions for paired notebook
 
