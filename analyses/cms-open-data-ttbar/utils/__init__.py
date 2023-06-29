@@ -1,4 +1,4 @@
-from . import client as client
+from . import clients as clients
 from .config import config as config
 from . import file_input as file_input
 from . import file_output as file_output

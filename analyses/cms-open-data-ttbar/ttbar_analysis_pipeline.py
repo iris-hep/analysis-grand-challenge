@@ -196,7 +196,7 @@ class TtbarAnalysis(processor.ProcessorABC):
 
         # setup triton gRPC client
         if self.use_inference and self.use_triton:
-            triton_client = utils.client.get_triton_client(utils.config["ml"]["TRITON_URL"])
+            triton_client = utils.clients.get_triton_client(utils.config["ml"]["TRITON_URL"])
 
 
         #### systematics
@@ -505,7 +505,7 @@ if USE_SERVICEX:
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 if USE_DASK:
     cloudpickle.register_pickle_by_value(utils) # serialize methods and objects in utils so that they can be accessed within the coffea processor
-    executor = processor.DaskExecutor(client=utils.client.get_client(af=utils.config["global"]["AF"]))
+    executor = processor.DaskExecutor(client=utils.clients.get_client(af=utils.config["global"]["AF"]))
 else:
     executor = processor.FuturesExecutor(workers=utils.config["benchmarking"]["NUM_CORES"])
 
