@@ -42,8 +42,42 @@ def validate(histos: dict, reference: dict) -> dict[str, list[str]]:
         if not np.allclose(h['edges'], ref_h['edges']):
             errors[name].append(f"Edges do not match:\n\tgot      {h['edges']}\n\texpected {ref_h['edges']}")
         contents_depend_on_rng = "pt_res_up" in name # skip checking the contents of these histograms as they are not stable
+
         if not contents_depend_on_rng and not np.allclose(h['contents'], ref_h['contents']):
-            errors[name].append(f"Contents do not match:\n\tgot      {h['contents']}\n\texpected {ref_h['contents']}")
+
+            # check if bin migration
+            is_close = np.isclose(h['contents'], ref_h['contents'])
+            where_not_close = np.where(np.invert(is_close))
+            diff_values = np.diff(where_not_close)
+            split_indices = np.argwhere(np.abs(diff_values[0])>1)
+            split_indices_mod = []
+            for i in range(len(split_indices)):
+                if len(split_indices[i])>0:
+                    split_indices_mod.append(split_indices[i][0]+1)
+            if len(split_indices_mod)>0:
+                split_values = np.split(where_not_close[0], split_indices_mod)
+            else:
+                split_values = [where_not_close[0]]
+
+            is_error=False
+            for group in split_values:
+                h_group = np.array(h['contents'])[group]
+                ref_group = np.array(ref_h['contents'])[group]
+                # if difference is great, count as error
+                if not np.allclose(h_group, ref_group, atol=5e-1):
+                    print("Adjacent bins have difference which is too great:")
+                    print("histogram: ", h_group, ", reference: ", ref_group)
+                    print()
+                    is_error = True
+                # check partial sum
+                if not np.allclose(sum(h_group), sum(ref_group)):
+                    print("Partial sum is not equal:")
+                    print("histogram: ", h_group, ", reference: ", ref_group)
+                    print()
+                    is_error = True
+
+            if is_error:
+                errors[name].append(f"Contents do not match:\n\tgot      {h['contents']}\n\texpected {ref_h['contents']}")
 
     return errors
 
@@ -68,3 +102,4 @@ if __name__ == "__main__":
             errors = '\n\t'.join(errors)
             print(f"{hist_name}\n\t{errors}")
         sys.exit(1)
+
