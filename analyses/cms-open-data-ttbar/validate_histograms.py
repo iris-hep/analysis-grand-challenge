@@ -15,6 +15,7 @@ def parse_args() -> argparse.Namespace:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--reference", help="JSON reference against which histogram contents should be compared")
     group.add_argument("--dump-json", help="Print JSON representation of histogram contents to screen", action='store_true')
+    group.add_argument("--verbose", help="Print extra information about bin mismatches")
     return parser.parse_args()
 
 # convert uproot file containing only TH1Ds to a corresponding JSON-compatible dict with structure:
@@ -31,7 +32,7 @@ def as_dict(f: uproot.ReadOnlyDirectory) -> dict[str, dict]:
         histos[name]["contents"] = h.counts(flow=True).tolist()
     return histos
 
-def validate(histos: dict, reference: dict) -> dict[str, list[str]]:
+def validate(histos: dict, reference: dict, verbose=False) -> dict[str, list[str]]:
     errors = defaultdict(list)
     for name, ref_h in reference.items():
         if name not in histos:
@@ -70,9 +71,10 @@ def validate(histos: dict, reference: dict) -> dict[str, list[str]]:
                 if not np.allclose(sum(h_group), sum(ref_group)):
                     is_error = True
                 else:
-                    print("Bin migration likely:")
-                    print("histogram: ", h_group, ", reference: ", ref_group)
-                    print()
+                    if verbose:
+                        print("Bin migration likely:")
+                        print("histogram: ", h_group, ", reference: ", ref_group)
+                        print()
             if is_error:
                 errors[name].append(f"Contents do not match:\n\tgot      {h['contents']}\n\texpected {ref_h['contents']}")
 
@@ -91,7 +93,7 @@ if __name__ == "__main__":
         ref_histos = json.load(reference)
 
     print(f"Validating '{args.histos}' against reference '{args.reference}'...")
-    errs = validate(histos=histos, reference=ref_histos)
+    errs = validate(histos=histos, reference=ref_histos, verbose=args.verbose)
     if len(errs) == 0:
         print("All good!")
     else:
