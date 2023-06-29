@@ -680,6 +680,7 @@ print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {f
 model_prediction = cabinetry.model_utils.prediction(model)
 model_prediction_postfit = cabinetry.model_utils.prediction(model, fit_results=fit_results)
 figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=config)
+# below method reimplements this visualization in a grid view
 utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data, config)
 
 # %% [markdown]
