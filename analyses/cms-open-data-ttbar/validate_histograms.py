@@ -65,17 +65,14 @@ def validate(histos: dict, reference: dict) -> dict[str, list[str]]:
                 ref_group = np.array(ref_h['contents'])[group]
                 # if difference is great, count as error
                 if not np.allclose(h_group, ref_group, atol=5e-1):
-                    print("Adjacent bins have difference which is too great:")
-                    print("histogram: ", h_group, ", reference: ", ref_group)
-                    print()
                     is_error = True
                 # check partial sum
                 if not np.allclose(sum(h_group), sum(ref_group)):
-                    print("Partial sum is not equal:")
+                    is_error = True
+                else:
+                    print("Bin migration likely:")
                     print("histogram: ", h_group, ", reference: ", ref_group)
                     print()
-                    is_error = True
-
             if is_error:
                 errors[name].append(f"Contents do not match:\n\tgot      {h['contents']}\n\texpected {ref_h['contents']}")
 
