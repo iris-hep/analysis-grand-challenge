@@ -43,12 +43,11 @@ def validate(histos: dict, reference: dict, verbose=False) -> dict[str, list[str
         if not np.allclose(h['edges'], ref_h['edges']):
             errors[name].append(f"Edges do not match:\n\tgot      {h['edges']}\n\texpected {ref_h['edges']}")
         contents_depend_on_rng = "pt_res_up" in name # skip checking the contents of these histograms as they are not stable
+        is_close = np.isclose(h['contents'], ref_h['contents']) 
+        
+        #### check if bin migration ####
+        if not contents_depend_on_rng and not all(is_close):
 
-        if not contents_depend_on_rng and not np.allclose(h['contents'], ref_h['contents']):
-
-            #### check if bin migration ####
-            # returns boolean array that returns false elementwise if not close
-            is_close = np.isclose(h['contents'], ref_h['contents']) 
             # gets indices where above array is false
             where_not_close = np.where(np.invert(is_close))[0]
             # gets difference of adjacent entries
