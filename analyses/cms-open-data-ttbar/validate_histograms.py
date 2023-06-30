@@ -15,7 +15,7 @@ def parse_args() -> argparse.Namespace:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--reference", help="JSON reference against which histogram contents should be compared")
     group.add_argument("--dump-json", help="Print JSON representation of histogram contents to screen", action='store_true')
-    group.add_argument("--verbose", help="Print extra information about bin mismatches")
+    parser.add_argument("--verbose", help="Print extra information about bin mismatches", action='store_true')
     return parser.parse_args()
 
 # convert uproot file containing only TH1Ds to a corresponding JSON-compatible dict with structure:
@@ -46,37 +46,55 @@ def validate(histos: dict, reference: dict, verbose=False) -> dict[str, list[str
 
         if not contents_depend_on_rng and not np.allclose(h['contents'], ref_h['contents']):
 
-            # check if bin migration
-            is_close = np.isclose(h['contents'], ref_h['contents'])
-            where_not_close = np.where(np.invert(is_close))
+            #### check if bin migration ####
+            # returns boolean array that returns false elementwise if not close
+            is_close = np.isclose(h['contents'], ref_h['contents']) 
+            # gets indices where above array is false
+            where_not_close = np.where(np.invert(is_close))[0]
+            # gets difference of adjacent entries
             diff_values = np.diff(where_not_close)
-            split_indices = np.argwhere(np.abs(diff_values[0])>1)
-            split_indices_mod = []
-            for i in range(len(split_indices)):
-                if len(split_indices[i])>0:
-                    split_indices_mod.append(split_indices[i][0]+1)
-            if len(split_indices_mod)>0:
-                split_values = np.split(where_not_close[0], split_indices_mod)
+            # get the indices where the above difference is greater than 1 (to form groupings of bins based on location)
+            split_indices = np.argwhere(np.abs(diff_values)>1)
+            # np.argwhere adds extra dimension we don't need
+            split_indices = split_indices.reshape((split_indices.shape[0],))
+            
+            # if only one grouping detected
+            if len(split_indices)==0:
+                split_values = [where_not_close]
+            # if more than one grouping detected
             else:
-                split_values = [where_not_close[0]]
-
+                # shift indices to the point we want to split at
+                split_indices = split_indices + 1
+                # split indices into groupings
+                split_values = np.split(where_not_close, split_indices)
+            
             is_error=False
+            # iterate through groupings and test for bin migration or error
             for group in split_values:
                 h_group = np.array(h['contents'])[group]
                 ref_group = np.array(ref_h['contents'])[group]
                 # if difference is great, count as error
-                if not np.allclose(h_group, ref_group, atol=5e-1):
+                if not np.allclose(h_group, ref_group, atol=2.0):
                     is_error = True
+                    if verbose:
+                        print(f"In {name}: Not close enough for bin migration")
+                        print("histogram: ", h_group, ", reference: ", ref_group)
+                        print()
                 # check partial sum
-                if not np.allclose(sum(h_group), sum(ref_group)):
+                elif not np.allclose(sum(h_group), sum(ref_group)):
                     is_error = True
+                    if verbose:
+                        print(f"In {name}: Partial sums are unequal")
+                        print("histogram: ", h_group, ", reference: ", ref_group)
+                        print()
                 else:
                     if verbose:
-                        print("Bin migration likely:")
+                        print(f"In {name}: Bin migration likely")
                         print("histogram: ", h_group, ", reference: ", ref_group)
                         print()
             if is_error:
                 errors[name].append(f"Contents do not match:\n\tgot      {h['contents']}\n\texpected {ref_h['contents']}")
+            print()
 
     return errors
 
