@@ -73,7 +73,7 @@ def validate(histos: dict, reference: dict, verbose=False) -> dict[str, list[str
                 h_group = np.array(h['contents'])[group]
                 ref_group = np.array(ref_h['contents'])[group]
                 # if difference is great, count as error
-                if not np.allclose(h_group, ref_group, atol=2.0):
+                if not np.allclose(h_group, ref_group, atol=2.0): # 2.0 is chosen as it seems to cover the difference expected of one events migrating between bins in histograms from 1 file per sample. this definitely can be tuned in the future
                     is_error = True
                     if verbose:
                         print(f"In {name}: Not close enough for bin migration")
