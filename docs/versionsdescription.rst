@@ -1,44 +1,81 @@
 .. _versions-description:
 
-AGC Versions
+Versions
 ================================
 
-The below table gives a brief overview of all AGC versions.
+The below table gives a brief overview of the AGC versions. Each version here corresponds to a slightly altered task.
 
-.. list-table:: AGC Versions
-   :widths: 15 16 18 18 15 18
+.. list-table:: Versions
+   :widths: 12 22 22 22 22
    :header-rows: 1
-
+   
    * - Version
      - Datasets
-     - Available Pipelines
      - Cuts
-     - Machine Learning
      - Systematics
-   * - 0.1.0
+     - Machine Learning
+   * - 0
      - CMS 2015 Open Data (POET)
-     - Pure ``coffea``; ``coffea`` with ``ServiceX`` processors; ``ServiceX`` followed by ``coffea``
      - Exactly one lepton with :math:`p_T>25` GeV; at least four jets with :math:`p_T>25` GeV; at least one jet with :math:`b`-tag > 0.5
+     - :math:`t\bar{t}` sample variations, ``pt_scale`` variations, ``pt_res`` variations, ``btag`` variations, **W + jets** scale variations, luminosity
      - None
-     - 
-   * - 0.2.0
-     - CMS 2015 Open Data (POET)
-     - Pure ``coffea``; ``ServiceX`` followed by ``coffea``
-     - Exactly one lepton with :math:`p_T>25` GeV; at least four jets with :math:`p_T>25` GeV; at least one jet with :math:`b`-tag > 0.5
-     - None
-     - 
-   * - 1.0.0
+   * - 1
      - CMS 2015 Open Data (NanoAOD)
-     - Pure ``coffea``; ``ServiceX`` followed by ``coffea``
      - Exactly one lepton with :math:`p_T>25` GeV; at least four jets with :math:`p_T>25` GeV; at least one jet with :math:`b`-tag > 0.5
+     - :math:`t\bar{t}` sample variations, ``pt_scale`` variations, ``pt_res`` variations, ``btag`` variations, **W + jets** scale variations, luminosity
      - None
-     - 
-   * - 2.0.0
+   * - 2
      - CMS 2015 Open Data (NanoAOD)
-     - 
-     - 
+     - Exactly one lepton with :math:`p_T>30` GeV; at least four jets with :math:`p_T>30` GeV; at least one jet with :math:`b`-tag > 0.5 (see :ref:`versions-cuts` for additional cuts)
+     - :math:`t\bar{t}` sample variations, ``pt_scale`` variations, ``pt_res`` variations, ``btag`` variations, **W + jets** scale variations, luminosity
      - BDT to predict jet-parton assignment in :math:`t\bar{t}` events
-     - 
+     
+     
+Description of AGC Tags
+================================
+The below table gives a brief overview of the AGC tags in the main repository (<https://github.com/iris-hep/analysis-grand-challenge/tags>`_). The above table describes differences in task, while the below table describes differences in implementation
+
+.. list-table:: Tags
+   :widths: 9 5 5 27 27 27 
+   :header-rows: 1
+   
+   * - Tag
+     - Version
+     - Released
+     - Available Pipelines
+     - Systematics
+     - Dependency Management
+   * - 0.1.0
+     - 0
+     - Yes
+     - Pure ``coffea``; ``coffea`` with ``ServiceX`` processor
+     - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations are not propagated through signal region observable calculation)
+     - Functions used in ``coffea`` processor are defined in the notebook
+   * - 0.2.0
+     - 0
+     - Yes
+     - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
+     - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations are not propagated through signal region observable calculation)
+     - Functions used in ``coffea`` processor are defined in the notebook
+   * - 1.0.0
+     - 1
+     - Yes
+     - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
+     - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations are not propagated through signal region observable calculation)
+     - Functions used in ``coffea`` processor are defined in the notebook
+   * - 1.1.0
+     - 1
+     - Yes
+     - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
+     - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations corrected)
+     - Functions used in ``coffea`` processor are defined in the notebook
+   * - 2.0.0
+     - 2
+     - No
+     - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing; optional machine learning component (with additional option to use ``NVIDIA Triton`` inference server)
+     - Systematic variations within ``coffea`` processor handled by ``correctionlib``
+     - Modules are shipped to ``dask`` workers using ``cloudpickle``
+
 
 Datasets
 ================================
