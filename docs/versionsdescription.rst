@@ -1,6 +1,6 @@
 .. _versions-description:
 
-Versions
+AGC Analysis Task Versions
 ================================
 
 The below table gives a brief overview of the AGC versions. Each version here corresponds to a slightly altered task.
