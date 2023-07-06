@@ -40,42 +40,36 @@ Note that the major versions (0, 1, and 2) correspond to differences in analysis
 Our reference implementation for each major task (0, 1, 2) will always refer to the latest tag within that series.
 
 .. list-table:: Tags
-   :widths: 9 5 5 27 27 27 
+   :widths: 8 5 29 29 29
    :header-rows: 1
    
    * - Tag
      - Version
-     - Released
      - Available Pipelines
      - Systematics
      - Dependency Management
    * - 0.1.0
      - 0
-     - Yes
      - Pure ``coffea``; ``coffea`` with ``ServiceX`` processor
      - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations are not propagated through signal region observable calculation)
      - Functions used in ``coffea`` processor are defined in the notebook
    * - 0.2.0
      - 0
-     - Yes
      - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
      - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations are not propagated through signal region observable calculation)
      - Functions used in ``coffea`` processor are defined in the notebook
    * - 1.0.0
      - 1
-     - Yes
      - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
      - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations are not propagated through signal region observable calculation)
      - Functions used in ``coffea`` processor are defined in the notebook
    * - 1.1.0
      - 1
-     - Yes
      - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
      - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations corrected)
      - Functions used in ``coffea`` processor are defined in the notebook
    * - 2.0.0 (WIP)
      - 2
-     - No
      - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing; optional machine learning component (with additional option to use ``NVIDIA Triton`` inference server)
      - Systematic variations within ``coffea`` processor handled by ``correctionlib``
      - Modules are shipped to ``dask`` workers using ``cloudpickle``
