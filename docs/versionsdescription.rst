@@ -33,7 +33,11 @@ The below table gives a brief overview of the AGC versions. Each version here co
      
 Description of AGC Tags
 ================================
-The below table gives a brief overview of the AGC tags in the main repository (<https://github.com/iris-hep/analysis-grand-challenge/tags>`_). The above table describes differences in task, while the below table describes differences in implementation
+This section is specific to the implementation in the `main repository <https://github.com/iris-hep/analysis-grand-challenge>`_.
+
+The below table gives a brief overview of the AGC tags, including descriptions of minor versions and patches which are implementation-specific. 
+Note that the major versions (0, 1, and 2) correspond to differences in analysis task (described above), while minor versions are reserved for individual implementations to assign for small changes and patches. 
+Our reference implementation for each major task (0, 1, 2) will always refer to the latest tag within that series.
 
 .. list-table:: Tags
    :widths: 9 5 5 27 27 27 
