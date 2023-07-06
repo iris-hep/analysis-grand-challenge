@@ -24,7 +24,7 @@ The below table gives a brief overview of the AGC versions. Each version here co
      - Exactly one lepton with :math:`p_T>25` GeV; at least four jets with :math:`p_T>25` GeV; at least one jet with :math:`b`-tag > 0.5
      - :math:`t\bar{t}` sample variations, ``pt_scale`` variations, ``pt_res`` variations, ``btag`` variations, **W + jets** scale variations, luminosity
      - None
-   * - 2
+   * - 2 (WIP)
      - CMS 2015 Open Data (NanoAOD)
      - Exactly one lepton with :math:`p_T>30` GeV; at least four jets with :math:`p_T>30` GeV; at least one jet with :math:`b`-tag > 0.5 (see :ref:`versions-cuts` for additional cuts)
      - :math:`t\bar{t}` sample variations, ``pt_scale`` variations, ``pt_res`` variations, ``btag`` variations, **W + jets** scale variations, luminosity
