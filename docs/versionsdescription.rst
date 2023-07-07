@@ -31,7 +31,7 @@ The below table gives a brief overview of the AGC versions. Each version here co
      - BDT to predict jet-parton assignment in :math:`t\bar{t}` events
      
      
-Description of AGC Tags
+Reference Implementation Versions 
 ================================
 This section is specific to the implementation in the `main repository <https://github.com/iris-hep/analysis-grand-challenge>`_.
 
