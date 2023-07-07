@@ -213,7 +213,7 @@ This section explains how to calculate the various systematic uncertainties we i
 
 6. Statistical Model
 ---------------------------------------------------------------
-The following description details building a statistical model in the ``HistFactory`` format. This format is documented `here <https://root.cern/doc/master/group__HistFactory.html>`_ (``ROOT``) and `here <https://pyhf.readthedocs.io/en/latest/intro.html#histfactory>`_ (``pyhf``).
+The following description details building a statistical model in the ``HistFactory`` format. This format is documented in the `ROOT documentation <https://root.cern/doc/master/group__HistFactory.html>`_ and the `pyhf documentation <https://pyhf.readthedocs.io/en/latest/intro.html#histfactory>`_.
 
 We want to develop a statistical model, parameterized by some physical parameters :math:`\vec{\alpha}`. 
 We have one parameter of interest, the :math:`t\bar{t}` cross-section, and a handful of *nuisance parameters*, which are physics parameters that are not of interest in this analysis. 
@@ -313,7 +313,7 @@ It is a future goal to move onto a more sophisticated architecture, as the BDT m
 
 BDT Performance
 ---------------------------------------------------------------
-The results in this section are specific to the models provided in the `repository /<https://github.com/iris-hep/analysis-grand-challenge/tree/main/analyses/cms-open-data-ttbar/models>`_. The results will differ some with each model-training.
+The results in this section are specific to the models provided in the `repository <https://github.com/iris-hep/analysis-grand-challenge/tree/main/analyses/cms-open-data-ttbar/models>`_. The results will differ some with each model-training.
 
 We can first qualitatively compare the top mass reconstruction by the trijet combination method and the BDT method by comparing their distributions to the truth top mass reconstruction distribution. 
 The events considered here are those in which it is possible to correctly reconstruct all jet-parton assignments in the leading four jets.
