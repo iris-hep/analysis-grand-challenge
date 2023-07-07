@@ -219,3 +219,123 @@ def get_inference_results_triton(features, even, triton_client, MODEL_NAME,
         ).as_numpy(output_name)[:, 1]
 
     return results
+
+## functions for calculating features and labels for the BDT
+def training_filter(jets, electrons, muons, genparts, even):
+    '''
+    Filters events down to training set and calculates jet-level labels
+    
+    Args:
+        jets: selected jets after region filter (and selecting leading four for each event)
+        electrons: selected electrons after region filter
+        muons: selected muons after region filter
+        genparts: selected genpart after region filter
+        even: whether the event is even-numbered (used to separate training events)
+    
+    Returns:
+        jets: selected jets after training filter
+        electrons: selected electrons after training filter
+        muons: selected muons after training filter
+        labels: labels of jets within an event (24=W, 6=top_hadron, -6=top_lepton)
+        even: whether the event is even-numbered
+    '''
+    #### filter genPart to valid matching candidates ####
+
+    # get rid of particles without parents
+    genpart_parent = genparts.distinctParent
+    genpart_filter = np.invert(ak.is_none(genpart_parent, axis=1))
+    genparts = genparts[genpart_filter]
+    genpart_parent = genparts.distinctParent
+
+    # ensure that parents are top quark or W
+    genpart_filter2 = ((np.abs(genpart_parent.pdgId)==6) | (np.abs(genpart_parent.pdgId)==24))
+    genparts = genparts[genpart_filter2]
+
+    # ensure particle itself is a quark
+    genpart_filter3 = ((np.abs(genparts.pdgId)<7) & (np.abs(genparts.pdgId)>0))
+    genparts = genparts[genpart_filter3]
+
+    # get rid of duplicates
+    genpart_filter4 = genparts.hasFlags("isLastCopy")
+    genparts = genparts[genpart_filter4]
+            
+        
+    #### get jet-level labels and filter events to training set
+        
+    # match jets to nearest valid genPart candidate
+    nearest_genpart = jets.nearest(genparts, threshold=0.4)
+    nearest_parent = nearest_genpart.distinctParent # parent of matched particle
+    parent_pdgid = nearest_parent.pdgId # pdgId of parent particle
+    grandchild_pdgid = nearest_parent.distinctChildren.distinctChildren.pdgId # pdgId of particle's parent's grandchildren
+
+    grandchildren_flat = np.abs(ak.flatten(grandchild_pdgid,axis=-1)) # flatten innermost axis for convenience
+
+    # if particle has a cousin that is a lepton
+    has_lepton_cousin = (ak.sum(((grandchildren_flat%2==0) & (grandchildren_flat>10) & (grandchildren_flat<19)),
+                                axis=-1)>0)
+    # if particle has a cousin that is a neutrino
+    has_neutrino_cousin = (ak.sum(((grandchildren_flat%2==1) & (grandchildren_flat>10) & (grandchildren_flat<19)),
+                                  axis=-1)>0)
+
+    # if a particle has a lepton cousin and a neutrino cousin
+    has_both_cousins = ak.fill_none((has_lepton_cousin & has_neutrino_cousin), False).to_numpy()
+
+    # get labels from parent pdgId (fill none with 100 to filter out events with those jets)
+    labels = np.abs(ak.fill_none(parent_pdgid,100).to_numpy())
+    labels[has_both_cousins] = -6 # assign jets with both cousins as top_lepton (not necessarily antiparticle)
+
+    training_event_filter = (np.sum(labels,axis=1)==48) # events with a label sum of 48 have the correct particles
+            
+    # filter events
+    jets = jets[training_event_filter]
+    electrons = electrons[training_event_filter]
+    muons = muons[training_event_filter]
+    labels = labels[training_event_filter]
+    even = even[training_event_filter]
+    
+    return jets, electrons, muons, labels, even
+
+
+def get_training_set(jets, electrons, muons, labels):
+    '''
+    Get features for each of the 12 combinations per event and calculates their corresponding combination-level labels
+    
+    Args:
+        jets: selected jets after training filter
+        electrons: selected electrons after training filter
+        muons: selected muons after training filter
+        labels: jet-level labels output by training_filter
+    
+    Returns:
+        features, labels (flattened to remove event level)
+    '''
+    
+    permutations_dict, labels_dict = get_permutations_dict(4, include_labels=True)
+    
+    features, perm_counts = get_features(jets, electrons, muons, max_n_jets=4)
+    
+    #### calculate combination-level labels ####
+    permutation_labels = np.array(labels_dict[4])
+    
+    # which combination does the truth label correspond to?
+    which_combination = np.zeros(len(jets), dtype=int)
+    # no correct matches
+    which_anti_combination = np.zeros(labels.shape[0], dtype=int)
+    for i in range(12):
+        which_combination[(labels==permutation_labels[i,:]).all(1)] = i
+        which_anti_combination[np.invert((labels==permutation_labels[i,:]).any(1))] = i
+
+    # convert to combination-level truth label (-1, 0 or 1)
+    which_combination = list(zip(range(len(jets),), which_combination))
+    which_anti_combination = list(zip(range(labels.shape[0],), which_anti_combination))
+    
+    truth_labels = -1*np.ones((len(jets),12))
+    for i,tpl in enumerate(which_combination):
+        truth_labels[tpl]=1
+    for i,tpl in enumerate(which_anti_combination):
+        truth_labels[tpl]=0
+        
+    #### flatten to combinations (easy to unflatten since each event always has 12 combinations) ####
+    labels = truth_labels.reshape((truth_labels.shape[0]*truth_labels.shape[1],1))
+    
+    return features, labels, which_combination

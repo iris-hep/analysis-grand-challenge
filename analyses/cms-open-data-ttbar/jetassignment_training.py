@@ -36,27 +36,29 @@
 # * Register best model in `mlflow` model repository
 
 # %% tags=[]
+import awkward as ak
+import cloudpickle
 from coffea.nanoevents import NanoAODSchema
 from coffea import processor
-import awkward as ak
-import numpy as np
+import datetime
 import hist
 import json
 import matplotlib.pyplot as plt
-import uproot
-import time
+import numpy as np
 import os
-import datetime
+import time
+import uproot
+import os
 
 import utils
 
 # ML-related imports
 from dask.distributed import Client
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
-from sklearn.model_selection import ParameterSampler, train_test_split, KFold, cross_validate
 import mlflow
 from mlflow.models.signature import infer_signature
 from mlflow.tracking import MlflowClient
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.model_selection import ParameterSampler, train_test_split, KFold, cross_validate
 from xgboost import XGBClassifier
 
 # %% tags=[]
@@ -66,251 +68,35 @@ from xgboost import XGBClassifier
 N_FILES_MAX_PER_SAMPLE = 5
 
 # set to True for DaskExecutor
-<<<<<<< HEAD
 USE_DASK_PROCESSING = True
-=======
-USE_DASK_PROCESSING = False
->>>>>>> 22be8de5492a10e1260233f936373d5fc18be3cc
-
-# number of cores if using FuturesExecutor
-NUM_CORES = 4
-
-# chunk size to use
-CHUNKSIZE = 100_000
-
-# analysis facility: set to "coffea_casa" for coffea-casa environments, "EAF" for FNAL, "local" for local setups
-AF = "coffea_casa"
 
 
 ### MACHINE LEARNING OPTIONS
 
 # enable Dask (whether to use dask for hyperparameter optimization. currently does not work)
-<<<<<<< HEAD
-USE_DASK_ML = True
-=======
 USE_DASK_ML = False
->>>>>>> 22be8de5492a10e1260233f936373d5fc18be3cc
 
 # enable MLFlow logging (to store metrics and models of hyperparameter optimization trials)
 USE_MLFLOW = True
 
 # enable MLFlow model logging/registering
 MODEL_LOGGING = True
-MODEL_REGISTERING = False
+MODEL_REGISTERING = True
 
-# enter generated mlflow tracking token (temporary solution) https://wiki.ncsa.illinois.edu/display/NCSASoftware/MLFlow+at+NCSA
-MLFLOW_TRACKING_TOKEN = ""
-
-# number of folds for cross-validation
-N_FOLD = 2
-
-# number of trials (per model) for hyperparameter optimization. Total number of trials will be 2*N_TRIALS
-N_TRIALS = 5
-
-# name to use for registering model
-MODEL_NAME = "reconstruction_bdt_xgb"
-
-<<<<<<< HEAD
-# number of events to use for training (more is better, but slower)
-=======
 # number of events to use for training (more results in higher efficiency, but slower to train)
->>>>>>> 22be8de5492a10e1260233f936373d5fc18be3cc
 N_EVENTS_TRAIN = 10000
+
 
 # %% tags=[]
 # get dictionaries for permutation indices, associated labels, and evaluation matrices
 # permutation indices correspond to the different possible combinations of jets in an event for correspondence 
 # with the W boson, the top quark on the side of hadronic decay, and the top quark on the side of leptonic decay
 # evaluation matrix is used to calculate the fraction of matches correct within an event
-permutations_dict, labels_dict, evaluation_matrices = utils.get_permutations_dict(4, 
-                                                                                  include_labels=True, 
-                                                                                  include_eval_mat=True)
-evaluation_matrix = evaluation_matrices[4]
-print(evaluation_matrix)
-
-
-# %% tags=[]
-## functions for calculating features and labels for the BDT
-def training_filter(jets, electrons, muons, genparts, even):
-    '''
-    Filters events down to training set and calculates jet-level labels
-    
-    Args:
-        jets: selected jets after region filter (and selecting leading four for each event)
-        electrons: selected electrons after region filter
-        muons: selected muons after region filter
-        genparts: selected genpart after region filter
-        even: whether the event is even-numbered (used to separate training events)
-    
-    Returns:
-        jets: selected jets after training filter
-        electrons: selected electrons after training filter
-        muons: selected muons after training filter
-        labels: labels of jets within an event (24=W, 6=top_hadron, -6=top_lepton)
-        even: whether the event is even-numbered
-    '''
-    #### filter genPart to valid matching candidates ####
-
-    # get rid of particles without parents
-    genpart_parent = genparts.distinctParent
-    genpart_filter = np.invert(ak.is_none(genpart_parent, axis=1))
-    genparts = genparts[genpart_filter]
-    genpart_parent = genparts.distinctParent
-
-    # ensure that parents are top quark or W
-    genpart_filter2 = ((np.abs(genpart_parent.pdgId)==6) | (np.abs(genpart_parent.pdgId)==24))
-    genparts = genparts[genpart_filter2]
-
-    # ensure particle itself is a quark
-    genpart_filter3 = ((np.abs(genparts.pdgId)<7) & (np.abs(genparts.pdgId)>0))
-    genparts = genparts[genpart_filter3]
-
-    # get rid of duplicates
-    genpart_filter4 = genparts.hasFlags("isLastCopy")
-    genparts = genparts[genpart_filter4]
-            
-        
-    #### get jet-level labels and filter events to training set
-        
-    # match jets to nearest valid genPart candidate
-    nearest_genpart = jets.nearest(genparts, threshold=0.4)
-    nearest_parent = nearest_genpart.distinctParent # parent of matched particle
-    parent_pdgid = nearest_parent.pdgId # pdgId of parent particle
-    grandchild_pdgid = nearest_parent.distinctChildren.distinctChildren.pdgId # pdgId of particle's parent's grandchildren
-
-    grandchildren_flat = np.abs(ak.flatten(grandchild_pdgid,axis=-1)) # flatten innermost axis for convenience
-
-    # if particle has a cousin that is a lepton
-    has_lepton_cousin = (ak.sum(((grandchildren_flat%2==0) & (grandchildren_flat>10) & (grandchildren_flat<19)),
-                                axis=-1)>0)
-    # if particle has a cousin that is a neutrino
-    has_neutrino_cousin = (ak.sum(((grandchildren_flat%2==1) & (grandchildren_flat>10) & (grandchildren_flat<19)),
-                                  axis=-1)>0)
-
-    # if a particle has a lepton cousin and a neutrino cousin
-    has_both_cousins = ak.fill_none((has_lepton_cousin & has_neutrino_cousin), False).to_numpy()
-
-    # get labels from parent pdgId (fill none with 100 to filter out events with those jets)
-    labels = np.abs(ak.fill_none(parent_pdgid,100).to_numpy())
-    labels[has_both_cousins] = -6 # assign jets with both cousins as top_lepton (not necessarily antiparticle)
-
-    training_event_filter = (np.sum(labels,axis=1)==48) # events with a label sum of 48 have the correct particles
-            
-    # filter events
-    jets = jets[training_event_filter]
-    electrons = electrons[training_event_filter]
-    muons = muons[training_event_filter]
-    labels = labels[training_event_filter]
-    even = even[training_event_filter]
-    
-    return jets, electrons, muons, labels, even
-    
-
-def get_training_set(jets, electrons, muons, labels, permutations_dict, labels_dict):
-    '''
-    Calculate features for each of the 12 combinations per event and calculates combination-level labels
-    
-    Args:
-        jets: selected jets after training filter
-        electrons: selected electrons after training filter
-        muons: selected muons after training filter
-        labels: jet-level labels output by training_filter
-    
-    Returns:
-        features, labels (flattened to remove event level)
-    '''
-    
-    # calculate number of jets in each event
-    njet = ak.num(jets).to_numpy()
-    # don't consider every jet for events with high jet multiplicity
-    njet[njet>max(permutations_dict.keys())] = max(permutations_dict.keys())
-    # create awkward array of permutation indices
-    perms = ak.Array([permutations_dict[n] for n in njet])
-    perm_counts = ak.num(perms)
-    
-    #### calculate features ####
-    features = np.zeros((sum(perm_counts),20))
-    
-    # grab lepton info
-    leptons = ak.flatten(ak.concatenate((electrons, muons),axis=1),axis=-1)
-
-    feature_count = 0
-    
-    # delta R between top_lepton and lepton
-    features[:,0] = ak.flatten(np.sqrt((leptons.eta - jets[perms[...,3]].eta)**2 + 
-                                       (leptons.phi - jets[perms[...,3]].phi)**2)).to_numpy()
-
-    
-    #delta R between the two W
-    features[:,1] = ak.flatten(np.sqrt((jets[perms[...,0]].eta - jets[perms[...,1]].eta)**2 + 
-                                       (jets[perms[...,0]].phi - jets[perms[...,1]].phi)**2)).to_numpy()
-
-    #delta R between W and top_hadron
-    features[:,2] = ak.flatten(np.sqrt((jets[perms[...,0]].eta - jets[perms[...,2]].eta)**2 + 
-                                       (jets[perms[...,0]].phi - jets[perms[...,2]].phi)**2)).to_numpy()
-    features[:,3] = ak.flatten(np.sqrt((jets[perms[...,1]].eta - jets[perms[...,2]].eta)**2 + 
-                                       (jets[perms[...,1]].phi - jets[perms[...,2]].phi)**2)).to_numpy()
-
-    # combined mass of top_lepton and lepton
-    features[:,4] = ak.flatten((leptons + jets[perms[...,3]]).mass).to_numpy()
-
-    # combined mass of W
-    features[:,5] = ak.flatten((jets[perms[...,0]] + jets[perms[...,1]]).mass).to_numpy()
-
-    # combined mass of W and top_hadron
-    features[:,6] = ak.flatten((jets[perms[...,0]] + jets[perms[...,1]] + 
-                                jets[perms[...,2]]).mass).to_numpy()
-    
-    # combined pT of W and top_hadron
-    features[:,7] = ak.flatten((jets[perms[...,0]] + jets[perms[...,1]] + 
-                                jets[perms[...,2]]).pt).to_numpy()
-
-
-    # pt of every jet
-    features[:,8] = ak.flatten(jets[perms[...,0]].pt).to_numpy()
-    features[:,9] = ak.flatten(jets[perms[...,1]].pt).to_numpy()
-    features[:,10] = ak.flatten(jets[perms[...,2]].pt).to_numpy()
-    features[:,11] = ak.flatten(jets[perms[...,3]].pt).to_numpy()
-    
-    # btagCSVV2 of every jet
-    features[:,12] = ak.flatten(jets[perms[...,0]].btagCSVV2).to_numpy()
-    features[:,13] = ak.flatten(jets[perms[...,1]].btagCSVV2).to_numpy()
-    features[:,14] = ak.flatten(jets[perms[...,2]].btagCSVV2).to_numpy()
-    features[:,15] = ak.flatten(jets[perms[...,3]].btagCSVV2).to_numpy()
-    
-    # qgl of every jet
-    features[:,16] = ak.flatten(jets[perms[...,0]].qgl).to_numpy()
-    features[:,17] = ak.flatten(jets[perms[...,1]].qgl).to_numpy()
-    features[:,18] = ak.flatten(jets[perms[...,2]].qgl).to_numpy()
-    features[:,19] = ak.flatten(jets[perms[...,3]].qgl).to_numpy()
-    
-    #### calculate combination-level labels ####
-    permutation_labels = np.array(labels_dict[4])
-    
-    # which combination does the truth label correspond to?
-    which_combination = np.zeros(len(jets), dtype=int)
-    # no correct matches
-    which_anti_combination = np.zeros(labels.shape[0], dtype=int)
-    for i in range(12):
-        which_combination[(labels==permutation_labels[i,:]).all(1)] = i
-        which_anti_combination[np.invert((labels==permutation_labels[i,:]).any(1))] = i
-
-    # convert to combination-level truth label (-1, 0 or 1)
-    which_combination = list(zip(range(len(jets),), which_combination))
-    which_anti_combination = list(zip(range(labels.shape[0],), which_anti_combination))
-    
-    truth_labels = -1*np.ones((len(jets),12))
-    for i,tpl in enumerate(which_combination):
-        truth_labels[tpl]=1
-    for i,tpl in enumerate(which_anti_combination):
-        truth_labels[tpl]=0
-        
-        
-    #### flatten to combinations (easy to unflatten since each event always has 12 combinations) ####
-    labels = truth_labels.reshape((truth_labels.shape[0]*truth_labels.shape[1],1))
-    
-    return features, labels, which_combination
-
+# permutations_dict, labels_dict, evaluation_matrices = utils.ml.get_permutations_dict(4, 
+#                                                                                      include_labels=True, 
+#                                                                                      include_eval_mat=True)
+# evaluation_matrix = evaluation_matrices[4]
+# print(evaluation_matrix)
 
 # %% [markdown]
 # ### Defining a `coffea` Processor
@@ -324,10 +110,8 @@ def col_accumulator(a):
 
 processor_base = processor.ProcessorABC
 class JetClassifier(processor_base):
-    def __init__(self, permutations_dict, labels_dict):
+    def __init__(self):
         super().__init__()
-        self.permutations_dict = permutations_dict
-        self.labels_dict = labels_dict
     
     def process(self, events):
         
@@ -370,7 +154,7 @@ class JetClassifier(processor_base):
             selected_genpart = selected_genpart[event_filters]
             even = even[event_filters]
             
-            ### only consider 4j2b region
+            ### only consider 4j2b (signal) region
             region_filter = ak.sum(selected_jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2 # at least two b-tagged jets
             selected_jets_region = selected_jets[region_filter][:,:4] # only keep top 4 jets
             selected_electrons_region = selected_electrons[region_filter]
@@ -379,11 +163,11 @@ class JetClassifier(processor_base):
             even = even[region_filter]
             
             # filter events and calculate labels
-            jets, electrons, muons, labels, even = training_filter(selected_jets_region, 
-                                                                   selected_electrons_region, 
-                                                                   selected_muons_region, 
-                                                                   selected_genpart_region,
-                                                                   even)
+            jets, electrons, muons, labels, even = utils.ml.training_filter(selected_jets_region, 
+                                                                            selected_electrons_region, 
+                                                                            selected_muons_region, 
+                                                                            selected_genpart_region,
+                                                                            even)
             
             
             # calculate mbjj
@@ -402,8 +186,7 @@ class JetClassifier(processor_base):
             trijet_label = ak.flatten(trijet_label)
             
             # calculate features and labels
-            features, labels, which_combination = get_training_set(jets, electrons, muons, labels,
-                                                                   self.permutations_dict, self.labels_dict)
+            features, labels, which_combination = utils.ml.get_training_set(jets, electrons, muons, labels)
     
             
         output = {"nevents": {events.metadata["dataset"]: len(events)},
@@ -424,14 +207,10 @@ class JetClassifier(processor_base):
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
 # %% tags=[]
-fileset = utils.construct_fileset(N_FILES_MAX_PER_SAMPLE, 
-                                  use_xcache=False)
+fileset = utils.file_input.construct_fileset(N_FILES_MAX_PER_SAMPLE, use_xcache=False)
 
 # get rid of everything except ttbar__nominal for training purposes
-fileset_keys = list(fileset.keys())
-for key in fileset_keys:
-    if key!="ttbar__nominal":
-        fileset.pop(key)
+fileset = {"ttbar__nominal": fileset["ttbar__nominal"]}
 
 # %% [markdown]
 # ### Execute the data delivery pipeline
@@ -440,12 +219,13 @@ for key in fileset_keys:
 NanoAODSchema.warn_missing_crossrefs = False
 
 if USE_DASK_PROCESSING:
-    executor = processor.DaskExecutor(client=utils.get_client(AF))
+    cloudpickle.register_pickle_by_value(utils)
+    executor = processor.DaskExecutor(client=utils.clients.get_client(utils.config_training["global"]["AF"]))
 else:
-    executor = processor.FuturesExecutor(workers=NUM_CORES)
+    executor = processor.FuturesExecutor(workers=utils.config_training["benchmarking"]["NUM_CORES"])
     
 run = processor.Runner(executor=executor, schema=NanoAODSchema, savemetrics=True, metadata_cache={}, 
-                       chunksize=CHUNKSIZE)
+                       chunksize=utils.config_training["benchmarking"]["CHUNKSIZE"])
 
 # preprocess
 filemeta = run.preprocess(fileset, treename="Events")
@@ -453,7 +233,7 @@ filemeta = run.preprocess(fileset, treename="Events")
 # process
 output, metrics = run(fileset, 
                       "Events", 
-                      processor_instance = JetClassifier(permutations_dict, labels_dict))
+                      processor_instance = JetClassifier())
 
 # %% tags=[]
 # grab features and labels and convert to np array
@@ -469,18 +249,20 @@ even = np.repeat(even, 12) # twelve permutations for each event
 # The key for the labeling scheme is as follows
 #
 # * 1: all jet assignments are correct
-# * 0: some jet assignments are correct (one or two are correct, others are incorrect)
-# * -1: all jet assignments are incorrect
+# * -1: some jet assignments are correct (one or two are correct, others are incorrect)
+# * 0: all jet assignments are incorrect
 #
 # There are twelve combinations for each event, so each event will have 1 correct combination, 2 completely incorrect combinations, and 9 partially correct combinations.
 
 # %% [markdown]
-<<<<<<< HEAD
 # # Histograms of Training Variables
-=======
-# ### Histograms of Training Variables
->>>>>>> 22be8de5492a10e1260233f936373d5fc18be3cc
 # To vizualize the separation power of the different variables, histograms are created for each of the three labels. Only `all_correct` and `none_correct` are used for training purposes.
+
+# %% tags=[]
+print(sum(labels==1))
+print(sum(labels==0))
+print(sum(labels==-1))
+print(len(labels))
 
 # %% tags=[]
 # separate by label for plotting
@@ -489,292 +271,11 @@ some_correct = features[labels==-1,:]
 none_correct = features[labels==0,:]
 
 # %% tags=[]
-#### delta R histogram ####
-
-# binning
-deltar_low = 0.0
-deltar_high = 8.0
-deltar_numbins = 100
-legend_list = ["All Matches Correct", "Some Matches Correct", "No Matches Correct"]
-
-# define histogram
-h = hist.Hist(
-    hist.axis.Regular(deltar_numbins, deltar_low, deltar_high, name="deltar", label="$\Delta R$", flow=False),
-    hist.axis.StrCategory(legend_list, name="truthlabel", label="Truth Label"),
-    hist.axis.StrCategory(["toplep_lepton","W_W","tophad_W"], name="category", label="Category"),
-)
-
-# fill histogram
-h.fill(deltar = all_correct[:,0], category="toplep_lepton", truthlabel="All Matches Correct")
-h.fill(deltar = some_correct[:,0], category="toplep_lepton", truthlabel="Some Matches Correct")
-h.fill(deltar = none_correct[:,0], category="toplep_lepton", truthlabel="No Matches Correct")
-h.fill(deltar = all_correct[:,1], category="W_W", truthlabel="All Matches Correct")
-h.fill(deltar = some_correct[:,1], category="W_W", truthlabel="Some Matches Correct")
-h.fill(deltar = none_correct[:,1], category="W_W", truthlabel="No Matches Correct")
-h.fill(deltar = all_correct[:,2], category="tophad_W", truthlabel="All Matches Correct")
-h.fill(deltar = some_correct[:,2], category="tophad_W", truthlabel="Some Matches Correct")
-h.fill(deltar = none_correct[:,2], category="tophad_W", truthlabel="No Matches Correct")
-h.fill(deltar = all_correct[:,3], category="tophad_W", truthlabel="All Matches Correct")
-h.fill(deltar = some_correct[:,3], category="tophad_W", truthlabel="Some Matches Correct")
-h.fill(deltar = none_correct[:,3], category="tophad_W", truthlabel="No Matches Correct")
-
 # make plots
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[0j::hist.rebin(2), :, "toplep_lepton"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("$\Delta R$ between $top_{lepton}$ jet and lepton")
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[0j::hist.rebin(2), :, "W_W"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("$\Delta R$ between the two $W$ jets")
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[0j::hist.rebin(2), :, "tophad_W"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("$\Delta R$ between $W$ jet and $top_{hadron}$ jet")
-fig.show()
-
-# %% tags=[]
-#### mass histogram ####
-
-# binning
-combinedmass_low = 0.0
-combinedmass_high = 1500.0
-combinedmass_numbins = 200
-legend_list = ["All Matches Correct", "Some Matches Correct", "No Matches Correct"]
-
-# define histogram
-h = hist.Hist(
-    hist.axis.Regular(combinedmass_numbins, combinedmass_low, combinedmass_high, 
-                      name="combinedmass", label="Combined Mass [GeV]", flow=False),
-    hist.axis.StrCategory(legend_list, name="truthlabel", label="Truth Label"),
-    hist.axis.StrCategory(["toplep_lepton","W_W","tophad_W_W"], name="category", label="Category"),
-)
-
-# fill histogram
-h.fill(combinedmass = all_correct[:,4], category="toplep_lepton", truthlabel="All Matches Correct")
-h.fill(combinedmass = some_correct[:,4], category="toplep_lepton", truthlabel="Some Matches Correct")
-h.fill(combinedmass = none_correct[:,4], category="toplep_lepton", truthlabel="No Matches Correct")
-h.fill(combinedmass = all_correct[:,5], category="W_W", truthlabel="All Matches Correct")
-h.fill(combinedmass = some_correct[:,5], category="W_W", truthlabel="Some Matches Correct")
-h.fill(combinedmass = none_correct[:,5], category="W_W", truthlabel="No Matches Correct")
-h.fill(combinedmass = all_correct[:,6], category="tophad_W_W", truthlabel="All Matches Correct")
-h.fill(combinedmass = some_correct[:,6], category="tophad_W_W", truthlabel="Some Matches Correct")
-h.fill(combinedmass = none_correct[:,6], category="tophad_W_W", truthlabel="No Matches Correct")
-
-# make plots
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "toplep_lepton"].plot(density=True, ax=ax)
-ax.legend(legend_list[:-1])
-ax.set_title("Combined mass of $top_{lepton}$ jet and lepton")
-ax.set_xlim([0,400])
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "W_W"].plot(density=True, ax=ax)
-ax.legend(legend_list[:-1])
-ax.set_title("Combined mass of the two $W$ jets")
-ax.set_xlim([0,400])
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "tophad_W_W"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("Combined mass of $W$ jets and $top_{hadron}$ jet (Reconstructed Top Mass)")
-ax.set_xlim([0,600])
-fig.show()
-
-# %% tags=[]
-#### combined pT histogram ####
-
-# binning
-combinedpt_low = 0.0
-combinedpt_high = 1000.0
-combinedpt_numbins = 200
-legend_list = ["All Matches Correct", "Some Matches Correct", "No Matches Correct"]
-
-# define histogram
-h = hist.Hist(
-    hist.axis.Regular(combinedpt_numbins, combinedpt_low, combinedpt_high, 
-                      name="pt", label="pT [GeV]", flow=False),
-    hist.axis.StrCategory(legend_list, name="truthlabel", label="Truth Label"),
-)
-
-# fill histogram
-h.fill(pt = all_correct[:,7], truthlabel="All Matches Correct")
-h.fill(pt = some_correct[:,7], truthlabel="Some Matches Correct")
-h.fill(pt = none_correct[:,7], truthlabel="No Matches Correct")
-
-# make plots
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h.plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("Combined pT of W jets and top_hadron jet")
-ax.set_xlim([0,600])
-fig.show()
-
-# %% tags=[]
-#### pT histogram ####
-
-# binning
-pt_low = 25.0
-pt_high = 300.0
-pt_numbins = 100
-legend_list = ["All Matches Correct", "Some Matches Correct", "No Matches Correct"]
-
-# define histogram
-h = hist.Hist(
-    hist.axis.Regular(pt_numbins, pt_low, pt_high, 
-                      name="jetpt", label="Jet $p_T$ [GeV]", flow=False),
-    hist.axis.StrCategory(legend_list, name="truthlabel", label="Truth Label"),
-    hist.axis.StrCategory(["W","toplep","tophad"], name="category", label="Category"),
-)
-
-# fill histogram
-h.fill(jetpt = all_correct[:,8], category="W", truthlabel="All Matches Correct")
-h.fill(jetpt = some_correct[:,8], category="W", truthlabel="Some Matches Correct")
-h.fill(jetpt = none_correct[:,8], category="W", truthlabel="No Matches Correct")
-h.fill(jetpt = all_correct[:,9], category="W", truthlabel="All Matches Correct")
-h.fill(jetpt = some_correct[:,9], category="W", truthlabel="Some Matches Correct")
-h.fill(jetpt = none_correct[:,9], category="W", truthlabel="No Matches Correct")
-h.fill(jetpt = all_correct[:,10], category="tophad", truthlabel="All Matches Correct")
-h.fill(jetpt = some_correct[:,10], category="tophad", truthlabel="Some Matches Correct")
-h.fill(jetpt = none_correct[:,10], category="tophad", truthlabel="No Matches Correct")
-h.fill(jetpt = all_correct[:,11], category="toplep", truthlabel="All Matches Correct")
-h.fill(jetpt = some_correct[:,11], category="toplep", truthlabel="Some Matches Correct")
-h.fill(jetpt = none_correct[:,11], category="toplep", truthlabel="No Matches Correct")
-
-# make plots
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "W"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("W Jet $p_T$")
-ax.set_xlim([25,300])
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "tophad"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("top_hadron Jet $p_T$")
-ax.set_xlim([25,300])
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "toplep"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("top_lepton Jet $p_T$")
-ax.set_xlim([25,200])
-fig.show()
-
-# %% tags=[]
-#### btag histogram ####
-
-# binning
-btag_low = 0.0
-btag_high = 1.0
-btag_numbins = 50
-legend_list = ["All Matches Correct", "Some Matches Correct", "No Matches Correct"]
-
-# define histogram
-h = hist.Hist(
-    hist.axis.Regular(btag_numbins, btag_low, btag_high, 
-                      name="btag", label="Jet btag", flow=False),
-    hist.axis.StrCategory(legend_list, name="truthlabel", label="Truth Label"),
-    hist.axis.StrCategory(["W","toplep","tophad"], name="category", label="Category"),
-)
-
-# fill histogram
-h.fill(btag = all_correct[:,12], category="W", truthlabel="All Matches Correct")
-h.fill(btag = some_correct[:,12], category="W", truthlabel="Some Matches Correct")
-h.fill(btag = none_correct[:,12], category="W", truthlabel="No Matches Correct")
-h.fill(btag = all_correct[:,13], category="W", truthlabel="All Matches Correct")
-h.fill(btag = some_correct[:,13], category="W", truthlabel="Some Matches Correct")
-h.fill(btag = none_correct[:,13], category="W", truthlabel="No Matches Correct")
-h.fill(btag = all_correct[:,14], category="tophad", truthlabel="All Matches Correct")
-h.fill(btag = some_correct[:,14], category="tophad", truthlabel="Some Matches Correct")
-h.fill(btag = none_correct[:,14], category="tophad", truthlabel="No Matches Correct")
-h.fill(btag = all_correct[:,15], category="toplep", truthlabel="All Matches Correct")
-h.fill(btag = some_correct[:,15], category="toplep", truthlabel="Some Matches Correct")
-h.fill(btag = none_correct[:,15], category="toplep", truthlabel="No Matches Correct")
-
-# make plots
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "W"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("W Jet btag")
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "tophad"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("top_hadron Jet btag")
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "toplep"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("top_lepton Jet btag")
-fig.show()
-
-# %% tags=[]
-#### qgl histogram ####
-
-# binning
-qgl_low = -1.0
-qgl_high = 1.0
-qgl_numbins = 50
-legend_list = ["All Matches Correct", "Some Matches Correct", "No Matches Correct"]
-
-# define histogram
-h = hist.Hist(
-    hist.axis.Regular(qgl_numbins, qgl_low, qgl_high, 
-                      name="qgl", label="Jet qgl", flow=False),
-    hist.axis.StrCategory(legend_list, name="truthlabel", label="Truth Label"),
-    hist.axis.StrCategory(["W","toplep","tophad"], name="category", label="Category"),
-)
-
-# fill histogram
-h.fill(qgl = all_correct[:,16], category="W", truthlabel="All Matches Correct")
-h.fill(qgl = some_correct[:,16], category="W", truthlabel="Some Matches Correct")
-h.fill(qgl = none_correct[:,16], category="W", truthlabel="No Matches Correct")
-h.fill(qgl = all_correct[:,17], category="W", truthlabel="All Matches Correct")
-h.fill(qgl = some_correct[:,17], category="W", truthlabel="Some Matches Correct")
-h.fill(qgl = none_correct[:,17], category="W", truthlabel="No Matches Correct")
-h.fill(qgl = all_correct[:,18], category="tophad", truthlabel="All Matches Correct")
-h.fill(qgl = some_correct[:,18], category="tophad", truthlabel="Some Matches Correct")
-h.fill(qgl = none_correct[:,18], category="tophad", truthlabel="No Matches Correct")
-h.fill(qgl = all_correct[:,19], category="toplep", truthlabel="All Matches Correct")
-h.fill(qgl = some_correct[:,19], category="toplep", truthlabel="Some Matches Correct")
-h.fill(qgl = none_correct[:,19], category="toplep", truthlabel="No Matches Correct")
-
-# make plots
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "W"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("W Jet qgl")
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "tophad"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("top_hadron Jet qgl")
-fig.show()
-
-fig,ax = plt.subplots(1,1,figsize=(8,4))
-h[:, :, "toplep"].plot(density=True, ax=ax)
-ax.legend(legend_list)
-ax.set_title("top_lepton Jet qgl")
-fig.show()
+utils.plotting.plot_training_variables(all_correct, some_correct, none_correct)
 
 # %% [markdown]
-<<<<<<< HEAD
 # # Model Optimization
-=======
-# ### Model Optimization
->>>>>>> 22be8de5492a10e1260233f936373d5fc18be3cc
 #
 # The model used here is `xgboost`'s gradient-boosted decision tree (`XGBClassifier`). Hyperparameter optimization is performed using random selection from a sample space of hyperparameters then testing model fits in a parallelized manner using `dask`. Optional `mlflow` logging is included.
 
@@ -817,11 +318,7 @@ N_EVENTS_TRAIN = min(min(int(features_odd.shape[0]/12), N_EVENTS_TRAIN), int(fea
 # set up trials
 if USE_MLFLOW:
     
-<<<<<<< HEAD
     os.environ['MLFLOW_TRACKING_TOKEN'] = "" # enter token here
-=======
-    os.environ['MLFLOW_TRACKING_TOKEN'] = MLFLOW_TRACKING_TOKEN
->>>>>>> 22be8de5492a10e1260233f936373d5fc18be3cc
     os.environ['MLFLOW_TRACKING_URI'] = "https://mlflow-demo.software-dev.ncsa.illinois.edu"
     
     mlflow.set_tracking_uri('https://mlflow-demo.software-dev.ncsa.illinois.edu') 
@@ -1035,11 +532,7 @@ def fit_model(params,
 # function to provide necessary environment variables to workers
 def initialize_mlflow(): 
     
-<<<<<<< HEAD
     os.environ['MLFLOW_TRACKING_TOKEN'] = "" # enter token here
-=======
-    os.environ['MLFLOW_TRACKING_TOKEN'] = MLFLOW_TRACKING_TOKEN
->>>>>>> 22be8de5492a10e1260233f936373d5fc18be3cc
     os.environ['MLFLOW_TRACKING_URI'] = "https://mlflow-demo.software-dev.ncsa.illinois.edu"
     
     mlflow.set_tracking_uri('https://mlflow-demo.software-dev.ncsa.illinois.edu') 
@@ -1170,10 +663,7 @@ else:
 best_model_odd.save_model(f"models/model_{datetime.datetime.today().strftime('%y%m%d')}_odd.json")
 
 # %% [markdown]
-<<<<<<< HEAD
 # # Evaluation with Optimized Model
-=======
-# ### Uploading model to NVIDIA Triton (optional)
 
 # %% tags=[]
 # generating Triton config file
@@ -1217,7 +707,6 @@ best_model_even.save_model("reconstruction_bdt_xgb/2/xgboost.model")
 
 # %% [markdown]
 # ### Evaluation with Optimized Model
->>>>>>> 22be8de5492a10e1260233f936373d5fc18be3cc
 
 # %% tags=[]
 # make predictions
