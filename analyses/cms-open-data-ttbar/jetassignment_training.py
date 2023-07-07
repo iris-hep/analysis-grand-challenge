@@ -259,12 +259,6 @@ even = np.repeat(even, 12) # twelve permutations for each event
 # To vizualize the separation power of the different variables, histograms are created for each of the three labels. Only `all_correct` and `none_correct` are used for training purposes.
 
 # %% tags=[]
-print(sum(labels==1))
-print(sum(labels==0))
-print(sum(labels==-1))
-print(len(labels))
-
-# %% tags=[]
 # separate by label for plotting
 all_correct = features[labels==1,:]
 some_correct = features[labels==-1,:]
