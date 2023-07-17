@@ -339,3 +339,71 @@ def get_training_set(jets, electrons, muons, labels):
     labels = truth_labels.reshape((truth_labels.shape[0]*truth_labels.shape[1],1))
     
     return features, labels, which_combination
+
+# for generating triton config text
+def write_triton_config(
+    model_name, 
+    n_features, 
+    backend_name = "fil", 
+    model_type = "xgboost", 
+    max_batch_size = 50000000, 
+    predict_proba = "true"
+):
+    n_out = 1
+    if predict_proba=="true":
+        n_out = 2
+        
+    return (f"name: \"{model_name}\"\n" 
+            + f"backend: \"{backend_name}\"\n"
+            + f"max_batch_size: {max_batch_size}\n"
+            + "input [\n"
+            + " {\n"
+            + "    name: \"input__0\"\n"
+            + "    data_type: TYPE_FP32\n"
+            + f"    dims: [ {n_features} ]\n"
+            + " }\n"
+            + "]\n"
+            + "output [\n"
+            + " {\n"
+            + "    name: \"output__0\"\n"
+            + "    data_type: TYPE_FP32\n"
+            + f"    dims: [ {n_out} ]\n"
+            + " }\n"
+            + "]\n"
+            + "instance_group [{ kind: KIND_GPU }]\n"
+            + "parameters [\n"
+            + "  {\n"
+            + "    key: \"model_type\"\n"
+            + "    value: { string_value: "
+            + f"\"{model_type}\""
+            + " }\n"
+            + "  },\n"
+            + "  {\n"
+            + "    key: \"predict_proba\"\n"
+            + "    value: { string_value: "
+            + f"\"{predict_proba}\""
+            + " }\n"
+            + "  },\n"
+            + "  {\n"
+            + "    key: \"output_class\"\n"
+            + "    value: { string_value: \"true\" }\n"
+            + "  },\n"
+            + "  {\n"
+            + "    key: \"threshold\"\n"
+            + "    value: { string_value: \"0.5\" }\n"
+            + "  },\n"
+            + "  {\n"
+            + "    key: \"algo\"\n"
+            + "    value: { string_value: \"ALGO_AUTO\" }\n"
+            + "  {\n"
+            + "    key: \"storage_type\"\n"
+            + "    value: { string_value: \"AUTO\" }\n"
+            + "  },\n"
+            + "  {\n"
+            + "    key: \"blocks_per_sm\"\n"
+            + "    value: { string_value: \"0\" }\n"
+            + "  }\n"
+            + "version_policy: { all { }}\n"
+            + "dynamic_batching { }")
+
+    
