@@ -54,6 +54,7 @@ import mlflow
 from mlflow.models.signature import infer_signature
 from mlflow.tracking import MlflowClient
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.model_selection import ParameterSampler
 from xgboost import XGBClassifier
 
 # %% tags=[]
@@ -464,18 +465,21 @@ def fit_model(params,
         
         run_id = params["run_id"]
         
-        if verbose: print("run_id = ", run_id)
+        if verbose: 
+            print("run_id = ", run_id)
         
         for param_name, value in params.items():
             mlflowclient.log_param(run_id, param_name, value)
             
-            if verbose: print(f"logged param: {param_name} = {value}")
+            if verbose: 
+                print(f"logged param: {param_name} = {value}")
             
     # remove parameters that are not used for XGBClassifier
     params_copy = params.copy()
     params_copy.pop("trial_num")
     params_copy.pop("parity")
-    if use_mlflow: params_copy.pop("run_id")
+    if use_mlflow: 
+        params_copy.pop("run_id")
     
     # initialize model with current trial paramters
     model = XGBClassifier(random_state=5, 
@@ -491,14 +495,15 @@ def fit_model(params,
         for metric, value in result.items():
             if not metric=="model":
                 mlflowclient.log_metric(run_id, metric, np.average(value))
-                if verbose: print(f"logged metric: {metric} = {np.average(value)}")
+                if verbose: 
+                    print(f"logged metric: {metric} = {np.average(value)}")
 
         # manually end run
         mlflowclient.set_terminated(run_id)
         
         if log_models:
             signature = infer_signature(features, result["model"].predict(features))
-            with mlflow.start_run(run_id=run_id, nested=True) as run:
+            with mlflow.start_run(run_id=run_id, nested=True):
                 mlflow.xgboost.log_model(result["model"], "model", signature=signature)
             result.pop("model")
                 
@@ -598,7 +603,7 @@ def save_register_models(res, USE_MLFLOW, MODEL_LOGGING, MODEL_REGISTERING, even
     
         # register best model in mlflow model repository
         if MODEL_REGISTERING:
-            result = mlflow.register_model(best_model_path, utils.config_training["ml"]["MODEL_NAME"])
+            mlflow.register_model(best_model_path, utils.config_training["ml"]["MODEL_NAME"])
             
     else:
         best_model = res[np.argmax(scores)]["full_result"]["model"]
