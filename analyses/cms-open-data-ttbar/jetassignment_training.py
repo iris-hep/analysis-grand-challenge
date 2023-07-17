@@ -42,23 +42,18 @@ from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 import datetime
 import hist
-import json
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import time
-import uproot
-import os
 
 import utils
 
 # ML-related imports
-from dask.distributed import Client
 import mlflow
 from mlflow.models.signature import infer_signature
 from mlflow.tracking import MlflowClient
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
-from sklearn.model_selection import ParameterSampler, train_test_split, KFold, cross_validate
 from xgboost import XGBClassifier
 
 # %% tags=[]
@@ -103,79 +98,65 @@ class JetClassifier(processor_base):
         super().__init__()
     
     def process(self, events):
-        
-        process = events.metadata["process"]  # "ttbar" etc.
-        variation = events.metadata["variation"]  # "nominal" etc.
-        
-        # normalization for MC
-        x_sec = events.metadata["xsec"]
-        nevts_total = events.metadata["nevts"]
-        lumi = 3378 # /pb
-        xsec_weight = x_sec * lumi / nevts_total
+                
+        # filter electrons, muons, and jets
+        selected_electrons = events.Electron[(events.Electron.pt > 30) & (np.abs(events.Electron.eta)<2.1) & 
+                                             (events.Electron.cutBased==4) & (events.Electron.sip3d < 4)]
+        selected_muons = events.Muon[(events.Muon.pt > 30) & (np.abs(events.Muon.eta)<2.1) & (events.Muon.tightId) & 
+                                     (events.Muon.sip3d < 4) & (events.Muon.pfRelIso04_all < 0.15)]
+        jet_filter = (events.Jet.pt > 30) & (np.abs(events.Jet.eta) < 2.4) & (events.Jet.isTightLeptonVeto)
+        selected_jets = events.Jet[jet_filter]
+        selected_genpart = events.GenPart
+        even = (events.event%2==0)
             
-        events["pt_nominal"] = 1.0
-        pt_variations = ["pt_nominal"] if variation == "nominal" else ["pt_nominal"]
-        for pt_var in pt_variations:
+        # single lepton requirement
+        event_filters = ((ak.count(selected_electrons.pt, axis=1) + ak.count(selected_muons.pt, axis=1)) == 1)
+        # require at least 4 jets
+        event_filters = event_filters & (ak.count(selected_jets.pt, axis=1) >= 4)
+        # require at least one jet above B_TAG_THRESHOLD
+        B_TAG_THRESHOLD = 0.5
+        event_filters = event_filters & (ak.sum(selected_jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) >= 1)
             
-            # filter electrons, muons, and jets
-            selected_electrons = events.Electron[(events.Electron.pt > 30) & (np.abs(events.Electron.eta)<2.1) & 
-                                                 (events.Electron.cutBased==4) & (events.Electron.sip3d < 4)]
-            selected_muons = events.Muon[(events.Muon.pt > 30) & (np.abs(events.Muon.eta)<2.1) & (events.Muon.tightId) & 
-                                         (events.Muon.sip3d < 4) & (events.Muon.pfRelIso04_all < 0.15)]
-            jet_filter = (events.Jet.pt > 30) & (np.abs(events.Jet.eta) < 2.4) & (events.Jet.isTightLeptonVeto)
-            selected_jets = events.Jet[jet_filter]
-            selected_genpart = events.GenPart
-            even = (events.event%2==0)
+        # apply event filters
+        selected_electrons = selected_electrons[event_filters]
+        selected_muons = selected_muons[event_filters]
+        selected_jets = selected_jets[event_filters]
+        selected_genpart = selected_genpart[event_filters]
+        even = even[event_filters]
             
-            # single lepton requirement
-            event_filters = ((ak.count(selected_electrons.pt, axis=1) + ak.count(selected_muons.pt, axis=1)) == 1)
-            # require at least 4 jets
-            event_filters = event_filters & (ak.count(selected_jets.pt, axis=1) >= 4)
-            # require at least one jet above B_TAG_THRESHOLD
-            B_TAG_THRESHOLD = 0.5
-            event_filters = event_filters & (ak.sum(selected_jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) >= 1)
+        ### only consider 4j2b (signal) region
+        region_filter = ak.sum(selected_jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2 # at least two b-tagged jets
+        selected_jets_region = selected_jets[region_filter][:,:4] # only keep top 4 jets
+        selected_electrons_region = selected_electrons[region_filter]
+        selected_muons_region = selected_muons[region_filter]
+        selected_genpart_region = selected_genpart[region_filter]
+        even = even[region_filter]
             
-            # apply event filters
-            selected_events = events[event_filters]
-            selected_electrons = selected_electrons[event_filters]
-            selected_muons = selected_muons[event_filters]
-            selected_jets = selected_jets[event_filters]
-            selected_genpart = selected_genpart[event_filters]
-            even = even[event_filters]
-            
-            ### only consider 4j2b (signal) region
-            region_filter = ak.sum(selected_jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2 # at least two b-tagged jets
-            selected_jets_region = selected_jets[region_filter][:,:4] # only keep top 4 jets
-            selected_electrons_region = selected_electrons[region_filter]
-            selected_muons_region = selected_muons[region_filter]
-            selected_genpart_region = selected_genpart[region_filter]
-            even = even[region_filter]
-            
-            # filter events and calculate labels
-            jets, electrons, muons, labels, even = utils.ml.training_filter(selected_jets_region, 
-                                                                            selected_electrons_region, 
-                                                                            selected_muons_region, 
-                                                                            selected_genpart_region,
-                                                                            even)
+        # filter events and calculate labels
+        jets, electrons, muons, labels, even = utils.ml.training_filter(selected_jets_region, 
+                                                                        selected_electrons_region, 
+                                                                        selected_muons_region, 
+                                                                        selected_genpart_region,
+                                                                        even)
             
             
-            # calculate mbjj
-            # reconstruct hadronic top as bjj system with largest pT
-            # the jet energy scale / resolution effect is not propagated to this observable at the moment
-            trijet = ak.combinations(jets, 3, fields=["j1", "j2", "j3"])  # trijet candidates
-            trijet_labels = ak.combinations(labels, 3, fields=["j1", "j2", "j3"])
-            trijet["p4"] = trijet.j1 + trijet.j2 + trijet.j3  # calculate four-momentum of tri-jet system
-            trijet["label"] = trijet_labels.j1 + trijet_labels.j2 + trijet_labels.j3
-            trijet["max_btag"] = np.maximum(trijet.j1.btagCSVV2, np.maximum(trijet.j2.btagCSVV2, trijet.j3.btagCSVV2))
-            trijet = trijet[trijet.max_btag > B_TAG_THRESHOLD]  # at least one-btag in trijet candidates
-            # pick trijet candidate with largest pT and calculate mass of system
-            trijet_mass = trijet["p4"][ak.argmax(trijet.p4.pt, axis=1, keepdims=True)].mass
-            trijet_label = trijet["label"][ak.argmax(trijet.p4.pt, axis=1, keepdims=True)]
-            observable = ak.flatten(trijet_mass)
-            trijet_label = ak.flatten(trijet_label)
+        # calculate mbjj
+        # reconstruct hadronic top as bjj system with largest pT
+        # the jet energy scale / resolution effect is not propagated to this observable at the moment
+        trijet = ak.combinations(jets, 3, fields=["j1", "j2", "j3"])  # trijet candidates
+        trijet_labels = ak.combinations(labels, 3, fields=["j1", "j2", "j3"])
+        trijet["p4"] = trijet.j1 + trijet.j2 + trijet.j3  # calculate four-momentum of tri-jet system
+        trijet["label"] = trijet_labels.j1 + trijet_labels.j2 + trijet_labels.j3
+        trijet["max_btag"] = np.maximum(trijet.j1.btagCSVV2, np.maximum(trijet.j2.btagCSVV2, trijet.j3.btagCSVV2))
+        trijet = trijet[trijet.max_btag > B_TAG_THRESHOLD]  # at least one-btag in trijet candidates
+        # pick trijet candidate with largest pT and calculate mass of system
+        trijet_mass = trijet["p4"][ak.argmax(trijet.p4.pt, axis=1, keepdims=True)].mass
+        trijet_label = trijet["label"][ak.argmax(trijet.p4.pt, axis=1, keepdims=True)]
+        observable = ak.flatten(trijet_mass)
+        trijet_label = ak.flatten(trijet_label)
             
-            # calculate features and labels
-            features, labels, which_combination = utils.ml.get_training_set(jets, electrons, muons, labels)
+        # calculate features and labels
+        features, labels, which_combination = utils.ml.get_training_set(jets, electrons, muons, labels)
     
             
         output = {"nevents": {events.metadata["dataset"]: len(events)},
