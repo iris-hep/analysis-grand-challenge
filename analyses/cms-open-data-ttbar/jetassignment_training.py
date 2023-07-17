@@ -648,7 +648,7 @@ print(config_txt)
 # !mkdir reconstruction_bdt_xgb
 
 # %% tags=[]
-with open(f'reconstruction_bdt_xgb/config.pbtxt', 'w') as the_file:
+with open('reconstruction_bdt_xgb/config.pbtxt', 'w') as the_file:
     the_file.write(config_txt)
 
 # %% tags=[]
