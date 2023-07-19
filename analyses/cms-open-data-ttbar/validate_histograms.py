@@ -93,7 +93,6 @@ def validate(histos: dict, reference: dict, verbose=False) -> dict[str, list[str
                         print()
             if is_error:
                 errors[name].append(f"Contents do not match:\n\tgot      {h['contents']}\n\texpected {ref_h['contents']}")
-            print()
 
     return errors
 
