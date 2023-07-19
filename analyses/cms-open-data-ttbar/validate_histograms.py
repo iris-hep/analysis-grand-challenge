@@ -36,7 +36,9 @@ def validate(histos: dict, reference: dict, verbose=False) -> dict[str, list[str
     errors = defaultdict(list)
     for name, ref_h in reference.items():
         if name not in histos:
-            errors[name].append("Histogram not found.")
+            # not an error if pseudodata histograms are missing
+            if name != "4j1b_pseudodata" and name != "4j2b_pseudodata":
+                errors[name].append("Histogram not found.")
             continue
 
         h = histos[name]
