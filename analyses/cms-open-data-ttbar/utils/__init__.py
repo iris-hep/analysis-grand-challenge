@@ -93,8 +93,6 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name=""):
 def save_histograms(all_histograms, fileset, filename):
     nominal_samples = [sample for sample in fileset.keys() if "nominal" in sample]
 
-    all_histograms += 1e-6  # add minimal event count to all bins to avoid crashes when processing a small number of samples
-
     pseudo_data = (all_histograms[:, :, "ttbar", "ME_var"] + all_histograms[:, :, "ttbar", "PS_var"]) / 2  + all_histograms[:, :, "wjets", "nominal"]
 
     with uproot.recreate(filename) as f:
