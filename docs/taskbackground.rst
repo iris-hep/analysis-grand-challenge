@@ -269,7 +269,7 @@ This is visualized in the diagram below:
   :width: 80%
   :alt: Diagram of a :math:`t\bar{t}` event with the three machine learning labels for jets.
   
-In each event, we consider each permutation of jets assigned to these labels, restricting to the leading :math:`N` jets. 
+In each event, we consider each permutation of jets assigned to these labels, restricting to the leading (in :math:`p_T`) :math:`N` jets. 
 The number of such permutations (assuming the event has at least :math:`N` jets and that :math:`N\geq 4`) is :math:`N!/(2\cdot (N-4)!)`. 
 For example, if there are 4 jets in an event, we consider :math:`4!/2=12` permutations. 
 The :math:`4!` comes from labelling 4 jets, while dividing by 2 accounts for the fact that two of the jets are labelled indistinguishably. 
