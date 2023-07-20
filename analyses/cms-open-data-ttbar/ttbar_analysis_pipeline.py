@@ -212,7 +212,7 @@ class TtbarAnalysis(processor.ProcessorABC):
             event_filters = event_filters & (ak.count(selected_jets.pt * pt_var_modifier, axis=1) >= 4)
             # at least one b-tagged jet ("tag" means score above threshold)
             B_TAG_THRESHOLD = 0.5
-            event_filters = event_filters & (ak.sum(selected_jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) >= 1)
+            event_filters = event_filters & (ak.sum(selected_jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 1)
 
             # apply event filters
             selected_events = events[event_filters]
@@ -223,7 +223,7 @@ class TtbarAnalysis(processor.ProcessorABC):
             for region in ["4j1b", "4j2b"]:
                 # further filtering: 4j1b CR with single b-tag, 4j2b SR with two or more tags
                 if region == "4j1b":
-                    region_filter = ak.sum(selected_jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) == 1
+                    region_filter = ak.sum(selected_jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) == 1
                     selected_jets_region = selected_jets[region_filter]
                     # use HT (scalar sum of jet pT) as observable
                     pt_var_modifier = (
@@ -333,12 +333,12 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 def get_query(source: ObjectStream) -> ObjectStream:
     """Query for event / column selection: >=4j >=1b, ==1 lep with pT>25 GeV, return relevant columns
     """
-    return source.Where(lambda e: e.Electron_pt.Where(lambda pt: pt > 25).Count() 
+    return source.Where(lambda e: e.Electron_pt.Where(lambda pt: pt > 25).Count()
                         + e.Muon_pt.Where(lambda pt: pt > 25).Count() == 1)\
                  .Where(lambda f: f.Jet_pt.Where(lambda pt: pt > 25).Count() >= 4)\
-                 .Where(lambda g: {"pt": g.Jet_pt, 
-                                   "btagCSVV2": g.Jet_btagCSVV2}.Zip().Where(lambda jet: 
-                                                                             jet.btagCSVV2 >= 0.5 
+                 .Where(lambda g: {"pt": g.Jet_pt,
+                                   "btagCSVV2": g.Jet_btagCSVV2}.Zip().Where(lambda jet:
+                                                                             jet.btagCSVV2 > 0.5
                                                                              and jet.pt > 25).Count() >= 1)\
                  .Select(lambda h: {"Electron_pt": h.Electron_pt,
                                     "Muon_pt": h.Muon_pt,
