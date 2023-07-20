@@ -212,7 +212,7 @@ This is modified to better reflect common practices in CMS in subsequent version
 * For electrons, we also require ``cutBased==4`` (tight)
 * For muons, we also require ``tightId`` and ``pfRelIso04_all<0.15`` (PF relative isolation dR=0.4, total (deltaBeta corrections))
 * Events must contain exactly one lepton
-* Jets must have :math:`p_T>30` GeV and :math:`|\eta|>2.4` as well as satisfy ``isTightLeptonVeto``
+* Jets must have :math:`p_T>30` GeV and :math:`|\eta|<2.4` and satisfy a tight lepton veto (``isTightLeptonVeto``, or ``jetId==6``)
 * Events must have at least four jets
 * Jets are considered :math:`b`-tagged if they have a :math:`b`-tag score over `B_TAG_THRESHOLD=0.5`.
 * Events must have at least one :math:`b`-tagged jet
