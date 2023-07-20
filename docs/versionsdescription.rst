@@ -68,6 +68,11 @@ Our reference implementation for each major task (0, 1, 2) will always be the la
      - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
      - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations corrected)
      - Functions used in ``coffea`` processor are defined in the notebook
+   * - 1.2.0
+     - 1
+     - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
+     - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (b-tagging cuts corrected, no 1e-6 offsetting of histogram yields)
+     - Functions used in ``coffea`` processor are defined in the notebook
    * - 2.0.0 (WIP)
      - 2
      - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing; optional machine learning component (with additional option to use ``NVIDIA Triton`` inference server)
