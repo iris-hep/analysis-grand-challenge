@@ -68,6 +68,11 @@ Our reference implementation for each major task (0, 1, 2) will always be the la
      - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
      - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (jet :math:`p_T` variations corrected)
      - Functions used in ``coffea`` processor are defined in the notebook
+   * - 1.2.0
+     - 1
+     - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing
+     - Systematic variations within ``coffea`` processor are manually calculated using ``awkward`` array logic (b-tagging cuts corrected, no 1e-6 offsetting of histogram yields)
+     - Functions used in ``coffea`` processor are defined in the notebook
    * - 2.0.0 (WIP)
      - 2
      - Pure ``coffea``; create cached files using ``ServiceX`` queries followed by standalone ``coffea`` processing; optional machine learning component (with additional option to use ``NVIDIA Triton`` inference server)
@@ -212,7 +217,7 @@ This is modified to better reflect common practices in CMS in subsequent version
 * For electrons, we also require ``cutBased==4`` (tight)
 * For muons, we also require ``tightId`` and ``pfRelIso04_all<0.15`` (PF relative isolation dR=0.4, total (deltaBeta corrections))
 * Events must contain exactly one lepton
-* Jets must have :math:`p_T>30` GeV and :math:`|\eta|>2.4` as well as satisfy ``isTightLeptonVeto``
+* Jets must have :math:`p_T>30` GeV and :math:`|\eta|<2.4` and satisfy a tight lepton veto (``isTightLeptonVeto``, or ``jetId==6``)
 * Events must have at least four jets
 * Jets are considered :math:`b`-tagged if they have a :math:`b`-tag score over `B_TAG_THRESHOLD=0.5`.
 * Events must have at least one :math:`b`-tagged jet

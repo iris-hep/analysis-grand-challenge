@@ -70,7 +70,7 @@ The tree of the above event looks something like
 To ensure that we retain the highest possible purity of :math:`t\bar{t}` events in the signal region, we make the following cuts:
 
 * Events must contain exactly one lepton, which must have :math:`p_T>30` GeV, :math:`|\eta|<2.1`, and ``sip3d<4`` (significance of 3d impact parameter)
-* Jets must have :math:`p_T>30` GeV and :math:`|\eta|>2.4` as well as satisfy ``isTightLeptonVeto``
+* Jets must have :math:`p_T>30` GeV and :math:`|\eta|<2.4` and satisfy a tight lepton veto (``isTightLeptonVeto``, or ``jetId==6``)
 * Events must have at least four jets
 * Events must have exactly one :math:`b`-tagged jet
 
@@ -269,7 +269,7 @@ This is visualized in the diagram below:
   :width: 80%
   :alt: Diagram of a :math:`t\bar{t}` event with the three machine learning labels for jets.
   
-In each event, we consider each permutation of jets assigned to these labels, restricting to the leading :math:`N` jets. 
+In each event, we consider each permutation of jets assigned to these labels, restricting to the leading (in :math:`p_T`) :math:`N` jets. 
 The number of such permutations (assuming the event has at least :math:`N` jets and that :math:`N\geq 4`) is :math:`N!/(2\cdot (N-4)!)`. 
 For example, if there are 4 jets in an event, we consider :math:`4!/2=12` permutations. 
 The :math:`4!` comes from labelling 4 jets, while dividing by 2 accounts for the fact that two of the jets are labelled indistinguishably. 
