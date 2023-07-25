@@ -74,15 +74,15 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 #
 # | setting | number of files | total size | number of events |
 # | --- | --- | --- | --- |
-# | `1` | 9 | 22.9 GB | 10455719 |
-# | `2` | 18 | 42.8 GB | 19497435 |
-# | `5` | 43 | 105 GB | 47996231 |
-# | `10` | 79 | 200 GB | 90546458 |
-# | `20` | 140 | 359 GB | 163123242 |
-# | `50` | 255 | 631 GB | 297247463 |
-# | `100` | 395 | 960 GB | 470397795 |
-# | `200` | 595 | 1.40 TB | 705273291 |
-# | `-1` | 787 | 1.78 TB | 940160174 |
+# | `1` | 9 | 22.9 GB | 10,455,719 |
+# | `2` | 18 | 42.8 GB | 19,497,435 |
+# | `5` | 43 | 105 GB | 47,996,231 |
+# | `10` | 79 | 200 GB | 90,546,458 |
+# | `20` | 140 | 359 GB | 163,123,242 |
+# | `50` | 255 | 631 GB | 297,247,463 |
+# | `100` | 395 | 960 GB | 470,397,795 |
+# | `200` | 595 | 1.40 TB | 705,273,291 |
+# | `-1` | 787 | 1.78 TB | 940,160,174 |
 #
 # The input files are all in the 1–3 GB range.
 
@@ -251,7 +251,7 @@ class TtbarAnalysis(processor.ProcessorABC):
             # Basic selection criteria
             selections.add("exactly_1l", (ak.num(elecs) + ak.num(muons)) == 1)
             selections.add("atleast_4j", ak.num(jets) >= 4)
-            selections.add("exactly_1b", ak.sum(jets.btagCSVV2 >= B_TAG_THRESHOLD, axis=1) == 1)
+            selections.add("exactly_1b", ak.sum(jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) == 1)
             selections.add("atleast_2b", ak.sum(jets.btagCSVV2 > B_TAG_THRESHOLD, axis=1) >= 2)
             # Complex selection criteria
             selections.add("4j1b", selections.all("exactly_1l", "atleast_4j", "exactly_1b"))
@@ -387,40 +387,40 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 
 # %% tags=[]
 def get_query(source: ObjectStream) -> ObjectStream:
-    """Query for event / column selection: >=4j >=1b, ==1 lep with pT>30 GeV + additional cuts, 
+    """Query for event / column selection: >=4j >=1b, ==1 lep with pT>30 GeV + additional cuts,
     return relevant columns
     *NOTE* jet pT cut is set lower to account for systematic variations to jet pT
     """
-    cuts = source.Where(lambda e: {"pt": e.Electron_pt, 
-                               "eta": e.Electron_eta, 
-                               "cutBased": e.Electron_cutBased, 
+    cuts = source.Where(lambda e: {"pt": e.Electron_pt,
+                               "eta": e.Electron_eta,
+                               "cutBased": e.Electron_cutBased,
                                "sip3d": e.Electron_sip3d,}.Zip()\
                         .Where(lambda electron: (electron.pt > 30
-                                                 and abs(electron.eta) < 2.1 
+                                                 and abs(electron.eta) < 2.1
                                                  and electron.cutBased == 4
-                                                 and electron.sip3d < 4)).Count() 
-                        + {"pt": e.Muon_pt, 
+                                                 and electron.sip3d < 4)).Count()
+                        + {"pt": e.Muon_pt,
                            "eta": e.Muon_eta,
                            "tightId": e.Muon_tightId,
                            "sip3d": e.Muon_sip3d,
                            "pfRelIso04_all": e.Muon_pfRelIso04_all}.Zip()\
-                        .Where(lambda muon: (muon.pt > 30 
-                                             and abs(muon.eta) < 2.1 
-                                             and muon.tightId 
+                        .Where(lambda muon: (muon.pt > 30
+                                             and abs(muon.eta) < 2.1
+                                             and muon.tightId
                                              and muon.pfRelIso04_all < 0.15)).Count()== 1)\
-                        .Where(lambda f: {"pt": f.Jet_pt, 
+                        .Where(lambda f: {"pt": f.Jet_pt,
                                           "eta": f.Jet_eta,
                                           "jetId": f.Jet_jetId}.Zip()\
-                               .Where(lambda jet: (jet.pt > 25 
-                                                   and abs(jet.eta) < 2.4 
+                               .Where(lambda jet: (jet.pt > 25
+                                                   and abs(jet.eta) < 2.4
                                                    and jet.jetId == 6)).Count() >= 4)\
-                        .Where(lambda g: {"pt": g.Jet_pt, 
+                        .Where(lambda g: {"pt": g.Jet_pt,
                                           "eta": g.Jet_eta,
                                           "btagCSVV2": g.Jet_btagCSVV2,
                                           "jetId": g.Jet_jetId}.Zip()\
-                        .Where(lambda jet: (jet.btagCSVV2 >= 0.5 
+                        .Where(lambda jet: (jet.btagCSVV2 > 0.5
                                             and jet.pt > 25
-                                            and abs(jet.eta) < 2.4) 
+                                            and abs(jet.eta) < 2.4)
                                             and jet.jetId == 6).Count() >= 1)
     selection = cuts.Select(lambda h: {"Electron_pt": h.Electron_pt,
                                        "Electron_eta": h.Electron_eta,
@@ -446,7 +446,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
                                       })
     if USE_INFERENCE:
         return selection
-    
+
     # some branches are only needed if USE_INFERENCE is turned on
     return selection.Select(lambda h: {"Electron_pt": h.Electron_pt,
                                        "Electron_eta": h.Electron_eta,
