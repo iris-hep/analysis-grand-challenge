@@ -50,6 +50,7 @@ Besides the implementation in this repository, have a look at
 
 - a ROOT RDataFrame-based implementation: [root-project/analysis-grand-challenge](https://github.com/root-project/analysis-grand-challenge),
 - a pure Julia implementation: [Moelf/LHC_AGC.jl](https://github.com/Moelf/LHC_AGC.jl).
+- a columnflow implementation: [columnflow/agc_cms_ttbar](https://github.com/columnflow/agc_cms_ttbar).
 
 Please get in touch if you have investigated other approaches you would like to share!
 There is no need to implement the full analysis task — it splits into pieces (for example the production of histograms) that can also be tackled individually.
