@@ -84,7 +84,6 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", inpu
                 # point to local files on /data
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/", "/data/alheld/") for f in file_paths]
             elif input_from_eos:
-                print("using input files from eospublic.cern.ch")
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD", "root://eospublic.cern.ch//eos/opendata/cms/upload/agc/1.0.0/") for f in file_paths]
             nevts_total = sum([f["nevts"] for f in file_list])
             metadata = {"process": process, "variation": variation, "nevts": nevts_total, "xsec": xsec_info[process]}
