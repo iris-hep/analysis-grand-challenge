@@ -12,6 +12,8 @@ benchmarking:
   CHUNKSIZE: 500000
 
   # read files from public EOS (thanks to the CMS DPOA team!)
+  # note that they are likely only available temporarily
+  # and not part of an official CMS Open Data release
   INPUT_FROM_EOS: false
 
   # metadata to propagate through to metrics
