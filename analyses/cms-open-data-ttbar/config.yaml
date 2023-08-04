@@ -12,7 +12,7 @@ benchmarking:
   CHUNKSIZE: 500000
 
   # read files from public EOS (thanks to the CMS DPOA team!)
-  INPUT_FROM_EOS: true
+  INPUT_FROM_EOS: false
 
   # metadata to propagate through to metrics
   # "ssl-dev" allows for the switch to local data on /data

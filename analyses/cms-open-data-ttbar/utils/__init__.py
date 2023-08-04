@@ -52,7 +52,6 @@ def set_style():
 def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", input_from_eos=False):
     # using https://atlas-groupdata.web.cern.ch/atlas-groupdata/dev/AnalysisTop/TopDataPreparation/XSection-MC15-13TeV.data
     # for reference
-    file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD", "root://eospublic.cern.ch//eos/opendata/cms/upload/agc/1.0.0/") for f in file_paths]
     # x-secs are in pb
     xsec_info = {
         "ttbar": 396.87 + 332.97, # nonallhad + allhad, keep same x-sec for all
