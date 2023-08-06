@@ -10,11 +10,15 @@ config = {
         "BIN_LOW": 50,
         # upper end of standard histograms in processor
         "BIN_HIGH": 550,
-        
+
     },
     "benchmarking": {
         # chunk size to use
         "CHUNKSIZE": 200000,
+        # read files from public EOS (thanks to the CMS DPOA team!)
+        # note that they are likely only available temporarily
+        # and not part of an official CMS Open Data release
+        "INPUT_FROM_EOS": False,
         ### metadata to propagate through to metrics ###
         # "ssl-dev" allows for the switch to local data on /data
         "AF_NAME": "coffea_casa",

@@ -8,12 +8,21 @@ import urllib
 
 # If local_data_cache is a writable path, this function will download any missing file into it and
 # then return file paths corresponding to these local copies.
-def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", local_data_cache=None):
+def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", local_data_cache=None, input_from_eos=False):
     if af_name == "ssl-dev":
         if use_xcache:
             raise RuntimeError("`use_xcache` and `af_name='ssl-dev'` are incompatible. Please only use one of them.")
         if local_data_cache is not None:
             raise RuntimeError("`af_name='ssl-dev'` and `local_data_cache` are incompatible. Please only use one of them.")
+        if input_from_eos:
+            raise RuntimeError("`af_name='ssl-dev'` and `input_from_eos` are incompatible. Please only use one of them.")
+
+    if input_from_eos:
+        if local_data_cache:
+            # download relies on https, EOS files use xrootd
+            raise RuntimeError("`input_from_eos` and `local_data_cache` are incompatible. Please only use one of them.")
+        if use_xcache:
+            raise RuntimeError("`input_from_eos` and `use_xcache` are incompatible. Please only use one of them.")
 
     if local_data_cache is not None:
         local_data_cache = Path(local_data_cache)
@@ -53,6 +62,9 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", loca
             elif af_name == "ssl-dev":
                 # point to local files on /data
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/", "/data/alheld/") for f in file_paths]
+            elif input_from_eos:
+                file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD",
+                                        "root://eospublic.cern.ch//eos/opendata/cms/upload/agc/1.0.0/") for f in file_paths]
             if local_data_cache is not None:
                 local_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/", f"{local_data_cache.absolute()}/") for f in file_paths]
                 for remote, local in zip(file_paths, local_paths):
@@ -92,7 +104,7 @@ def tqdm_urlretrieve_hook(t):
 def download_file(url, out_file):
     out_path = Path(out_file)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    with tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=out_path.name) as t:
+    with tqdm.tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=out_path.name) as t:
         urllib.request.urlretrieve(url, out_path.absolute(), reporthook=tqdm_urlretrieve_hook(t))
 
 class ServiceXDatasetGroup():
