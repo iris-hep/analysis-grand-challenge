@@ -104,7 +104,7 @@ def tqdm_urlretrieve_hook(t):
 def download_file(url, out_file):
     out_path = Path(out_file)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    with tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=out_path.name) as t:
+    with tqdm.tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=out_path.name) as t:
         urllib.request.urlretrieve(url, out_path.absolute(), reporthook=tqdm_urlretrieve_hook(t))
 
 class ServiceXDatasetGroup():
