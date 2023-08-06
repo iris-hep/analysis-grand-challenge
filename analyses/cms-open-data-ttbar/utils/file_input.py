@@ -17,9 +17,12 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", loca
         if input_from_eos:
             raise RuntimeError("`af_name='ssl-dev'` and `input_from_eos` are incompatible. Please only use one of them.")
 
-    if local_data_cache and input_from_eos:
-        # download relies on https, EOS files use xrootd
-        raise RuntimeError("`local_data_cache` and `input_from_eos` are incompatible. Please only use one of them.")
+    if input_from_eos:
+        if local_data_cache:
+            # download relies on https, EOS files use xrootd
+            raise RuntimeError("`input_from_eos` and `local_data_cache` are incompatible. Please only use one of them.")
+        if use_xcache:
+            raise RuntimeError("`input_from_eos` and `use_xcache` are incompatible. Please only use one of them.")
 
     if local_data_cache is not None:
         local_data_cache = Path(local_data_cache)
