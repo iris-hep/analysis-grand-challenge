@@ -88,8 +88,8 @@ IGNORE_CACHE = False
 # %% [markdown]
 # ### Required setup for this notebook
 #
-# If you are running on coffea-casa, you should be good to go: ServiceX credentials are automatically available to you.
-# If not, you will need to set those up.
+# If you are running on coffea-casa with CMS account ServiceX credentials are automatically available to you.
+# Otherwise you will need to set those up.
 # Create a file `servicex.yaml` in your home directory, or the place this notebook is located in.
 #
 # See this [talk by KyungEon](https://indico.cern.ch/event/1076231/contributions/4560404/) for more information.
