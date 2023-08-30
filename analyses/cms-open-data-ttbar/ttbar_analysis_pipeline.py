@@ -320,9 +320,10 @@ class TtbarAnalysis(processor.ProcessorABC):
 fileset = utils.construct_fileset(
                                     N_FILES_MAX_PER_SAMPLE,
                                     use_xcache=False,
-                                    af_name=config["benchmarking"]["AF_NAME"],
-                                    input_from_eos=config["benchmarking"]["INPUT_FROM_EOS"]
-                                 )  # local files on /data for ssl-dev as af_name
+                                    af_name=config["benchmarking"]["AF_NAME"],  # local files on /data for ssl-dev as af_name
+                                    input_from_eos=config["benchmarking"]["INPUT_FROM_EOS"],
+                                    xcache_atlas_prefix=None,  # e.g. "root://xcache.af.uchicago.edu//" for UChicago
+                                 )
 
 print(f"processes in fileset: {list(fileset.keys())}")
 print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files'][0]}, ...],")
