@@ -16,6 +16,10 @@ benchmarking:
   # and not part of an official CMS Open Data release
   INPUT_FROM_EOS: false
 
+  # prefix for URIs for ATLAS-style xcache use
+  # e.g. root://xcache.af.uchicago.edu// for UChicago
+  XCACHE_ATLAS_PREFIX: null
+
   # metadata to propagate through to metrics
   # "ssl-dev" allows for the switch to local data on /data
   AF_NAME: coffea_casa

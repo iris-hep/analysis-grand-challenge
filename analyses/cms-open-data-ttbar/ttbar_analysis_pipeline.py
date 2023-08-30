@@ -321,7 +321,8 @@ fileset = utils.construct_fileset(
                                     N_FILES_MAX_PER_SAMPLE,
                                     use_xcache=False,
                                     af_name=config["benchmarking"]["AF_NAME"],
-                                    input_from_eos=config["benchmarking"]["INPUT_FROM_EOS"]
+                                    input_from_eos=config["benchmarking"]["INPUT_FROM_EOS"],
+                                    xcache_atlas_prefix=config["benchmarking"]["XCACHE_ATLAS_PREFIX"]
                                  )  # local files on /data for ssl-dev as af_name
 
 print(f"processes in fileset: {list(fileset.keys())}")
