@@ -374,7 +374,7 @@ fileset = utils.file_input.construct_fileset(
     use_xcache=False,
     af_name=utils.config["benchmarking"]["AF_NAME"],  # local files on /data for af_name="ssl-dev"
     input_from_eos=utils.config["benchmarking"]["INPUT_FROM_EOS"],
-    xcache_prefix="",  # e.g. "root://xcache.af.uchicago.edu//" for UChicago
+    xcache_prefix=None,  # e.g. "root://xcache.af.uchicago.edu//" for UChicago
 )
 
 print(f"processes in fileset: {list(fileset.keys())}")
