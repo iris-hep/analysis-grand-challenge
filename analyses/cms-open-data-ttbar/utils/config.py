@@ -19,6 +19,9 @@ config = {
         # note that they are likely only available temporarily
         # and not part of an official CMS Open Data release
         "INPUT_FROM_EOS": False,
+        # prefix for URIs for ATLAS-style xcache use
+        # e.g. "root://xcache.af.uchicago.edu//" for UChicago
+        "XCACHE_ATLAS_PREFIX": None,
         ### metadata to propagate through to metrics ###
         # "ssl-dev" allows for the switch to local data on /data
         "AF_NAME": "coffea_casa",
