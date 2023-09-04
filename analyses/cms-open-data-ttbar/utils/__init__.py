@@ -17,13 +17,13 @@ def get_client(af="coffea_casa"):
         client = Client("tls://localhost:8786")
 
     elif af == "EAF":
-        from lpcdaskgateway import LPCGateway
+        from htcdaskgateway import HTCGateway
 
-        gateway = LPCGateway()
+        gateway = HTCGateway()
         cluster = gateway.new_cluster()
         cluster.scale(10)
         print("Please allow up to 60 seconds for HTCondor worker jobs to start")
-        print(f"Cluster dashboard: {str(cluster.dashboard_link)}")
+        print(f"Cluster dashboard: https://dask-gateway.fnal.gov/clusters/{str(cluster.name)}/status")
 
         client = cluster.get_client()
 
