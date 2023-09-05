@@ -231,9 +231,9 @@ Using the up/nominal/down measurements, an interpolation can be made (for each b
  
 The above example was obtained from `CERN-OPEN-2012-016 <https://cds.cern.ch/record/1456844>`_.
 
-In order to perform a fit with this model, we construct some pseudodata from our Monte Carlo samples. In a real analysis, real data would be used in place of pseudodata, but this substitution has no effect on our purpose, which is demonstrating the technical workflow of a physics analysis. The formula we use for the pseudodata construction uses the Matrix Element (ME) and Parton Shower (PS) variations of :math:`t\bar{t}` and the W + jets sample::
+In order to perform a fit with this model, we construct some pseudodata from our Monte Carlo samples. In a real analysis, real data would be used in place of pseudodata, but this substitution has no effect on our purpose, which is demonstrating the technical workflow of a physics analysis. The formula we use for the pseudodata construction uses the Matrix Element (ME) and Parton Shower (PS) variations of :math:`t\bar{t}` as well as the W + jets and t-channel single top samples::
 
-    pseudo_data = (all_histograms[:, :, "ttbar", "ME_var"] + all_histograms[:, :, "ttbar", "PS_var"]) / 2  + all_histograms[:, :, "wjets", "nominal"]
+    pseudo_data = (all_histograms[:, :, "ttbar", "ME_var"] + all_histograms[:, :, "ttbar", "PS_var"]) / 2  + all_histograms[:, :, "wjets", "nominal"] + all_histograms[:, :, "single_top_t_chan", "nominal"]
 
 Using our pseudodata, we run a maximum likelihood fit over all parameters to find the best-fit parameter values. The fit balances a trade-off between altering the model values to agree with the data and keeping the nuisance parameters as close to the nominal values as possible.
 
