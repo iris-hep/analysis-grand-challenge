@@ -4,10 +4,6 @@ import hist
 def save_histograms(hist_dict, fileset, filename, channel_names):
     nominal_samples = [sample for sample in fileset.keys() if "nominal" in sample]
 
-    # add minimal event count to all bins to avoid crashes when processing a small number of samples
-    for channel in channel_names:
-        hist_dict[channel] += 1e-6
-
     with uproot.recreate(filename) as f:
         out_dict = {}
         for channel in channel_names:
