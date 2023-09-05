@@ -644,10 +644,10 @@ if USE_INFERENCE:
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
 # %% tags=[]
-config = cabinetry.configuration.load("cabinetry_config.yml")
-cabinetry.templates.collect(config)
-cabinetry.templates.postprocess(config)  # optional post-processing (e.g. smoothing)
-ws = cabinetry.workspace.build(config)
+cabinetry_config = cabinetry.configuration.load("cabinetry_config.yml")
+cabinetry.templates.collect(cabinetry_config)
+cabinetry.templates.postprocess(cabinetry_config)  # optional post-processing (e.g. smoothing)
+ws = cabinetry.workspace.build(cabinetry_config)
 cabinetry.workspace.save(ws, "workspace.json")
 
 # %% [markdown]
@@ -681,9 +681,9 @@ print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {f
 # %%
 model_prediction = cabinetry.model_utils.prediction(model)
 model_prediction_postfit = cabinetry.model_utils.prediction(model, fit_results=fit_results)
-figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=config)
+figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=cabinetry_config)
 # below method reimplements this visualization in a grid view
-utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data, config)
+utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data, cabinetry_config)
 
 # %% [markdown]
 # ### ML Validation
