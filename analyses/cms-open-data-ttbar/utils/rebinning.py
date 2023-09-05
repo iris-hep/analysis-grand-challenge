@@ -1,5 +1,6 @@
 import cabinetry
 from cabinetry.contrib import histogram_reader
+import hist
 
 
 def get_cabinetry_rebinning_router(config, rebinning):

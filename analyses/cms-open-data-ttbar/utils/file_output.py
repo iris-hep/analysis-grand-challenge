@@ -1,5 +1,5 @@
 import uproot
-import hist
+
 
 def save_histograms(hist_dict, fileset, filename, channel_names):
     nominal_samples = [sample for sample in fileset.keys() if "nominal" in sample]
