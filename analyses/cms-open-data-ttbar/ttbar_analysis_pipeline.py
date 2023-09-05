@@ -517,13 +517,13 @@ utils.save_histograms(all_histograms, fileset, "histograms.root")
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
 # %%
-config = cabinetry.configuration.load("cabinetry_config.yml")
+cabinetry_config = cabinetry.configuration.load("cabinetry_config.yml")
 
 # rebinning: lower edge 110 GeV, merge bins 2->1
-rebinning_router = utils.get_cabinetry_rebinning_router(config, rebinning=slice(110j, None, hist.rebin(2)))
-cabinetry.templates.build(config, router=rebinning_router)
-cabinetry.templates.postprocess(config)  # optional post-processing (e.g. smoothing)
-ws = cabinetry.workspace.build(config)
+rebinning_router = utils.get_cabinetry_rebinning_router(cabinetry_config, rebinning=slice(110j, None, hist.rebin(2)))
+cabinetry.templates.build(cabinetry_config, router=rebinning_router)
+cabinetry.templates.postprocess(cabinetry_config)  # optional post-processing (e.g. smoothing)
+ws = cabinetry.workspace.build(cabinetry_config)
 cabinetry.workspace.save(ws, "workspace.json")
 
 # %% [markdown]
@@ -556,7 +556,7 @@ print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {f
 
 # %%
 model_prediction = cabinetry.model_utils.prediction(model)
-figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=config)
+figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=cabinetry_config)
 figs[0]["figure"]
 
 # %%
@@ -567,7 +567,7 @@ figs[1]["figure"]
 
 # %%
 model_prediction_postfit = cabinetry.model_utils.prediction(model, fit_results=fit_results)
-figs = cabinetry.visualize.data_mc(model_prediction_postfit, data, close_figure=True, config=config)
+figs = cabinetry.visualize.data_mc(model_prediction_postfit, data, close_figure=True, config=cabinetry_config)
 figs[0]["figure"]
 
 # %%
