@@ -123,7 +123,7 @@ Samples:
     SamplePath: "single_top_s_chan"
 
   - Name: "single top, t-channel"
-    SamplePath: "single_top_s_chan"
+    SamplePath: "single_top_t_chan"
 
   - Name: "tW"
     SamplePath: "single_top_tW"
