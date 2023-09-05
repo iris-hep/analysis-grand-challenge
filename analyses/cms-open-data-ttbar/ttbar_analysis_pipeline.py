@@ -520,7 +520,7 @@ utils.save_histograms(all_histograms, fileset, "histograms.root")
 cabinetry_config = cabinetry.configuration.load("cabinetry_config.yml")
 
 # rebinning: lower edge 110 GeV, merge bins 2->1
-rebinning_router = utils.get_cabinetry_rebinning_router(config, rebinning=slice(110j, None, hist.rebin(2)))
+rebinning_router = utils.get_cabinetry_rebinning_router(cabinetry_config, rebinning=slice(110j, None, hist.rebin(2)))
 cabinetry.templates.build(cabinetry_config, router=rebinning_router)
 cabinetry.templates.postprocess(cabinetry_config)  # optional post-processing (e.g. smoothing)
 ws = cabinetry.workspace.build(cabinetry_config)
