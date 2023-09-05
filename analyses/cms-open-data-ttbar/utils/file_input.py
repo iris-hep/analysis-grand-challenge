@@ -136,7 +136,7 @@ class ServiceXDatasetGroup():
             # (replacing / with : to mitigate servicex filename convention )
             parent_key = np.array([np.where(parent_file_urls==self.filelist[i][0].replace("/",":"))[0][0]
                                    for i in range(len(self.filelist))])
-        except:
+        except IndexError:
             # fallback solution that relies splitting via the port (name only changes before that)
             # probably not very stable and general! this may fail - please report back if you observe that happening
             # TODO: find something more stable
