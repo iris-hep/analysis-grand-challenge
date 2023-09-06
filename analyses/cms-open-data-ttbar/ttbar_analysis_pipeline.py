@@ -635,7 +635,7 @@ if USE_INFERENCE:
                                       fileset,
                                       "histograms_ml.root",
                                       utils.config["ml"]["FEATURE_NAMES"],
-                                      rebinning=True)
+                                      add_offset=True)
 
 # %% [markdown]
 # ### Statistical inference
