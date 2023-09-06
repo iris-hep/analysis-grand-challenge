@@ -5,4 +5,5 @@ from . import file_output as file_output
 from . import metrics as metrics
 from . import ml as ml
 from . import plotting as plotting
+from . import rebinning as rebinning
 from . import systematics as systematics

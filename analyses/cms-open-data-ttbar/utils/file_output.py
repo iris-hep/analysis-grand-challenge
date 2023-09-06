@@ -1,17 +1,19 @@
 import uproot
-import hist
 
-def save_histograms(hist_dict, fileset, filename, channel_names, rebin=True):
+
+def save_histograms(hist_dict, fileset, filename, channel_names, add_offset=False):
     nominal_samples = [sample for sample in fileset.keys() if "nominal" in sample]
-
-    # add minimal event count to all bins to avoid crashes when processing a small number of samples
-    for channel in channel_names:
-        hist_dict[channel] += 1e-6
 
     with uproot.recreate(filename) as f:
         out_dict = {}
         for channel in channel_names:
             current_hist = hist_dict[channel]
+
+            # optionally add minimal offset to avoid completely empty bins
+            # (useful for the ML validation variables that would need binning adjustment to avoid those)
+            if add_offset:
+                current_hist += 1e-6
+
             out_dict[f"{channel}_pseudodata"] = ((current_hist[:, "ttbar", "ME_var"] + current_hist[:, "ttbar", "PS_var"]) / 2 
                                                  + current_hist[:, "wjets", "nominal"])
 
@@ -39,9 +41,6 @@ def save_histograms(hist_dict, fileset, filename, channel_names, rebin=True):
             for var in wjets_variations:
                 out_dict[f"{channel}_wjets_{var}"] = current_hist[:, "wjets", var]
 
-        # write to file and rebin if necessary
+        # write to file
         for key in out_dict.keys():
-            if rebin:
-                f[key] = out_dict[key][120j :: hist.rebin(2)]
-            else:
-                f[key] = out_dict[key]
+            f[key] = out_dict[key]

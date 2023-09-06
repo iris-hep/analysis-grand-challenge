@@ -61,7 +61,7 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", loca
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094", "root://red-xcache1.unl.edu") for f in file_paths]
             elif af_name == "ssl-dev":
                 # point to local files on /data
-                file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/", "/data/alheld/") for f in file_paths]
+                file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC", "/data/alheld/AGC/datasets") for f in file_paths]
             elif input_from_eos:
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD",
                                         "root://eospublic.cern.ch//eos/opendata/cms/upload/agc/1.0.0/") for f in file_paths]

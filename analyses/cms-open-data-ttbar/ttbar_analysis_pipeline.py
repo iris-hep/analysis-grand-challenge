@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.1
+#       jupytext_version: 1.14.7
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -40,7 +40,7 @@
 # %% [markdown]
 # ### Imports: setting up our environment
 
-# %% tags=[]
+# %%
 import logging
 import time
 
@@ -86,7 +86,7 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 #
 # The input files are all in the 1–3 GB range.
 
-# %% tags=[]
+# %%
 ### GLOBAL CONFIGURATION
 # input files per process, set to e.g. 10 (smaller number = faster)
 N_FILES_MAX_PER_SAMPLE = 5
@@ -119,7 +119,7 @@ USE_TRITON = False
 #
 # During the processing step, machine learning is used to calculate one of the variables used for this analysis. The models used are trained separately in the `jetassignment_training.ipynb` notebook. Jets in the events are assigned to labels corresponding with their parent partons using a boosted decision tree (BDT). More information about the model and training can be found within that notebook.
 
-# %% tags=[]
+# %%
 class TtbarAnalysis(processor.ProcessorABC):
     def __init__(self, use_inference, use_triton):
 
@@ -368,7 +368,7 @@ class TtbarAnalysis(processor.ProcessorABC):
 #
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
-# %% tags=[]
+# %%
 fileset = utils.file_input.construct_fileset(
     N_FILES_MAX_PER_SAMPLE,
     use_xcache=False,
@@ -387,7 +387,7 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 #
 # Define the func_adl query to be used for the purpose of extracting columns and filtering.
 
-# %% tags=[]
+# %%
 def get_query(source: ObjectStream) -> ObjectStream:
     """Query for event / column selection: >=4j >=1b, ==1 lep with pT>30 GeV + additional cuts,
     return relevant columns
@@ -473,7 +473,7 @@ def get_query(source: ObjectStream) -> ObjectStream:
 #
 # Using the queries created with `func_adl`, we are using `ServiceX` to read the CMS Open Data files to build cached files with only the specific event information as dictated by the query.
 
-# %% tags=[]
+# %%
 if USE_SERVICEX:
     # dummy dataset on which to generate the query
     dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "Events", backend_name="uproot")
@@ -503,7 +503,7 @@ if USE_SERVICEX:
 #
 # When `USE_SERVICEX` is false, the input files need to be processed during this step as well.
 
-# %% tags=[]
+# %%
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 if USE_DASK:
     cloudpickle.register_pickle_by_value(utils) # serialize methods and objects in utils so that they can be accessed within the coffea processor
@@ -555,7 +555,7 @@ utils.metrics.track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX,
 # Let's have a look at the data we obtained.
 # We built histograms in two phase space regions, for multiple physics processes and systematic variations.
 
-# %% tags=[]
+# %%
 utils.plotting.set_style()
 
 all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1, edgecolor="grey")
@@ -563,7 +563,7 @@ plt.legend(frameon=False)
 plt.title("$\geq$ 4 jets, 1 b-tag")
 plt.xlabel("$H_T$ [GeV]");
 
-# %% tags=[]
+# %%
 all_histograms["hist_dict"]["4j2b"][:, :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1,edgecolor="grey")
 plt.legend(frameon=False)
 plt.title("$\geq$ 4 jets, $\geq$ 2 b-tags")
@@ -578,7 +578,7 @@ plt.xlabel("$m_{bjj}$ [GeV]");
 #
 # We are making of [UHI](https://uhi.readthedocs.io/) here to re-bin.
 
-# %% tags=[]
+# %%
 # b-tagging variations
 all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), "ttbar", "nominal"].plot(label="nominal", linewidth=2)
 all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), "ttbar", "btag_var_0_up"].plot(label="NP 1", linewidth=2)
@@ -589,7 +589,7 @@ plt.legend(frameon=False)
 plt.xlabel("$H_T$ [GeV]")
 plt.title("b-tagging variations");
 
-# %% tags=[]
+# %%
 # jet energy scale variations
 all_histograms["hist_dict"]["4j2b"][:, "ttbar", "nominal"].plot(label="nominal", linewidth=2)
 all_histograms["hist_dict"]["4j2b"][:, "ttbar", "pt_scale_up"].plot(label="scale up", linewidth=2)
@@ -598,7 +598,7 @@ plt.legend(frameon=False)
 plt.xlabel("$m_{bjj}$ [Gev]")
 plt.title("Jet energy variations");
 
-# %% tags=[]
+# %%
 # ML inference variables
 if USE_INFERENCE:
     fig, axs = plt.subplots(10,2,figsize=(14,40))
@@ -625,27 +625,34 @@ if USE_INFERENCE:
 # We'll save everything to disk for subsequent usage.
 # This also builds pseudo-data by combining events from the various simulation setups we have processed.
 
-# %% tags=[]
-utils.file_output.save_histograms(all_histograms['hist_dict'], 
-                                  fileset, 
-                                  "histograms.root", 
+# %%
+utils.file_output.save_histograms(all_histograms['hist_dict'],
+                                  fileset,
+                                  "histograms.root",
                                   ["4j1b", "4j2b"])
 if USE_INFERENCE:
-    utils.file_output.save_histograms(all_histograms['ml_hist_dict'], 
-                                      fileset, 
-                                      "histograms_ml.root", 
-                                      utils.config["ml"]["FEATURE_NAMES"], 
-                                      rebin=False)
+    utils.file_output.save_histograms(all_histograms['ml_hist_dict'],
+                                      fileset,
+                                      "histograms_ml.root",
+                                      utils.config["ml"]["FEATURE_NAMES"],
+                                      add_offset=True)
 
 # %% [markdown]
 # ### Statistical inference
 #
+# We are going to perform a re-binning for the statistical inference.
+# This is planned to be conveniently provided via cabinetry (see [cabinetry#412](https://github.com/scikit-hep/cabinetry/issues/412), but in the meantime we can achieve this via [template building overrides](https://cabinetry.readthedocs.io/en/latest/advanced.html#overrides-for-template-building).
+# The implementation is provided in a function in `utils/`.
+#
 # A statistical model has been defined in `config.yml`, ready to be used with our output.
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
-# %% tags=[]
+# %%
 cabinetry_config = cabinetry.configuration.load("cabinetry_config.yml")
-cabinetry.templates.collect(cabinetry_config)
+
+# rebinning: lower edge 110 GeV, merge bins 2->1
+rebinning_router = utils.rebinning.get_cabinetry_rebinning_router(cabinetry_config, rebinning=slice(110j, None, hist.rebin(2)))
+cabinetry.templates.build(cabinetry_config, router=rebinning_router)
 cabinetry.templates.postprocess(cabinetry_config)  # optional post-processing (e.g. smoothing)
 ws = cabinetry.workspace.build(cabinetry_config)
 cabinetry.workspace.save(ws, "workspace.json")
@@ -653,13 +660,13 @@ cabinetry.workspace.save(ws, "workspace.json")
 # %% [markdown]
 # We can inspect the workspace with `pyhf`, or use `pyhf` to perform inference.
 
-# %% tags=[]
+# %%
 # !pyhf inspect workspace.json | head -n 20
 
 # %% [markdown]
 # Let's try out what we built: the next cell will perform a maximum likelihood fit of our statistical model to the pseudodata we built.
 
-# %% tags=[]
+# %%
 model, data = cabinetry.model_utils.model_and_data(ws)
 fit_results = cabinetry.fit.fit(model, data)
 
@@ -670,7 +677,7 @@ cabinetry.visualize.pulls(
 # %% [markdown]
 # For this pseudodata, what is the resulting ttbar cross-section divided by the Standard Model prediction?
 
-# %% tags=[]
+# %%
 poi_index = model.config.poi_index
 print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {fit_results.uncertainty[poi_index]:.3f}")
 
@@ -689,7 +696,7 @@ utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data, ca
 # ### ML Validation
 # We can further validate our results by applying the above fit to different ML observables and checking for good agreement.
 
-# %% tags=[]
+# %%
 # load the ml workspace (uses the ml observable instead of previous method)
 if USE_INFERENCE:
     config_ml = cabinetry.configuration.load("cabinetry_config_ml.yml")
@@ -705,7 +712,7 @@ if USE_INFERENCE:
 
     cabinetry.workspace.save(ws_pruned, "workspace_ml.json")
 
-# %% tags=[]
+# %%
 if USE_INFERENCE:
     model_ml, data_ml = cabinetry.model_utils.model_and_data(ws_pruned)
 
@@ -722,7 +729,7 @@ if USE_INFERENCE:
     fit_results_mod = cabinetry.model_utils.match_fit_results(model_ml, fit_results)
     model_prediction_postfit = cabinetry.model_utils.prediction(model_ml, fit_results=fit_results_mod)
 
-# %% tags=[]
+# %%
 if USE_INFERENCE:
     utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
 
