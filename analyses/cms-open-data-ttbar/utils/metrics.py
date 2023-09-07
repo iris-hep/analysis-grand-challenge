@@ -5,9 +5,21 @@ import time
 from .config import config
 
 def track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_MAX_PER_SAMPLE):
-    
-    dataset_source = "/data" if fileset["ttbar__nominal"]["files"][0].startswith("/data") else "https://xrootd-local.unl.edu:1094" # TODO: xcache support
-    
+
+    file_name = fileset["ttbar__nominal"]["files"][0]
+    if file_name.startswith("/data"):
+        dataset_source = "/data"
+    elif "xcache.af.uchicago.edu" in file_name:
+        dataset_source = "xcache.af.uchicago.edu"
+    elif "red-xcache1.unl.edu" in file_name:
+        dataset_source = "red-xcache1.unl.edu"
+    elif "eospublic" in file_name:
+        dataset_source = "EOS"
+    elif "xrootd-local.unl.edu" in file_name:
+        dataset_source = "UNL"
+    else:
+        dataset_source = "unknown"
+
     metrics.update({
         "walltime": exec_time,
         "num_workers": config["benchmarking"]["NUM_CORES"],
@@ -20,7 +32,8 @@ def track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_M
         "cores_per_worker": config["benchmarking"]["CORES_PER_WORKER"],
         "chunksize": config["benchmarking"]["CHUNKSIZE"],
         "disable_processing": config["benchmarking"]["DISABLE_PROCESSING"],
-        "io_file_percent": config["benchmarking"]["IO_FILE_PERCENT"]
+        "io_file_percent": config["benchmarking"]["IO_FILE_PERCENT"],
+        "agc_version": "main"
     })
 
     # save metrics to disk
