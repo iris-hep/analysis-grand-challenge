@@ -431,7 +431,8 @@ metrics.update({
     "cores_per_worker": config["benchmarking"]["CORES_PER_WORKER"],
     "chunksize": config["benchmarking"]["CHUNKSIZE"],
     "disable_processing": config["benchmarking"]["DISABLE_PROCESSING"],
-    "io_file_percent": config["benchmarking"]["IO_FILE_PERCENT"]
+    "io_file_percent": config["benchmarking"]["IO_FILE_PERCENT"],
+    "agc_version": "agc-v1"
 })
 
 # save metrics to disk
