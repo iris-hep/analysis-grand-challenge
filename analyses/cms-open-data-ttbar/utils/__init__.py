@@ -191,3 +191,19 @@ def get_cabinetry_rebinning_router(config, rebinning):
         return h
 
     return rebinning_router
+
+
+def dataset_source(file_name):
+    if file_name.startswith("/data"):
+        dataset_source = "/data"
+    elif "xcache.af.uchicago.edu" in file_name:
+        dataset_source = "xcache.af.uchicago.edu"
+    elif "red-xcache1.unl.edu" in file_name:
+        dataset_source = "red-xcache1.unl.edu"
+    elif "eospublic" in file_name:
+        dataset_source = "EOS"
+    elif "xrootd-local.unl.edu" in file_name:
+        dataset_source = "UNL"
+    else:
+        dataset_source = "unknown"
+    return dataset_source
