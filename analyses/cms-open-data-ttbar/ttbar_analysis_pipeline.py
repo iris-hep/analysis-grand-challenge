@@ -527,10 +527,8 @@ else:
 # load local models if not using Triton
 if USE_INFERENCE and not USE_TRITON:
     # models are not yet loaded
-    assert utils.ml.model_even is None
-    assert utils.ml.model_odd is None
-    
-    utils.ml.load_models()
+    if utils.ml.model_even is None and utils.ml.model_odd is None:
+        utils.ml.load_models()
 
 filemeta = run.preprocess(fileset, treename=treename)  # pre-processing
 
