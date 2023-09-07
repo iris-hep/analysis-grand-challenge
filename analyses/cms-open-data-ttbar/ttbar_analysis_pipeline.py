@@ -418,19 +418,19 @@ print(f"\nexecution took {exec_time:.2f} seconds")
 
 # %%
 # track metrics
-dataset_source = "/data" if fileset["ttbar__nominal"]["files"][0].startswith("/data") else "https://xrootd-local.unl.edu:1094" # TODO: xcache support
+dataset_source = utils.dataset_source(fileset["ttbar__nominal"]["files"][0])
 metrics.update({
-    "walltime": exec_time, 
-    "num_workers": config["benchmarking"]["NUM_CORES"], 
-    "af": config["benchmarking"]["AF_NAME"], 
-    "dataset_source": dataset_source, 
-    "use_dask": USE_DASK, 
-    "use_servicex": USE_SERVICEX, 
-    "systematics": config["benchmarking"]["SYSTEMATICS"], 
+    "walltime": exec_time,
+    "num_workers": config["benchmarking"]["NUM_CORES"],
+    "af": config["benchmarking"]["AF_NAME"],
+    "dataset_source": dataset_source,
+    "use_dask": USE_DASK,
+    "use_servicex": USE_SERVICEX,
+    "systematics": config["benchmarking"]["SYSTEMATICS"],
     "n_files_max_per_sample": N_FILES_MAX_PER_SAMPLE,
-    "cores_per_worker": config["benchmarking"]["CORES_PER_WORKER"], 
-    "chunksize": config["benchmarking"]["CHUNKSIZE"], 
-    "disable_processing": config["benchmarking"]["DISABLE_PROCESSING"], 
+    "cores_per_worker": config["benchmarking"]["CORES_PER_WORKER"],
+    "chunksize": config["benchmarking"]["CHUNKSIZE"],
+    "disable_processing": config["benchmarking"]["DISABLE_PROCESSING"],
     "io_file_percent": config["benchmarking"]["IO_FILE_PERCENT"]
 })
 
