@@ -2,19 +2,23 @@ import awkward as ak
 import numpy as np
 from xgboost import XGBClassifier
 from .config import config
+import vector
+
 
 # local loading of ML models
 model_even = None
 model_odd = None
 
+
 def load_models():
     global model_even
     model_even = XGBClassifier()
     model_even.load_model(config["ml"]["XGBOOST_MODEL_PATH_EVEN"])
-    
+
     global model_odd
     model_odd = XGBClassifier()
     model_odd.load_model(config["ml"]["XGBOOST_MODEL_PATH_ODD"])
+
 
 def get_permutations_dict(MAX_N_JETS, include_labels=False, include_eval_mat=False):
     """
@@ -93,7 +97,8 @@ def get_permutations_dict(MAX_N_JETS, include_labels=False, include_eval_mat=Fal
 
     else:
         return permutations_dict
-    
+
+
 def get_features(jets, electrons, muons, max_n_jets=6):
     """
     Calculate features for each of the 12 combinations per event
@@ -108,6 +113,8 @@ def get_features(jets, electrons, muons, max_n_jets=6):
         features (flattened to remove event level)
         perm_counts: how many permutations in each event. use to unflatten features
     """
+    # for four-vector addition of custom Momentum4D instances below
+    vector.register_awkward()
 
     permutations_dict = get_permutations_dict(max_n_jets)
 
@@ -139,8 +146,17 @@ def get_features(jets, electrons, muons, max_n_jets=6):
     features[:, 3] = ak.flatten(np.sqrt((jets[perms[..., 1]].eta - jets[perms[..., 2]].eta) ** 2
                                         + (jets[perms[..., 1]].phi - jets[perms[..., 2]].phi) ** 2)).to_numpy()
 
+    # combining the original leptons and jets arrays results in column overtouching
+    # see https://github.com/CoffeaTeam/coffea/issues/892 for details
+    # to work around this, create smaller versions of the arrays using only the relevant
+    # four-vector information
+    el_p4 = ak.zip({"pt": electrons.pt, "eta": electrons.eta, "phi": electrons.phi, "mass": electrons.mass}, with_name="Momentum4D")
+    mu_p4 = ak.zip({"pt": muons.pt, "eta": muons.eta, "phi": muons.phi, "mass": muons.mass}, with_name="Momentum4D")
+    lep_p4 = ak.flatten(ak.concatenate((el_p4, mu_p4), axis=1), axis=-1)
+    jet_p4 = ak.zip({"pt": jets.pt, "eta": jets.eta, "phi": jets.phi, "mass": jets.mass}, with_name="Momentum4D")
+
     # combined mass of b_toplep and lepton
-    features[:, 4] = ak.flatten((leptons + jets[perms[..., 3]]).mass).to_numpy()
+    features[:, 4] = ak.flatten((lep_p4 + jet_p4[perms[..., 3]]).mass).to_numpy()
 
     # combined mass of W
     features[:, 5] = ak.flatten((jets[perms[..., 0]] + jets[perms[..., 1]]).mass).to_numpy()
@@ -171,6 +187,7 @@ def get_features(jets, electrons, muons, max_n_jets=6):
 
     return features, perm_counts
 
+
 def get_inference_results_local(features, even, model_even, model_odd):
     results = np.zeros(features.shape[0])
     if len(features[even]) > 0:
@@ -182,15 +199,15 @@ def get_inference_results_local(features, even, model_even, model_odd):
     return results
 
 
-def get_inference_results_triton(features, even, triton_client, MODEL_NAME, 
+def get_inference_results_triton(features, even, triton_client, MODEL_NAME,
                                  MODEL_VERS_EVEN, MODEL_VERS_ODD):
-    
+
     model_metadata = triton_client.get_model_metadata(MODEL_NAME, MODEL_VERS_EVEN)
-    
+
     input_name = model_metadata.inputs[0].name
     dtype = model_metadata.inputs[0].datatype
     output_name = model_metadata.outputs[0].name
-    
+
     results = np.zeros(features.shape[0])
 
     import tritonclient.grpc as grpcclient
