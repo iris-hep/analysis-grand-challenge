@@ -4,7 +4,7 @@ import time
 
 from .config import config
 
-def track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_MAX_PER_SAMPLE):
+def track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_MAX_PER_SAMPLE, USE_INFERENCE, USE_TRITON):
 
     file_name = fileset["ttbar__nominal"]["files"][0]
     if file_name.startswith("/data"):
@@ -33,7 +33,9 @@ def track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_M
         "chunksize": config["benchmarking"]["CHUNKSIZE"],
         "disable_processing": config["benchmarking"]["DISABLE_PROCESSING"],
         "io_file_percent": config["benchmarking"]["IO_FILE_PERCENT"],
-        "agc_version": "main"
+        "agc_version": "main",
+        "use_inference": USE_INFERENCE,
+        "use_triton": USE_TRITON
     })
 
     # save metrics to disk
