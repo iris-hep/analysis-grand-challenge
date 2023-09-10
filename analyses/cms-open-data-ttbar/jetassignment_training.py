@@ -69,18 +69,19 @@ USE_DASK_PROCESSING = True
 
 ### MACHINE LEARNING OPTIONS
 
-# enable Dask (whether to use dask for hyperparameter optimization. currently does not work)
-USE_DASK_ML = False
+# enable Dask (whether to use dask for hyperparameter optimization)
+USE_DASK_ML = True
 
 # enable MLFlow logging (to store metrics and models of hyperparameter optimization trials)
-USE_MLFLOW = False
+# if using MLFlow, be sure to add credentials in config_training.py before running code
+USE_MLFLOW = True
 
 # enable MLFlow model logging/registering
-MODEL_LOGGING = False
+MODEL_LOGGING = True
 MODEL_REGISTERING = False
 
 # number of events to use for training (more results in higher efficiency, but slower to train)
-N_EVENTS_TRAIN = 10000
+N_EVENTS_TRAIN = 20000
 
 
 # %% [markdown]
@@ -540,7 +541,7 @@ def run_training(features, labels, samples, evaluation_matrix,
         start_time = time.time() 
 
         # initialize mlflow and set up dask client
-        client = utils.get_client()
+        client = utils.clients.get_client(utils.config_training["global"]["AF"])
         if USE_MLFLOW:
             client.run(initialize_mlflow)
 
