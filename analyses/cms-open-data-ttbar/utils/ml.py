@@ -419,6 +419,7 @@ def write_triton_config(
             + "    key: \"blocks_per_sm\"\n"
             + "    value: { string_value: \"0\" }\n"
             + "  }\n"
+            + "]\n"
             + "version_policy: { all { }}\n"
             + "dynamic_batching { }")
 
