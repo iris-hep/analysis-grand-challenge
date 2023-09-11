@@ -411,6 +411,7 @@ def write_triton_config(
             + "  {\n"
             + "    key: \"algo\"\n"
             + "    value: { string_value: \"ALGO_AUTO\" }\n"
+            + "  },\n"
             + "  {\n"
             + "    key: \"storage_type\"\n"
             + "    value: { string_value: \"AUTO\" }\n"
