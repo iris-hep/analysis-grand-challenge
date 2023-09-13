@@ -93,7 +93,7 @@ config = {
         # name of ML model in Triton server
         "MODEL_NAME": "reconstruction_bdt_xgb",
         # URL of Triton server
-        "TRITON_URL": "agc-triton-inference-server:8001",
+        "TRITON_URL": "triton-inference-server:8001",
         # Triton model version which is trained on even events
         "MODEL_VERSION_EVEN": "2",
         # Triton model version which is trained on odd events
