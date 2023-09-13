@@ -15,6 +15,19 @@ def get_client(af="coffea_casa"):
 
         client = cluster.get_client()
 
+    elif af == "cmsaf-dev":
+        from dask_gateway import Gateway
+        
+        gateway = Gateway()
+        clusters = gateway.list_clusters()
+        # by default you will have at least one Dask gateway cluster, but here could be more
+        # to shut down cluster please use: `cluster.shutdown()`
+        cluster = gateway.connect(clusters[0].name)
+        # adjust number of workers manually
+        cluster.scale(50)
+        
+        client = cluster.get_client()
+        
     elif af == "local":
         from dask.distributed import Client
 
