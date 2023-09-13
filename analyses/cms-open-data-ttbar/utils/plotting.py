@@ -405,3 +405,39 @@ def plot_data_mc(model_prediction_prefit, model_prediction_postfit, data, config
         figs.append({"figure": fig, "region": channel_name})
 
     return figs
+
+def plot_training_variables(all_correct, some_correct, none_correct):
+    
+    import hist
+    from .config import config as config
+    config = config["ml"]
+    
+    legend_list = ["All Matches Correct", "Some Matches Correct", "No Matches Correct"]
+    
+    n_features = all_correct.shape[1]
+        
+    # plot features on grid
+    fig, axs = plt.subplots(10,2,figsize=(14,40))
+    for i in range(n_features):
+        if i<10: 
+            column=0
+            row=i
+        else: 
+            column=1
+            row=i-10
+            
+        # define histogram
+        h = hist.Hist(
+            hist.axis.Regular(50, config["BIN_LOW"][i], config["BIN_HIGH"][i], name='observable', label=config["FEATURE_DESCRIPTIONS"][i], flow=False),
+            hist.axis.StrCategory(legend_list, name="truthlabel", label="Truth Label"),
+        )
+        
+        # fill histogram
+        h.fill(observable = all_correct[:,i], truthlabel="All Matches Correct")
+        h.fill(observable = some_correct[:,i], truthlabel="Some Matches Correct")
+        h.fill(observable = none_correct[:,i], truthlabel="No Matches Correct")
+        
+        h.plot(density=True, ax=axs[row,column])
+        axs[row, column].legend(legend_list, frameon=False)
+    
+    fig.show()
