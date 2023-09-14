@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.7
+#       jupytext_version: 1.14.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -656,7 +656,7 @@ with open('reconstruction_bdt_xgb/config.pbtxt', 'w') as the_file:
 # !mkdir reconstruction_bdt_xgb/1
 
 # %%
-best_model_even.save_model("reconstruction_bdt_xgb/1/xgboost.model")
+best_model_odd.save_model("reconstruction_bdt_xgb/1/xgboost.model")
 
 # %%
 # !mkdir reconstruction_bdt_xgb/2
