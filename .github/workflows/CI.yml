@@ -26,10 +26,11 @@ jobs:
           pip install -r docs/requirements.txt
           sphinx-build docs docs/_build
 
-  linter:
+  pre-commit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: jpetrucciani/ruff-check@main
+      - uses: actions/setup-python@v3
+      - uses: pre-commit/action@v3.0.0

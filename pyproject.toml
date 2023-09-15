@@ -1,3 +1,6 @@
 [tool.ruff]
 # ignore too long lines and ; at the end of a line
 ignore = ["E501", "E703"]
+
+[tool.jupytext]
+formats = "ipynb,py:percent"
