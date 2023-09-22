@@ -2,7 +2,6 @@ import json
 import numpy as np
 import os
 from pathlib import Path
-from servicex import ServiceXDataset
 import tqdm
 import urllib
 
