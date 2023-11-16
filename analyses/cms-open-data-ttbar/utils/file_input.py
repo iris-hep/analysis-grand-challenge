@@ -8,7 +8,7 @@ import urllib
 
 try:
     from servicex import ServiceXDataset
-except:
+except ImportError:
     # if servicex is not available, ServiceXDatasetGroup cannot be used
     # this is fine for worker nodes: only needed where main notebook is executed
     pass

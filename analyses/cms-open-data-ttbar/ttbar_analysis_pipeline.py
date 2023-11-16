@@ -556,7 +556,7 @@ utils.metrics.track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX,
 # We built histograms in two phase space regions, for multiple physics processes and systematic variations.
 
 # %%
-import utils.plotting
+import utils.plotting  # noqa: E402
 
 utils.plotting.set_style()
 
@@ -650,7 +650,7 @@ if USE_INFERENCE:
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
 # %%
-import utils.rebinning
+import utils.rebinning  # noqa: E402
 
 cabinetry_config = cabinetry.configuration.load("cabinetry_config.yml")
 
