@@ -473,11 +473,11 @@ def get_query(source):
 
 # %%
 if USE_SERVICEX:
-        try:
-            from func_adl_servicex import ServiceXSourceUpROOT
-        except ImportError:
-            print("cannot import func_adl_servicex, which is a required dependency when using ServiceX")
-            raise
+    try:
+        from func_adl_servicex import ServiceXSourceUpROOT
+    except ImportError:
+        print("cannot import func_adl_servicex, which is a required dependency when using ServiceX")
+        raise
 
     # dummy dataset on which to generate the query
     dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "Events", backend_name="uproot")
