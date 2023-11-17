@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.7
+#       jupytext_version: 1.15.2
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -52,8 +52,6 @@ from coffea import processor
 from coffea.nanoevents import NanoAODSchema
 from coffea.analysis_tools import PackedSelection
 import copy
-from func_adl import ObjectStream
-from func_adl_servicex import ServiceXSourceUpROOT
 import hist
 import matplotlib.pyplot as plt
 import numpy as np
@@ -388,7 +386,7 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 # Define the func_adl query to be used for the purpose of extracting columns and filtering.
 
 # %%
-def get_query(source: ObjectStream) -> ObjectStream:
+def get_query(source):
     """Query for event / column selection: >=4j >=1b, ==1 lep with pT>30 GeV + additional cuts,
     return relevant columns
     *NOTE* jet pT cut is set lower to account for systematic variations to jet pT
@@ -475,6 +473,12 @@ def get_query(source: ObjectStream) -> ObjectStream:
 
 # %%
 if USE_SERVICEX:
+    try:
+        from func_adl_servicex import ServiceXSourceUpROOT
+    except ImportError:
+        print("cannot import func_adl_servicex, which is a required dependency when using ServiceX")
+        raise
+
     # dummy dataset on which to generate the query
     dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "Events", backend_name="uproot")
 
@@ -512,10 +516,10 @@ else:
     executor = processor.FuturesExecutor(workers=utils.config["benchmarking"]["NUM_CORES"])
 
 run = processor.Runner(
-    executor=executor, 
-    schema=NanoAODSchema, 
-    savemetrics=True, 
-    metadata_cache={}, 
+    executor=executor,
+    schema=NanoAODSchema,
+    savemetrics=True,
+    metadata_cache={},
     chunksize=utils.config["benchmarking"]["CHUNKSIZE"])
 
 if USE_SERVICEX:
@@ -533,8 +537,8 @@ filemeta = run.preprocess(fileset, treename=treename)  # pre-processing
 t0 = time.monotonic()
 # processing
 all_histograms, metrics = run(
-    fileset, 
-    treename, 
+    fileset,
+    treename,
     processor_instance=TtbarAnalysis(USE_INFERENCE, USE_TRITON)
 )
 exec_time = time.monotonic() - t0
@@ -552,6 +556,8 @@ utils.metrics.track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX,
 # We built histograms in two phase space regions, for multiple physics processes and systematic variations.
 
 # %%
+import utils.plotting  # noqa: E402
+
 utils.plotting.set_style()
 
 all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1, edgecolor="grey")
@@ -644,6 +650,8 @@ if USE_INFERENCE:
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
 # %%
+import utils.rebinning  # noqa: E402
+
 cabinetry_config = cabinetry.configuration.load("cabinetry_config.yml")
 
 # rebinning: lower edge 110 GeV, merge bins 2->1

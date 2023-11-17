@@ -2,9 +2,17 @@ import json
 import numpy as np
 import os
 from pathlib import Path
-from servicex import ServiceXDataset
 import tqdm
 import urllib
+
+
+try:
+    from servicex import ServiceXDataset
+except ImportError:
+    # if servicex is not available, ServiceXDatasetGroup cannot be used
+    # this is fine for worker nodes: only needed where main notebook is executed
+    pass
+
 
 # If local_data_cache is a writable path, this function will download any missing file into it and
 # then return file paths corresponding to these local copies.
@@ -111,6 +119,7 @@ def download_file(url, out_file):
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with tqdm.tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=out_path.name) as t:
         urllib.request.urlretrieve(url, out_path.absolute(), reporthook=tqdm_urlretrieve_hook(t))
+
 
 class ServiceXDatasetGroup():
     def __init__(self, fileset, backend_name="uproot", ignore_cache=False):
