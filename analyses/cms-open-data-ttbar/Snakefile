@@ -8,7 +8,8 @@ rule all:
         "histograms_ttbar_single_top_s_chan.root",
         "histograms_ttbar_single_top_t_chan.root",
         "histograms_ttbar_single_top_tW_nominal.root",
-        "histograms_wjets_nominal.root"
+        "histograms_wjets_nominal.root",
+        "histograms_merged.root"
 
 # Create a rule for ttbar_nominal sample
 rule ttbar_nominal_sample:
@@ -18,10 +19,11 @@ rule ttbar_nominal_sample:
         "histograms_ttbar_nominal.root"
     params:
         selected_sample = 'ttbar__nominal',
+        merged_step = 'No'
     container: 
         "povstenandrii/papermill:20231102a"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill {input} sample1_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample1_out.ipynb -p selected_sample {params.selected_sample} -p merged_step {params.merged_step} -k python3"
 
 rule ttbar__scaledown_sample:
     input:
@@ -29,11 +31,12 @@ rule ttbar__scaledown_sample:
     output:
         "histograms_ttbar_scaledown.root"
     params:
-        selected_sample = 'ttbar__scaledown'
+        selected_sample = 'ttbar__scaledown',
+         merged_step = 'No'
     container: 
         "povstenandrii/papermill:20231102a"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill {input} sample2_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample2_out.ipynb -p selected_sample {params.selected_sample} -p merged_step {params.merged_step} -k python3"
 
 rule ttbar__scaleup_sample:
     input:
@@ -41,11 +44,12 @@ rule ttbar__scaleup_sample:
     output:
         "histograms_ttbar_scaleup.root"
     params:
-        selected_sample = 'ttbar__scaleup'
+        selected_sample = 'ttbar__scaleup',
+        merged_step = 'No'
     container: 
         "povstenandrii/papermill:20231102a"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill {input} sample3_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample3_out.ipynb -p selected_sample {params.selected_sample} -p merged_step {params.merged_step} -k python3"
 
 rule ttbar__ME_var_sample:
     input:
@@ -53,11 +57,12 @@ rule ttbar__ME_var_sample:
     output:
         "histograms_ttbar_ME_var.root"
     params:
-        selected_sample = 'ttbar__ME_var'
+        selected_sample = 'ttbar__ME_var',
+        merged_step = 'No'
     container: 
         "povstenandrii/papermill:20231102a"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill {input} sample4_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample4_out.ipynb -p selected_sample {params.selected_sample} -p merged_step {params.merged_step} -k python3"
 
 rule ttbar__PS_var_sample:
     input:
@@ -65,11 +70,12 @@ rule ttbar__PS_var_sample:
     output:
         "histograms_ttbar_PS_var.root"
     params:
-        selected_sample = 'ttbar__PS_var'
+        selected_sample = 'ttbar__PS_var',
+        merged_step = 'No'
     container: 
         "povstenandrii/papermill:20231102a"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill {input} sample5_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample5_out.ipynb -p selected_sample {params.selected_sample} -p merged_step {params.merged_step} -k python3"
 
 rule single_top_s_chan__nominal_sample:
     input:
@@ -77,11 +83,12 @@ rule single_top_s_chan__nominal_sample:
     output:
         "histograms_ttbar_single_top_s_chan.root"
     params:
-        selected_sample = 'single_top_s_chan__nominal'
+        selected_sample = 'single_top_s_chan__nominal',
+        merged_step = 'No'
     container: 
         "povstenandrii/papermill:20231102a"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill {input} sample6_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample6_out.ipynb -p selected_sample {params.selected_sample} -p merged_step {params.merged_step} -k python3"
 
 rule single_top_t_chan__nominal_sample:
     input:
@@ -89,11 +96,12 @@ rule single_top_t_chan__nominal_sample:
     output:
         "histograms_ttbar_single_top_t_chan.root"
     params:
-        selected_sample = 'single_top_t_chan__nominal'
+        selected_sample = 'single_top_t_chan__nominal',
+        merged_step = 'No'
     container: 
         "povstenandrii/papermill:20231102a"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill {input} sample7_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample7_out.ipynb -p selected_sample {params.selected_sample} -p merged_step {params.merged_step} -k python3"
 
 rule single_top_tW__nominal_sample:
     input:
@@ -101,11 +109,12 @@ rule single_top_tW__nominal_sample:
     output:
         "histograms_ttbar_single_top_tW_nominal.root"
     params:
-        selected_sample = 'single_top_tW__nominal'
+        selected_sample = 'single_top_tW__nominal',
+        merged_step = 'No'
     container: 
         "povstenandrii/papermill:20231102a"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill {input} sample8_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample8_out.ipynb -p selected_sample {params.selected_sample} -p merged_step {params.merged_step} -k python3"
 
 rule wjets__nominal_sample:
     input:
@@ -113,11 +122,27 @@ rule wjets__nominal_sample:
     output:
         "histograms_wjets_nominal.root"
     params:
+        selected_sample = 'wjets__nominal',
+        merged_step = 'No'
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample9_out.ipynb -p selected_sample {params.selected_sample} -p merged_step {params.merged_step} -k python3"
+
+rule mergred_histograms:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_merged.root"
+    params:
+        merged_step = "Yes",
         selected_sample = 'wjets__nominal'
     container: 
         "povstenandrii/papermill:20231102a"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill {input} sample9_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample_merged.ipynb -p merged_step {params.merged_step} -p selected_sample {params.selected_sample} -k python3"
+
+
 
 
 
