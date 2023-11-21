@@ -1,4 +1,4 @@
-version: 0.6.0
+  version: 0.6.0
 inputs:
   files:
     - ttbar_analysis_pipeline.py   
@@ -21,7 +21,8 @@ inputs:
   parameters:
     notebook: ttbar_analysis_pipeline.ipynb
     value1: True
-    value2: False a
+    value2: False 
+    workingdir: "REANA_WORKSPACE"
 workflow:
   type: serial #since everything in reana.yaml file the serial should be the workflow engine
   specification:

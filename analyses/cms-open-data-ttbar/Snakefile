@@ -1,0 +1,124 @@
+rule all:
+    input:
+        "histograms_ttbar_nominal.root",
+        "histograms_ttbar_ME_var.root",
+        "histograms_ttbar_PS_var.root",
+        "histograms_ttbar_scaleup.root",
+        "histograms_ttbar_scaledown.root",
+        "histograms_ttbar_single_top_s_chan.root",
+        "histograms_ttbar_single_top_t_chan.root",
+        "histograms_ttbar_single_top_tW_nominal.root",
+        "histograms_wjets_nominal.root"
+
+# Create a rule for ttbar_nominal sample
+rule ttbar_nominal_sample:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_ttbar_nominal.root"
+    params:
+        selected_sample = 'ttbar__nominal',
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample1_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+
+rule ttbar__scaledown_sample:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_ttbar_scaledown.root"
+    params:
+        selected_sample = 'ttbar__scaledown'
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample2_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+
+rule ttbar__scaleup_sample:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_ttbar_scaleup.root"
+    params:
+        selected_sample = 'ttbar__scaleup'
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample3_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+
+rule ttbar__ME_var_sample:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_ttbar_ME_var.root"
+    params:
+        selected_sample = 'ttbar__ME_var'
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample4_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+
+rule ttbar__PS_var_sample:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_ttbar_PS_var.root"
+    params:
+        selected_sample = 'ttbar__PS_var'
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample5_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+
+rule single_top_s_chan__nominal_sample:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_ttbar_single_top_s_chan.root"
+    params:
+        selected_sample = 'single_top_s_chan__nominal'
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample6_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+
+rule single_top_t_chan__nominal_sample:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_ttbar_single_top_t_chan.root"
+    params:
+        selected_sample = 'single_top_t_chan__nominal'
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample7_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+
+rule single_top_tW__nominal_sample:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_ttbar_single_top_tW_nominal.root"
+    params:
+        selected_sample = 'single_top_tW__nominal'
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample8_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+
+rule wjets__nominal_sample:
+    input:
+        "samples.ipynb"
+    output:
+        "histograms_wjets_nominal.root"
+    params:
+        selected_sample = 'wjets__nominal'
+    container: 
+        "povstenandrii/papermill:20231102a"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill {input} sample9_out.ipynb -p selected_sample {params.selected_sample} -k python3"
+
+
+
+
