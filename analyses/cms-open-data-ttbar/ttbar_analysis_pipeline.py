@@ -628,16 +628,10 @@ if USE_INFERENCE:
 # This also builds pseudo-data by combining events from the various simulation setups we have processed.
 
 # %%
-utils.file_output.save_histograms(all_histograms['hist_dict'],
-                                  fileset,
-                                  "histograms.root",
-                                  ["4j1b", "4j2b"])
+utils.file_output.save_histograms(all_histograms['hist_dict'], "histograms.root")
+
 if USE_INFERENCE:
-    utils.file_output.save_histograms(all_histograms['ml_hist_dict'],
-                                      fileset,
-                                      "histograms_ml.root",
-                                      utils.config["ml"]["FEATURE_NAMES"],
-                                      add_offset=True)
+    utils.file_output.save_histograms(all_histograms['ml_hist_dict'], "histograms_ml.root", add_offset=True)
 
 # %% [markdown]
 # ### Statistical inference
