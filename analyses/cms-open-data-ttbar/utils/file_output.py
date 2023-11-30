@@ -23,9 +23,9 @@ def save_histograms(hist_dict, filename, add_offset=False):
 
             # add pseudodata histogram if all inputs to it are available
             if (
-                sum(histogram[:, "ttbar", "ME_var"]) != 0
-                and sum(histogram[:, "ttbar", "PS_var"]) != 0
-                and sum(histogram[:, "wjets", "nominal"]) != 0
+                sum(histogram[:, "ttbar", "ME_var"].values()) != 0
+                and sum(histogram[:, "ttbar", "PS_var"].values()) != 0
+                and sum(histogram[:, "wjets", "nominal"].values()) != 0
             ):
                 f[f"{channel}_pseudodata"] = (
                     histogram[:, "ttbar", "ME_var"] + histogram[:, "ttbar", "PS_var"]
