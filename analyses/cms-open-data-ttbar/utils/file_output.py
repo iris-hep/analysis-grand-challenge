@@ -20,16 +20,16 @@ def save_histograms(hist_dict, filename, add_offset=False):
                     variation_string = "" if variation == "nominal" else f"_{variation}"
                     current_1d_hist = histogram[:, sample, variation]
 
-                    if sum(current_1d_hist.values()) != empty_hist_yield:
+                    if sum(current_1d_hist.values()) <= empty_hist_yield:
                         # only save histograms containing events
                         # many combinations are not used (e.g. ME var for W+jets)
                         f[f"{channel}_{sample}{variation_string}"] = current_1d_hist
 
             # add pseudodata histogram if all inputs to it are available
             if (
-                sum(histogram[:, "ttbar", "ME_var"].values()) != empty_hist_yield
-                and sum(histogram[:, "ttbar", "PS_var"].values()) != empty_hist_yield
-                and sum(histogram[:, "wjets", "nominal"].values()) != empty_hist_yield
+                sum(histogram[:, "ttbar", "ME_var"].values()) <= empty_hist_yield
+                and sum(histogram[:, "ttbar", "PS_var"].values()) <= empty_hist_yield
+                and sum(histogram[:, "wjets", "nominal"].values()) <= empty_hist_yield
             ):
                 f[f"{channel}_pseudodata"] = (
                     histogram[:, "ttbar", "ME_var"] + histogram[:, "ttbar", "PS_var"]
