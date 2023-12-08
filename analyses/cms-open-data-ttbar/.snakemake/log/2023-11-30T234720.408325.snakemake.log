@@ -1,0 +1,3 @@
+MissingInputException in line 114 of /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile:
+Missing input files for rule mergred_histograms:
+histograms_single_top_t_chan.root

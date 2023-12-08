@@ -1,0 +1,7 @@
+Job stats:
+job                     count    min threads    max threads
+--------------------  -------  -------------  -------------
+all                         1              1              1
+ttbar_nominal_sample        1              1              1
+total                       2              1              1
+

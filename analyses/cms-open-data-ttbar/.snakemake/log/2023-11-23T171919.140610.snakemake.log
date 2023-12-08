@@ -1,0 +1,122 @@
+Lints for snakefile /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile:
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill {input} sample1_out.ipynb -p selected_sample {params.selected_sample} -k python3" in line 25:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill {input} sample2_out.ipynb -p selected_sample {params.selected_sample} -k python3" in line 37:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill {input} sample3_out.ipynb -p selected_sample {params.selected_sample} -k python3" in line 49:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill {input} sample4_out.ipynb -p selected_sample {params.selected_sample} -k python3" in line 61:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill {input} sample5_out.ipynb -p selected_sample {params.selected_sample} -k python3" in line 73:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill {input} sample6_out.ipynb -p selected_sample {params.selected_sample} -k python3" in line 85:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill {input} sample7_out.ipynb -p selected_sample {params.selected_sample} -k python3" in line 97:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill {input} sample8_out.ipynb -p selected_sample {params.selected_sample} -k python3" in line 109:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill {input} sample9_out.ipynb -p selected_sample {params.selected_sample} -k python3" in line 121:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+    * Absolute path "/bin/bash -l && source fix-env.sh && papermill merged.ipynb sample_merged.ipynb -p merged_step {params.merged_step} -k python3" in line 142:
+      Do not define absolute paths inside of the workflow, since this renders your workflow irreproducible on other machines. Use path relative to the working directory instead, or make
+      the path configurable via a config file.
+      Also see:
+      https://snakemake.readthedocs.io/en/latest/snakefiles/configuration.html#configuration
+
+Lints for rule ttbar_nominal_sample (line 21, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+
+Lints for rule ttbar__scaledown_sample (line 48, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+
+Lints for rule ttbar__scaleup_sample (line 75, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+
+Lints for rule ttbar__ME_var_sample (line 102, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+
+Lints for rule ttbar__PS_var_sample (line 129, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+
+Lints for rule single_top_s_chan__nominal_sample (line 156, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+
+Lints for rule single_top_t_chan__nominal_sample (line 183, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+
+Lints for rule single_top_tW__nominal_sample (line 210, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+
+Lints for rule wjets__nominal_sample (line 237, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+
+Lints for rule mergred_histograms (line 264, /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile):
+    * No log directive defined:
+      Without a log directive, all output will be printed to the terminal. In distributed environments, this means that errors are harder to discover. In local environments, output of
+      concurrent jobs will be mixed and become unreadable.
+      Also see:
+      https://snakemake.readthedocs.io/en/stable/snakefiles/rules.html#log-files
+

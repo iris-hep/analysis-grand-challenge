@@ -1,0 +1,17 @@
+firstsample:
+  process:
+    process_type: interpolated-script-cmd
+    interpreter: bash
+    script: |
+      /bin/bash -l 
+      source fix-env.sh
+      papermill {input} sample2_out.ipynb -p selected_sample 'ttbar_scaledown' -k python3
+
+  publisher:
+    publisher_type: interpolated-pub
+    publish:
+      histfile: 'histograms_ttbar_scaledown.root'
+  environment:
+    environment_type: 'docker-encapsulated'
+    image: 'povstenandrii/papermill:20231102a'
+

@@ -1,0 +1,21 @@
+independent_variables:
+- header: {name: Summary}
+dependent_variables:
+  channels:
+  - name: '4j1b CR'
+    nbins: 11
+  - name: '4j2b SR'
+    nbins: 11
+
+  samples:
+    - name: 'W + jets'
+    - name: 'single top, s-channel'
+    - name: 'single top, t-channel'
+    - name: 'tW'
+    - name: 'ttbar'
+
+  summary:
+    channels: 2
+    samples: 5
+    parameters: 14
+    modifiers: 14

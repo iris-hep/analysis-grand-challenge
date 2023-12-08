@@ -1,0 +1,3 @@
+MissingInputException in line 1 of /home/andrii/Documents/Reana_local/analysis-grand-challenge/analyses/cms-open-data-ttbar/Snakefile:
+Missing input files for rule all:
+histograms_ttbar_nominal.roothistograms_ttbar_ME_var.root

@@ -1,0 +1,16 @@
+Job stats:
+job                                  count    min threads    max threads
+---------------------------------  -------  -------------  -------------
+all                                      1              1              1
+mergred_histograms                       1              1              1
+single_top_s_chan__nominal_sample        1              1              1
+single_top_tW__nominal_sample            1              1              1
+single_top_t_chan__nominal_sample        1              1              1
+ttbar__ME_var_sample                     1              1              1
+ttbar__PS_var_sample                     1              1              1
+ttbar__scaledown_sample                  1              1              1
+ttbar__scaleup_sample                    1              1              1
+ttbar_nominal_sample                     1              1              1
+wjets__nominal_sample                    1              1              1
+total                                   11              1              1
+
