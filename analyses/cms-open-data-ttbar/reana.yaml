@@ -24,17 +24,7 @@ workflow:
         environment: 'hub.opensciencegrid.org/iris-hep/analysis-systems-base:latest'  
         commands:
         - /bin/bash -l && source fix-env.sh && python ttbar_analysis_pipeline.py
-<<<<<<< Updated upstream
-        # - conda activate /opt/micromamba/envs/analysis-systems && python ttbar_analysis_pipeline.py
-        #- /opt/micromamba/envs/analysis-systems/bin/conda init bash && /opt/micromamba/envs/analysis-systems/bin/conda activate /opt/micromamba/envs/analysis-systems && python ttbar_analysis_pipeline.py
-        #- bash -l -c "python ttbar_analysis_pipeline.py"
-outputs:
-  files:
-    # some output file should be here?
-    - histograms.root
-# outputs reana download
-=======
 outputs:
   files:
     - merged_histograms.root
->>>>>>> Stashed changes
+

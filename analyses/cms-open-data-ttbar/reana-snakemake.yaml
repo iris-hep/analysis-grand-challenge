@@ -14,10 +14,8 @@ inputs:
     - corrections.json
     - Snakefile
     - merged.ipynb
-<<<<<<< Updated upstream
 
   directories:
-=======
     - prepare_workspace.py
     - sample_ttbar__nominal_paths.txt
     - sample_ttbar__scaledown_paths.txt
@@ -34,19 +32,10 @@ inputs:
 
   directories:
     - histograms
->>>>>>> Stashed changes
     - models
     - reference
     - utils
     - report
-<<<<<<< Updated upstream
-workflow:
-  type: snakemake
-  file: Snakefile
-outputs:
-  files:
-    - histogram_1.root
-=======
     - files
 workflow:
   type: snakemake
@@ -54,4 +43,4 @@ workflow:
 outputs:
   files:
     - merged_histograms.root
->>>>>>> Stashed changes
+
