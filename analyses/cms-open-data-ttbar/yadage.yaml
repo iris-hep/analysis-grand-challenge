@@ -1,0 +1,22 @@
+stages:
+  - name: firstsample
+    dependencies: [init]
+    scheduler:
+      scheduler_type: 'singlestep-stage'
+      parameters:
+        outfilename: '{workdir}/histograms_ttbar_scaledown.root'
+      step:
+        process:
+          process_type: 'interpolated-script-cmd'
+          script: |
+            /bin/bash -l 
+            source fix-env.sh
+            papermill {input} sample2_out.ipynb -p selected_sample 'ttbar_scaledown' -k python3
+
+        publisher:
+          publisher_type: 'frompar-pub'
+          outputmap:
+            data: outfilename
+        environment:
+          environment_type: 'docker-encapsulated'
+          image: 'povstenandrii/papermill:20231102a'

@@ -1,0 +1,15 @@
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0000.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0001.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0002.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0003.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0004.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0005.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0006.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0007.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0008.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0009.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0010.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0011.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0012.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0013.root
+https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD/TT_TuneEE5C_13TeV-powheg-herwigpp/cmsopendata2015_ttbar_19999_PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1_10000_0014.root

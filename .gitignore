@@ -33,3 +33,15 @@ analyses/cms-open-data-ttbar/metrics
 
 # dask
 dask-worker-space/
+analyses/cms-open-data-ttbar/first_option.py
+analyses/cms-open-data-ttbar/reana_higgs_tautau.yaml
+analyses/cms-open-data-ttbar/reana_samples.yaml
+analyses/cms-open-data-ttbar/Sample_execution.py
+analyses/cms-open-data-ttbar/out.ipynb
+analyses/cms-open-data-ttbar/.snakemake/log/2023-11-13T230445.475964.snakemake.log
+analyses/cms-open-data-ttbar/samples.py
+analyses/cms-open-data-ttbar/uproot.py
+.bash_history
+.cache/matplotlib/fontlist-v330.json
+.ipython/profile_default/startup/README
+analyses/cms-open-data-ttbar/loops.py

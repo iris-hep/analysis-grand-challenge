@@ -1,0 +1,233 @@
+independent_variables:
+  - header:
+      name: sample
+    values:
+      - value: 4j1b CR bin 1
+      - value: 4j1b CR bin 2
+      - value: 4j1b CR bin 3
+      - value: 4j1b CR bin 4
+      - value: 4j1b CR bin 5
+      - value: 4j1b CR bin 6
+      - value: 4j1b CR bin 7
+      - value: 4j1b CR bin 8
+      - value: 4j1b CR bin 9
+      - value: 4j1b CR bin 10
+      - value: 4j1b CR bin 11
+
+dependent_variables:
+  - header:
+      name: W+jets
+    values:
+      - value: 41.88
+        errors:
+          - symerror: 43.89
+      - value: 502.60
+        errors:
+          - symerror: 99.38
+      - value: 586.37
+        errors:
+          - symerror: 129.88
+      - value: 1214.62
+        errors:
+          - symerror: 273.35
+      - value: 712.02
+        errors:
+          - symerror: 193.14
+      - value: 586.37
+        errors:
+          - symerror: 184.61
+      - value: 293.18
+        errors: 
+          - symerror: 96.08
+      - value: 376.95
+        errors:
+          - symerror: 137.23
+      - value: 251.30
+        errors: 
+          - symerror: 163.63
+      - value: 418.83
+        errors:
+          - symerror: 199.79
+      - value: 167.53
+        errors: 
+          - symerror: 110.60 
+  - header:
+      name: single top, s-channel
+    values:
+      - value: 0.09
+        errors:
+          - symerror: 0.05
+      - value: 0.49
+        errors:
+          - symerror: 0.13
+      - value: 1.06
+        errors:
+          - symerror: 0.18
+      - value: 0.93
+        errors:
+          - symerror: 0.21
+      - value: 1.06
+        errors:
+          - symerror: 0.27
+      - value: 0.79
+        errors:
+          - symerror: 0.24
+      - value: 0.70
+        errors:
+          - symerror: 0.23
+      - value: 0.44
+        errors:
+          - symerror: 0.18
+      - value: 0.67
+        errors:
+          - symerror: 0.29
+      - value: 0.26
+        errors:
+          - symerror: 0.16
+      - value: 0.48
+        errors:
+          - symerror: 0.22
+  - header:
+      name: single top, t-channel
+    values:
+      - value: 4.71
+        errors:
+          - symerror: 2.18
+      - value: 30.95
+        errors:
+          - symerror: 6.61 
+      - value: 73.35
+        errors:
+          - symerror: 15.77
+      - value: 72.00
+        errors:
+          - symerror: 17.18
+      - value: 67.97
+        errors:
+          - symerror: 16.79
+      - value: 72.68
+        errors:
+          - symerror: 19.40
+      - value: 44.41
+        errors:
+          - symerror: 14.27
+      - value: 28.94
+        errors:
+          - symerror: 9.67
+      - value: 32.30
+        errors:
+          - symerror: 12.73
+      - value: 20.19
+        errors:
+          - symerror: 10.30
+      - value: 16.15
+        errors:
+          - symerror: 8.14
+  - header:
+      name: tW
+    values:
+      - value: 9.67
+        errors:
+          - symerror: 4.04
+      - value: 134.81
+        errors:
+          - symerror: 22.19
+      - value: 270.52
+        errors:
+          - symerror: 48.43
+      - value: 282.31
+        errors:
+          - symerror: 59.70
+      - value: 256.01
+        errors:
+          - symerror: 60.29
+      - value: 179.24
+        errors:
+          - symerror: 51.60
+      - value: 146.90
+        errors:
+          - symerror: 43.58
+      - value: 112.14
+        errors:
+          - symerror: 38.34
+      - value: 82.52
+        errors:
+          - symerror: 30.35
+      - value: 61.96
+        errors:
+          - symerror: 25.82
+      - value: 48.66
+        errors:
+          - symerror: 21.96
+  - header:
+      name: ttbar
+    values:
+      - value: 62.82
+        errors:
+          - symerror: 79.08
+      - value: 1154.71
+        errors:
+          - symerror: 632.68
+      - value: 3164.82
+        errors:
+          - symerror: 917.75
+      - value: 3935.24
+        errors:
+          - symerror: 1033.83
+      - value: 3447.50
+        errors:
+          - symerror: 1185.83
+      - value: 2902.47
+        errors:
+          - symerror: 1012.21
+      - value: 2144.99
+        errors:
+          - symerror: 957.92
+      - value: 1570.40
+        errors:
+          - symerror: 1021.58
+      - value: 1327.10
+        errors:
+          - symerror: 699.45
+      - value: 825.85
+        errors:
+          - symerror: 552.74
+      - value: 633.70
+        errors:
+          - symerror: 470.82
+  - header:
+      name: total
+    values:
+      - value: 119.17
+        errors:
+          - symerror: 102.79
+      - value: 1832.56
+        errors:
+          - symerror: 670.36
+      - value: 4096.12
+        errors:
+          - symerror: 1024.04
+      - value: 5505.11
+        errors:
+          - symerror: 1298.17
+      - value: 4484.55
+        errors:
+          - symerror: 1374.94
+      - value: 3741.55
+        errors:
+          - symerror: 1198.13
+      - value: 2630.18
+        errors:
+          - symerror: 1062.41
+      - value: 2088.87
+        errors:
+          - symerror: 1130.01
+      - value: 1604.63
+        errors:
+          - symerror: 742.68
+      - value: 1327.10
+        errors:
+          - symerror: 699.45
+      - value: 866.53
+        errors:
+          - symerror: 547.62

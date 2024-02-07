@@ -1,0 +1,328 @@
+max_files_per_sample = -1
+download_sleep = 10
+url_prefix = "https://xrootd-local.unl.edu:1094//"
+
+import glob
+def get_samples():
+    "Return list of the samples."
+    samples = []
+    fd = open(f"samples.txt")
+    samples = fd.read().splitlines()
+    fd.close()
+    return samples
+
+import json
+import os
+
+def get_file_paths(sample, max=max_files_per_sample):
+    "Return list of at most MAX file paths for the given SAMPLE."
+    import json
+    import os
+    filepaths = []
+    fd = open(f"sample_{sample}_paths.txt")
+    filepaths = fd.read().splitlines()
+    fd.close()
+    return [f"histograms/histograms_{sample}_"+filepath[35:] for filepath in filepaths][:max]
+
+
+rule all:
+    input:
+        "histograms_merged.root"
+
+
+
+rule process_sample_ttbar_nominal_one_file:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    output:
+        "histograms/histograms_ttbar__nominal_{filename}"
+    params:
+        sample_name = 'ttbar__nominal'
+    shell:
+        "/bin/bash -l && sleep {download_sleep} && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill samples.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+
+
+rule process_sample_ttbar_nominal:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "merged1.ipynb",
+        expand(get_file_paths("ttbar__nominal"))
+    output:
+        "everything_merged_ttbar__nominal.root"
+    params:
+        sample_name = 'ttbar__nominal'
+    shell:
+        "source fix-env.sh && papermill merged1.ipynb merged_nominal.ipynb -p sample_name {params.sample_name} -k python3"
+
+
+
+rule process_sample_ttbar_scaledown_one_file:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    output:
+        "histograms/histograms_ttbar__scaledown_{filename}"
+    params:
+        sample_name = 'ttbar__scaledown'
+    shell:
+        "sleep {download_sleep} && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill samples.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+rule process_sample_ttbar_scaledown:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "merged1.ipynb",
+        expand(get_file_paths("ttbar__scaledown"))
+    output:
+        "everything_merged_ttbar__scaledown.root"
+    params:
+        sample_name = 'ttbar__scaledown'
+    shell:
+        "source fix-env.sh && papermill merged1.ipynb merged_scaledown.ipynb -p sample_name {params.sample_name} -k python3"
+
+
+
+rule process_sample_ttbar_scaleup_one_file:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    output:
+        "histograms/histograms_ttbar__scaleup_{filename}"
+    params:
+        sample_name = 'ttbar__scaleup'
+    shell:
+        "sleep {download_sleep} && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill samples.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+
+
+rule process_sample_ttbar_scaleup:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "merged1.ipynb",
+        expand(get_file_paths("ttbar__scaleup"))
+    output:
+        "everything_merged_ttbar__scaleup.root"
+    params:
+        sample_name = 'ttbar__scaleup'
+    shell:
+        "source fix-env.sh && papermill merged1.ipynb merged_scaleup.ipynb -p sample_name {params.sample_name} -k python3"
+
+
+rule process_sample_ttbar_PS_var_one_file:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    output:
+        "histograms/histograms_ttbar__PS_var_{filename}"
+    params:
+        sample_name = 'ttbar__PS_var'
+    shell:
+        "sleep {download_sleep} && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill samples.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+
+
+rule process_sample_ttbar_PS_var:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "merged1.ipynb",
+        expand(get_file_paths("ttbar__PS_var"))
+    output:
+        "everything_merged_ttbar__PS_var.root"
+    params:
+        sample_name = 'ttbar__PS_var'
+    shell:
+        "source fix-env.sh && papermill merged1.ipynb merged_PS_var.ipynb -p sample_name {params.sample_name} -k python3"
+
+
+rule process_sample_ttbar_ME_var_one_file:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    output:
+        "histograms/histograms_ttbar__ME_var_{filename}"
+    params:
+        sample_name = 'ttbar__ME_var'
+    shell:
+        "sleep {download_sleep} && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill samples.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+
+
+rule process_sample_ttbar_ME_var:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "merged1.ipynb",
+        expand(get_file_paths("ttbar__ME_var"))
+    output:
+        "everything_merged_ttbar__ME_var.root"
+    params:
+        sample_name = 'ttbar__ME_var'
+    shell:
+        "source fix-env.sh && papermill merged1.ipynb merged_ME_var.ipynb -p sample_name {params.sample_name} -k python3"
+
+
+rule process_sample_single_top_s_chan__nominal_one_file:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    output:
+        "histograms/histograms_single_top_s_chan__nominal_{filename}"
+    params:
+        sample_name = 'single_top_s_chan__nominal'
+    shell:
+        "sleep {download_sleep} && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill samples.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+
+
+rule process_sample_single_top_s_chan__nominal:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "merged1.ipynb",
+        expand(get_file_paths("single_top_s_chan__nominal"))
+    output:
+        "everything_merged_single_top_s_chan__nominal.root"
+    params:
+        sample_name = 'single_top_s_chan__nominal'
+    shell:
+        "source fix-env.sh && papermill merged1.ipynb merged_s_chan.ipynb -p sample_name {params.sample_name} -k python3"
+
+
+
+rule process_sample_single_top_t_chan__nominal_one_file:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    output:
+        "histograms/histograms_single_top_t_chan__nominal_{filename}"
+    params:
+        sample_name = 'single_top_t_chan__nominal'
+    shell:
+        "sleep {download_sleep} && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill samples.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+
+
+rule process_sample_single_top_t_chan__nominal:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "merged1.ipynb",
+        expand(get_file_paths("single_top_t_chan__nominal"))
+    output:
+        "everything_merged_single_top_t_chan__nominal.root"
+    params:
+        sample_name = 'single_top_t_chan__nominal'
+    shell:
+        "source fix-env.sh && papermill merged1.ipynb merged_t_chan.ipynb -p sample_name {params.sample_name} -k python3"
+
+
+rule process_sample_single_top_tW__nominal_one_file:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    output:
+        "histograms/histograms_single_top_tW__nominal_{filename}"
+    params:
+        sample_name = 'single_top_tW__nominal'
+    shell:
+        "sleep {download_sleep} && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill samples.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+
+
+rule process_sample_single_top_tW__nominal:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "merged1.ipynb",
+        expand(get_file_paths("single_top_tW__nominal"))
+    output:
+        "everything_merged_single_top_tW__nominal.root"
+    params:
+        sample_name = 'single_top_tW__nominal'
+    shell:
+        "source fix-env.sh && papermill merged1.ipynb merged_single_top_tW.ipynb -p sample_name {params.sample_name} -k python3"
+
+
+rule process_sample_wjets_nominal_one_file:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    output:
+        "histograms/histograms_wjets__nominal_{filename}"
+    params:
+        sample_name = 'wjets__nominal'
+    shell:
+        "sleep {download_sleep} && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill samples.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+
+
+rule process_sample_wjets_nominal:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "merged1.ipynb",
+        expand(get_file_paths("wjets__nominal"))
+    output:
+        "everything_merged_wjets__nominal.root"
+    params:
+        sample_name = 'wjets__nominal'
+    shell:
+        "source fix-env.sh && papermill merged1.ipynb merged_nominal.ipynb -p sample_name {params.sample_name} -k python3"
+
+rule merged_histograms:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        "second cascading.ipynb",
+        "everything_merged_ttbar__nominal.root",
+        "everything_merged_ttbar__ME_var.root",
+        "everything_merged_ttbar__PS_var.root",
+        "everything_merged_ttbar__scaleup.root",
+        "everything_merged_ttbar__scaledown.root",
+        "everything_merged_single_top_s_chan__nominal.root",
+        "everything_merged_single_top_t_chan__nominal.root",
+        "everything_merged_single_top_tW__nominal.root",
+        "everything_merged_wjets__nominal.root"
+    output:
+        "histograms_merged.root"
+    params:
+        merged_step = "Yes"
+    shell:
+        "/bin/bash -l && source fix-env.sh && papermill second cascading.ipynb sample_merged.ipynb -p merged_step {params.merged_step} -k python3"
+
+    
+
