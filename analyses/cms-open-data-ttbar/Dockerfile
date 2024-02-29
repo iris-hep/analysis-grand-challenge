@@ -1,1 +1,0 @@
-FROM povstenandrii/papermill:20231102a

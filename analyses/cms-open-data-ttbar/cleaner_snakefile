@@ -1,0 +1,98 @@
+max_files_per_sample = 10
+url_prefix = "https://xrootd-local.unl.edu:1094//"
+
+import glob
+def get_samples():
+    "Return list of the samples."
+    samples = []
+    fd = open(f"samples.txt")
+    samples = fd.read().splitlines()
+    fd.close()
+    return samples
+
+import json
+import os
+
+def extract_samples_from_json(json_file):
+    output_files = []
+    
+    with open(json_file, "r") as fd:
+        data = json.load(fd)
+
+        for sample, conditions in data.items():
+            for condition, details in conditions.items():
+                sample_name = f"{sample}__{condition}"
+                output_files.append(sample_name)
+                with open(f"sample_{sample_name}_paths.txt", "w") as path_file:
+                    paths = [file_info["path"] for file_info in details["files"]]
+                    path_file.write("\n".join(paths))
+
+    return output_files
+
+
+def get_file_paths(wildcards, max=max_files_per_sample):
+    "Return list of at most MAX file paths for the given SAMPLE."
+    #sample = wildcards.sample
+
+    import json
+    import os
+    filepaths = []
+    fd = open(f"sample_{sample}_paths.txt")
+    filepaths = fd.read().splitlines()
+    fd.close()
+    return [f"histograms/histograms_{sample}_"+filepath[35:] for filepath in filepaths][:max]
+
+ttbar_samples = [f"ttbar__{case}" for case in ["nominal", "scaledown", "scaleup", "ME_var", "PS_var"]]
+single_top_samples = [f"single_top_{case}" for case in ["s_chan__nominal", "t_chan__nominal", "tW__nominal"]]
+#single_top_samples = [f"everything_merged_single_top_{case}" for case in ["s_chan__nominal.root", "t_chan__nominal.root", "top_tW__nominal.root"]]
+#wjet_samples = ["everything_merged_wjets__nominal"]
+wjet_samples = ["wjets__nominal"]
+
+samples = extract_samples_from_json("nanoaod_inputs.json")
+for sample in samples:
+    paths = get_file_paths(sample, max_files_per_sample)
+
+
+
+rule all:
+    input:
+        #expand(
+         #   "everything_merged_{samples}.root",
+          #  samples = ttbar_samples + single_top_samples + wjet_samples
+        #)
+        "everything_merged_ttbar__nominal.root",
+        "everything_merged_ttbar__scaledown.root",
+        "everything_merged_ttbar__scaleup.root",
+        "everything_merged_ttbar__ME_var.root",
+        "everything_merged_ttbar__PS_var.root",
+        "everything_merged_single_top_s_chan__nominal.root",
+        "everything_merged_single_top_t_chan__nominal.root",
+        "everything_merged_single_top_tW__nominal.root",
+        "everything_merged_wjets__nominal.root"
+
+rule produce_histos:
+    container:
+        "povstenandrii/papermill:20231102a"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        prep_script = "prepare_workspace.py",
+        samples_notebook = "samples.ipynb"
+    output:
+        "histograms/histograms_{sample}_{filename}"
+    shell:
+        "/bin/bash -l && source fix-env.sh && python {input.prep_script} sample_{wildcards.sample}_{wildcards.filename} && papermill {input.samples_notebook} sample_{wildcards.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {wildcards.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+
+rule process_histos:
+    container:
+        "povstenandrii/merged_povsten:20240215"
+    resources:
+        kubernetes_memory_limit="1850Mi"
+    input:
+        #files = get_file_paths
+        expand(get_file_paths(sample)),
+        notebook = "file_merging.ipynb"
+    output:
+        "everything_merged_{sample}.root"
+    shell:
+        "papermill {input.notebook} sample_{wildcards.sample_name}.ipynb -p sample_name {sample} -k python3"
