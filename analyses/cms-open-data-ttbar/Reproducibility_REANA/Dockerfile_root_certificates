@@ -1,0 +1,9 @@
+FROM docker.io/povstenandrii/papermill:20231102a
+
+# Copy cerngridca.crt from the local directory to the container
+COPY /ca-certificates/cerngridca.crt  /usr/local/share/ca-certificates/cerngridca.crt
+COPY /ca-certificates/cernroot.crt /usr/local/share/ca-certificates/cernroot.crt
+
+#RUN apk --no-cache add ca-certificates
+
+RUN update-ca-certificates

@@ -1,6 +1,5 @@
 N_FILES_MAX_PER_SAMPLE = 1
 download_sleep = 10
-#url_prefix = "https://xrootd-local.unl.edu:1094//"
 url_prefix = "https://eospublichttp.cern.ch//eos/opendata"
 
 import glob
