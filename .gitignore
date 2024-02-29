@@ -45,3 +45,9 @@ analyses/cms-open-data-ttbar/uproot.py
 .cache/matplotlib/fontlist-v330.json
 .ipython/profile_default/startup/README
 analyses/cms-open-data-ttbar/loops.py
+.DS_Store
+analyses/cms-open-data-ttbar/ca-certificates/cerngridca.crt
+analyses/cms-open-data-ttbar/ca-certificates/cernroot.crt
+HEPData_cabinetry/.DS_Store
+analyses/cms-open-data-ttbar/Dockerfile_root_certificates
+.DS_Store

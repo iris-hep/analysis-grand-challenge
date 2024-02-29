@@ -16,7 +16,7 @@ except ImportError:
 
 # If local_data_cache is a writable path, this function will download any missing file into it and
 # then return file paths corresponding to these local copies.
-def construct_fileset(n_files_max_per_sample, key_to_extract, variation, use_xcache=False, af_name="", local_data_cache=None, input_from_eos=False, xcache_atlas_prefix=None):
+def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", local_data_cache=None, input_from_eos=False, xcache_atlas_prefix=None):
     if af_name == "ssl-dev":
         if use_xcache:
             raise RuntimeError("`use_xcache` and `af_name='ssl-dev'` are incompatible. Please only use one of them.")
@@ -49,40 +49,47 @@ def construct_fileset(n_files_max_per_sample, key_to_extract, variation, use_xca
         "data": None
     }
 
+    # list of files
     with open("nanoaod_inputs.json") as f:
-        file_info_1 = json.load(f)
-    file_info = file_info_1[key_to_extract][variation]
+        file_info = json.load(f)
+
+    # process into "fileset" summarizing all info
     fileset = {}
-    file_list = file_info["files"]
-    if n_files_max_per_sample != -1:
-        file_list = file_list[:n_files_max_per_sample]  # use partial set of samples
-    file_paths=[f["path"] for f in file_list]
-    if use_xcache:
-        file_paths = [f.replace("https://xrootd-local.unl.edu:1094", "root://red-xcache1.unl.edu") for f in file_paths]
-    elif af_name == "ssl-dev":
-        # point to local files on /data
-        file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC", "/data/alheld/AGC/datasets") for f in file_paths]
-    elif input_from_eos:
-        file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD",
-                                "root://eospublic.cern.ch//eos/opendata/cms/upload/agc/1.0.0/") for f in file_paths]
+    for process in file_info.keys():
+        if process == "data":
+            continue  # skip data
 
-    if xcache_atlas_prefix is not None:
-        # prepend xcache to paths
-        file_paths = [xcache_atlas_prefix + f for f in file_paths]
+        for variation in file_info[process].keys():
+            file_list = file_info[process][variation]["files"]
+            if n_files_max_per_sample != -1:
+                file_list = file_list[:n_files_max_per_sample]  # use partial set of samples
 
-    if local_data_cache is not None:
-        local_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/", f"{local_data_cache.absolute()}/") for f in file_paths]
-        for remote, local in zip(file_paths, local_paths):
-            if not Path(local).exists():
-                download_file(remote, local)
-        file_paths = local_paths
-    nevts_total = sum([f["nevts"] for f in file_list])
-    metadata = {"process": key_to_extract, "variation": variation, "nevts": nevts_total, "xsec": xsec_info[key_to_extract]}
-    fileset.update({f"{key_to_extract}__{variation}": {"files": file_paths, "metadata": metadata}})
+            file_paths = [f["path"] for f in file_list]
+            if use_xcache:
+                file_paths = [f.replace("https://xrootd-local.unl.edu:1094", "root://red-xcache1.unl.edu") for f in file_paths]
+            elif af_name == "ssl-dev":
+                # point to local files on /data
+                file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC", "/data/alheld/AGC/datasets") for f in file_paths]
+            elif input_from_eos:
+                file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD",
+                                        "root://eospublic.cern.ch//eos/opendata/cms/upload/agc/1.0.0/") for f in file_paths]
 
+            if xcache_atlas_prefix is not None:
+                # prepend xcache to paths
+                file_paths = [xcache_atlas_prefix + f for f in file_paths]
 
+            if local_data_cache is not None:
+                local_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/", f"{local_data_cache.absolute()}/") for f in file_paths]
+                for remote, local in zip(file_paths, local_paths):
+                    if not Path(local).exists():
+                        download_file(remote, local)
+                file_paths = local_paths
+            nevts_total = sum([f["nevts"] for f in file_list])
+            metadata = {"process": process, "variation": variation, "nevts": nevts_total, "xsec": xsec_info[process]}
+            fileset.update({f"{process}__{variation}": {"files": file_paths, "metadata": metadata}})
 
     return fileset
+
 
 def tqdm_urlretrieve_hook(t):
     """From https://github.com/tqdm/tqdm/blob/master/examples/tqdm_wget.py ."""

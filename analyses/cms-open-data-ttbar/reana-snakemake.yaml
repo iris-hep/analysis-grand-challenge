@@ -1,34 +1,18 @@
 version: 0.8.0
 inputs:
   files:
-    - ttbar_analysis_pipeline.py
-    - samples.ipynb
-    - ttbar_analysis_pipeline.ipynb
-    - validate_histograms.py
+    - ttbar_analysis_reana.ipynb 
     - cabinetry_config_ml.yml
-    - GetIOBranches.py
     - cabinetry_config.yml
     - nanoaod_inputs.json
-    - nanoaod_branch_rations.json
     - fix-env.sh
     - corrections.json
     - Snakefile
-    - merged.ipynb
-
-  directories:
+    - file_merging.ipynb
+    - final_merging.ipynb
     - prepare_workspace.py
-    - sample_ttbar__nominal_paths.txt
-    - sample_ttbar__scaledown_paths.txt
-    - sample_single_top_tW__nominal_paths.txt
-    - sample_single_top_s_chan__nominal_paths.txt
-    - sample_single_top_t_chan__nominal_paths.txt
-    - sample_ttbar__scaleup_paths.txt
-    - sample_ttbar__ME_var_paths.txt
-    - sample_ttbar__PS_var_paths.txt
-    - sample_wjets__nominal_paths.txt
-    - samples.txt
-    - merged1.ipynb
-    - second cascading.ipynb
+    - entrypoint.sh
+    - Snakefile1
 
   directories:
     - histograms
@@ -42,5 +26,4 @@ workflow:
   file: Snakefile1
 outputs:
   files:
-    - merged_histograms.root
-
+    - histograms_merged.root
