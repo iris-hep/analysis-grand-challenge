@@ -1,9 +1,8 @@
 FROM docker.io/povstenandrii/papermill:20231102a
 
 # Copy cerngridca.crt from the local directory to the container
-COPY /ca-certificates/cerngridca.crt  /usr/local/share/ca-certificates/cerngridca.crt
-COPY /ca-certificates/cernroot.crt /usr/local/share/ca-certificates/cernroot.crt
+COPY /ca-certificates/cerngridca.crt  /etc/pki/ca-trust/source/anchors/cerngridca.crt
+COPY /ca-certificates/cernroot.crt /etc/pki/ca-trust/source/anchors/cernroot.crt
 
-#RUN apk --no-cache add ca-certificates
-
-RUN update-ca-certificates
+RUN yum install -y ca-certificates && yum autoremove -y && yum clean all 
+RUN update-ca-trust

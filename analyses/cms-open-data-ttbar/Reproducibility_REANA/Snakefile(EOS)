@@ -47,15 +47,6 @@ for sample in samples:
 rule all:
     input:
         "histograms_merged.root"
-        #"everything_merged_ttbar__nominal.root",
-        #"everything_merged_ttbar__scaledown.root",
-        #"everything_merged_ttbar__scaleup.root",
-        #"everything_merged_ttbar__ME_var.root",
-        #"everything_merged_ttbar__PS_var.root",
-        #"everything_merged_single_top_s_chan__nominal.root",
-        #"everything_merged_single_top_t_chan__nominal.root",
-        #"everything_merged_single_top_tW__nominal.root",
-        #"everything_merged_wjets__nominal.root"
 
 rule process_sample_ttbar_nominal_one_file:
     container:

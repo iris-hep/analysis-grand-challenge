@@ -51,3 +51,12 @@ analyses/cms-open-data-ttbar/ca-certificates/cernroot.crt
 HEPData_cabinetry/.DS_Store
 analyses/cms-open-data-ttbar/Dockerfile_root_certificates
 .DS_Store
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_single_top_s_chan__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_single_top_t_chan__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_single_top_tW__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__ME_var_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__PS_var_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__scaledown_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_wjets__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__scaleup_paths.txt
