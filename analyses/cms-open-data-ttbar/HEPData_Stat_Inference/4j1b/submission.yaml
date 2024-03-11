@@ -1,0 +1,53 @@
+---
+additional_resources:
+- description: Created with hepdata_lib 0.14.3
+  location: https://doi.org/10.5281/zenodo.1217998
+comment: ''
+data_license:
+  description: The content can be shared and adapted but you must             give
+    appropriate credit and cannot restrict access to others.
+  name: cc-by-4.0
+  url: https://creativecommons.org/licenses/by/4.0/
+related_to_hepdata_records: []
+---
+data_file: 4j1b_figure.yaml
+description: Example description
+keywords: []
+location: Example location
+name: 4j1b Figure
+related_to_table_dois: []
+---
+data_file: 4j2b_figure.yaml
+description: Example description
+keywords: []
+location: Example location
+name: 4j2b Figure
+related_to_table_dois: []
+---
+data_file: 4j1b_figure.yaml
+description: Example description
+keywords: []
+location: Example location
+name: 4j1b Figure
+related_to_table_dois: []
+---
+data_file: 4j1b_figure.yaml
+description: Example description
+keywords: []
+location: Example location
+name: 4j1b Figure
+related_to_table_dois: []
+---
+data_file: 4j1b_figure.yaml
+description: Example description
+keywords: []
+location: Example location
+name: 4j1b Figure
+related_to_table_dois: []
+---
+data_file: 4j1b_figure.yaml
+description: Example description
+keywords: []
+location: Example location
+name: 4j1b Figure
+related_to_table_dois: []
