@@ -1,0 +1,551 @@
+dependent_variables:
+- header:
+    name: W+jets
+    units: Number of jets
+  values:
+  - errors:
+    - label: A symmetric error
+      symerror: 38.662
+    value: 2.0e-06
+  - errors:
+    - label: A symmetric error
+      symerror: 1.3894e-07
+    value: 2.0e-06
+  - errors:
+    - label: A symmetric error
+      symerror: 20.587
+    value: 83.767
+  - errors:
+    - label: A symmetric error
+      symerror: 93.141
+    value: 209.42
+  - errors:
+    - label: A symmetric error
+      symerror: 97.061
+    value: 125.65
+  - errors:
+    - label: A symmetric error
+      symerror: 157.2
+    value: 335.07
+  - errors:
+    - label: A symmetric error
+      symerror: 95.837
+    value: 209.42
+  - errors:
+    - label: A symmetric error
+      symerror: 207.54
+    value: 335.07
+  - errors:
+    - label: A symmetric error
+      symerror: 115.99
+    value: 2.0e-06
+  - errors:
+    - label: A symmetric error
+      symerror: 49.641
+    value: 125.65
+  - errors:
+    - label: A symmetric error
+      symerror: 8.6334e-08
+    value: 2.0e-06
+  - errors:
+    - label: A symmetric error
+      symerror: 10.257
+    value: 41.883
+  - errors:
+    - label: A symmetric error
+      symerror: 38.662
+    value: 2.0e-06
+  - errors:
+    - label: A symmetric error
+      symerror: 9.7621e-08
+    value: 2.0e-06
+  - errors:
+    - label: A symmetric error
+      symerror: 50.442
+    value: 83.767
+  - errors:
+    - label: A symmetric error
+      symerror: 9.9718e-08
+    value: 2.0e-06
+  - errors:
+    - label: A symmetric error
+      symerror: 54.294
+    value: 125.65
+  - errors:
+    - label: A symmetric error
+      symerror: 45.691
+    value: 2.0e-06
+  - errors:
+    - label: A symmetric error
+      symerror: 49.615
+    value: 41.883
+  - errors:
+    - label: A symmetric error
+      symerror: 67.957
+    value: 83.767
+  - errors:
+    - label: A symmetric error
+      symerror: 8.02
+    value: 41.883
+  - errors:
+    - label: A symmetric error
+      symerror: 7.2543
+    value: 41.883
+  - errors:
+    - label: A symmetric error
+      symerror: 1.0842e-07
+    value: 2.0e-06
+  - errors:
+    - label: A symmetric error
+      symerror: 68.586
+    value: 125.65
+  - errors:
+    - label: A symmetric error
+      symerror: 1.4695e-07
+    value: 2.0e-06
+- header:
+    name: single top, s-channel
+    units: Number of jets
+  values:
+  - errors:
+    - label: A symmetric error
+      symerror: 0.022365
+    value: 0.052827
+  - errors:
+    - label: A symmetric error
+      symerror: 0.077686
+    value: 0.15848
+  - errors:
+    - label: A symmetric error
+      symerror: 0.75511
+    value: 1.4615
+  - errors:
+    - label: A symmetric error
+      symerror: 0.88804
+    value: 1.9017
+  - errors:
+    - label: A symmetric error
+      symerror: 0.7368
+    value: 2.0954
+  - errors:
+    - label: A symmetric error
+      symerror: 0.7727
+    value: 2.2539
+  - errors:
+    - label: A symmetric error
+      symerror: 0.61686
+    value: 1.9897
+  - errors:
+    - label: A symmetric error
+      symerror: 0.43808
+    value: 1.4439
+  - errors:
+    - label: A symmetric error
+      symerror: 0.29686
+    value: 0.98607
+  - errors:
+    - label: A symmetric error
+      symerror: 0.25111
+    value: 0.65151
+  - errors:
+    - label: A symmetric error
+      symerror: 0.15008
+    value: 0.68673
+  - errors:
+    - label: A symmetric error
+      symerror: 0.14888
+    value: 0.59869
+  - errors:
+    - label: A symmetric error
+      symerror: 0.11973
+    value: 0.4226
+  - errors:
+    - label: A symmetric error
+      symerror: 0.15752
+    value: 0.56347
+  - errors:
+    - label: A symmetric error
+      symerror: 0.081496
+    value: 0.33456
+  - errors:
+    - label: A symmetric error
+      symerror: 0.11344
+    value: 0.33456
+  - errors:
+    - label: A symmetric error
+      symerror: 0.14545
+    value: 0.38739
+  - errors:
+    - label: A symmetric error
+      symerror: 0.11994
+    value: 0.4226
+  - errors:
+    - label: A symmetric error
+      symerror: 0.14237
+    value: 0.49304
+  - errors:
+    - label: A symmetric error
+      symerror: 0.093334
+    value: 0.33456
+  - errors:
+    - label: A symmetric error
+      symerror: 0.14182
+    value: 0.35217
+  - errors:
+    - label: A symmetric error
+      symerror: 0.12755
+    value: 0.31695
+  - errors:
+    - label: A symmetric error
+      symerror: 0.12107
+    value: 0.2113
+  - errors:
+    - label: A symmetric error
+      symerror: 0.1208
+    value: 0.29934
+  - errors:
+    - label: A symmetric error
+      symerror: 0.059874
+    value: 0.14087
+- header:
+    name: single top, t-channel
+    units: Number of jets
+  values:
+  - errors:
+    - label: A symmetric error
+      symerror: 2.6315
+    value: 5.3834
+  - errors:
+    - label: A symmetric error
+      symerror: 4.4361
+    value: 6.7292
+  - errors:
+    - label: A symmetric error
+      symerror: 22.505
+    value: 43.74
+  - errors:
+    - label: A symmetric error
+      symerror: 39.73
+    value: 100.94
+  - errors:
+    - label: A symmetric error
+      symerror: 33.748
+    value: 94.209
+  - errors:
+    - label: A symmetric error
+      symerror: 38.582
+    value: 115.74
+  - errors:
+    - label: A symmetric error
+      symerror: 31.358
+    value: 98.92
+  - errors:
+    - label: A symmetric error
+      symerror: 20.213
+    value: 75.367
+  - errors:
+    - label: A symmetric error
+      symerror: 16.429
+    value: 60.563
+  - errors:
+    - label: A symmetric error
+      symerror: 13.477
+    value: 57.198
+  - errors:
+    - label: A symmetric error
+      symerror: 9.359
+    value: 38.357
+  - errors:
+    - label: A symmetric error
+      symerror: 8.703
+    value: 24.225
+  - errors:
+    - label: A symmetric error
+      symerror: 5.5858
+    value: 24.225
+  - errors:
+    - label: A symmetric error
+      symerror: 7.3144
+    value: 26.244
+  - errors:
+    - label: A symmetric error
+      symerror: 5.0556
+    value: 24.898
+  - errors:
+    - label: A symmetric error
+      symerror: 6.7059
+    value: 20.188
+  - errors:
+    - label: A symmetric error
+      symerror: 5.3009
+    value: 19.515
+  - errors:
+    - label: A symmetric error
+      symerror: 6.4644
+    value: 27.59
+  - errors:
+    - label: A symmetric error
+      symerror: 7.201
+    value: 20.188
+  - errors:
+    - label: A symmetric error
+      symerror: 10.36
+    value: 32.973
+  - errors:
+    - label: A symmetric error
+      symerror: 5.8686
+    value: 11.44
+  - errors:
+    - label: A symmetric error
+      symerror: 9.0673
+    value: 26.917
+  - errors:
+    - label: A symmetric error
+      symerror: 5.7029
+    value: 16.15
+  - errors:
+    - label: A symmetric error
+      symerror: 4.8263
+    value: 11.44
+  - errors:
+    - label: A symmetric error
+      symerror: 2.4619
+    value: 6.7292
+- header:
+    name: tW
+    units: Number of jets
+  values:
+  - errors:
+    - label: A symmetric error
+      symerror: 4.7721
+    value: 11.486
+  - errors:
+    - label: A symmetric error
+      symerror: 8.3169
+    value: 13.904
+  - errors:
+    - label: A symmetric error
+      symerror: 51.495
+    value: 118.18
+  - errors:
+    - label: A symmetric error
+      symerror: 70.489
+    value: 166.24
+  - errors:
+    - label: A symmetric error
+      symerror: 88.948
+    value: 235.46
+  - errors:
+    - label: A symmetric error
+      symerror: 78.466
+    value: 236.06
+  - errors:
+    - label: A symmetric error
+      symerror: 73.923
+    value: 229.41
+  - errors:
+    - label: A symmetric error
+      symerror: 65.661
+    value: 207.05
+  - errors:
+    - label: A symmetric error
+      symerror: 51.342
+    value: 175.91
+  - errors:
+    - label: A symmetric error
+      symerror: 37.574
+    value: 137.23
+  - errors:
+    - label: A symmetric error
+      symerror: 26.716
+    value: 99.745
+  - errors:
+    - label: A symmetric error
+      symerror: 20.548
+    value: 83.726
+  - errors:
+    - label: A symmetric error
+      symerror: 17.436
+    value: 73.147
+  - errors:
+    - label: A symmetric error
+      symerror: 18.4
+    value: 69.519
+  - errors:
+    - label: A symmetric error
+      symerror: 15.588
+    value: 59.847
+  - errors:
+    - label: A symmetric error
+      symerror: 16.651
+    value: 60.452
+  - errors:
+    - label: A symmetric error
+      symerror: 17.18
+    value: 58.336
+  - errors:
+    - label: A symmetric error
+      symerror: 12.242
+    value: 47.757
+  - errors:
+    - label: A symmetric error
+      symerror: 13.432
+    value: 47.455
+  - errors:
+    - label: A symmetric error
+      symerror: 13.894
+    value: 46.85
+  - errors:
+    - label: A symmetric error
+      symerror: 15.754
+    value: 49.57
+  - errors:
+    - label: A symmetric error
+      symerror: 10.545
+    value: 35.969
+  - errors:
+    - label: A symmetric error
+      symerror: 14.108
+    value: 39.898
+  - errors:
+    - label: A symmetric error
+      symerror: 10.85
+    value: 30.226
+  - errors:
+    - label: A symmetric error
+      symerror: 7.3118
+    value: 19.647
+- header:
+    name: ttbar
+    units: Number of jets
+  values:
+  - errors:
+    - label: A symmetric error
+      symerror: 104.99
+    value: 240.18
+  - errors:
+    - label: A symmetric error
+      symerror: 230.69
+    value: 445.26
+  - errors:
+    - label: A symmetric error
+      symerror: 1509.5
+    value: 3201.8
+  - errors:
+    - label: A symmetric error
+      symerror: 2289.8
+    value: 4958.8
+  - errors:
+    - label: A symmetric error
+      symerror: 2276.3
+    value: 6024.8
+  - errors:
+    - label: A symmetric error
+      symerror: 2250.9
+    value: 5775.4
+  - errors:
+    - label: A symmetric error
+      symerror: 1756.7
+    value: 5180.5
+  - errors:
+    - label: A symmetric error
+      symerror: 1428.9
+    value: 4264.1
+  - errors:
+    - label: A symmetric error
+      symerror: 1083.3
+    value: 3451.2
+  - errors:
+    - label: A symmetric error
+      symerror: 709.68
+    value: 2538.5
+  - errors:
+    - label: A symmetric error
+      symerror: 514.94
+    value: 1882.6
+  - errors:
+    - label: A symmetric error
+      symerror: 444.0
+    value: 1555.6
+  - errors:
+    - label: A symmetric error
+      symerror: 374.22
+    value: 1285.9
+  - errors:
+    - label: A symmetric error
+      symerror: 343.66
+    value: 1158.4
+  - errors:
+    - label: A symmetric error
+      symerror: 290.01
+    value: 1188.0
+  - errors:
+    - label: A symmetric error
+      symerror: 275.86
+    value: 1093.7
+  - errors:
+    - label: A symmetric error
+      symerror: 279.45
+    value: 1075.3
+  - errors:
+    - label: A symmetric error
+      symerror: 324.1
+    value: 1095.6
+  - errors:
+    - label: A symmetric error
+      symerror: 326.23
+    value: 1175.0
+  - errors:
+    - label: A symmetric error
+      symerror: 323.76
+    value: 1103.0
+  - errors:
+    - label: A symmetric error
+      symerror: 388.04
+    value: 1006.9
+  - errors:
+    - label: A symmetric error
+      symerror: 402.09
+    value: 1093.7
+  - errors:
+    - label: A symmetric error
+      symerror: 315.31
+    value: 849.87
+  - errors:
+    - label: A symmetric error
+      symerror: 257.38
+    value: 665.11
+  - errors:
+    - label: A symmetric error
+      symerror: 187.45
+    value: 371.35
+independent_variables:
+- header:
+    name: sample
+    units: should be some units for the samples??
+  values:
+  - value: Feature0 bin0
+  - value: Feature0 bin1
+  - value: Feature0 bin2
+  - value: Feature0 bin3
+  - value: Feature0 bin4
+  - value: Feature0 bin5
+  - value: Feature0 bin6
+  - value: Feature0 bin7
+  - value: Feature0 bin8
+  - value: Feature0 bin9
+  - value: Feature0 bin10
+  - value: Feature0 bin11
+  - value: Feature0 bin12
+  - value: Feature0 bin13
+  - value: Feature0 bin14
+  - value: Feature0 bin15
+  - value: Feature0 bin16
+  - value: Feature0 bin17
+  - value: Feature0 bin18
+  - value: Feature0 bin19
+  - value: Feature0 bin20
+  - value: Feature0 bin21
+  - value: Feature0 bin22
+  - value: Feature0 bin23
+  - value: Feature0 bin24
