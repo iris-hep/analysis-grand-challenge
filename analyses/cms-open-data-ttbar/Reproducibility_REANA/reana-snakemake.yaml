@@ -7,7 +7,7 @@ inputs:
     - nanoaod_inputs.json
     - fix-env.sh
     - corrections.json
-    - Snakefile
+    - Snakefile(EOS)
     - file_merging.ipynb
     - final_merging.ipynb
     - prepare_workspace.py
@@ -23,7 +23,9 @@ inputs:
     - files
 workflow:
   type: snakemake
-  file: Snakefile1
+  resources:
+    kerberos: true
+  file: Snakefile(EOS)
 outputs:
   files:
     - histograms_merged.root

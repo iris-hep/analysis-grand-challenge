@@ -1,4 +1,4 @@
-max_files_per_sample = 20
+max_files_per_sample = 1
 download_sleep = 10
 url_prefix = "https://xrootd-local.unl.edu:1094//"
 

@@ -1,6 +1,7 @@
-N_FILES_MAX_PER_SAMPLE = 1
+N_FILES_MAX_PER_SAMPLE = -1
 download_sleep = 10
-url_prefix = "https://eospublichttp.cern.ch//eos/opendata"
+#url_prefix = "https://eospublichttp.cern.ch//eos/opendata" , https://eospublichttp.cern.ch//eos/opendata/cms/upload/agc/1.0.0/
+url_prefix = "root://eospublic.cern.ch//eos/opendata"
 
 import glob
 import json
@@ -19,7 +20,7 @@ def extract_samples_from_json(json_file):
                 output_files.append(sample_name)
                 with open(f"sample_{sample_name}_paths.txt", "w") as path_file:
                     paths = [file_info["path"].replace("https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD",
-                                                       "https://eospublichttp.cern.ch//eos/opendata/cms/upload/agc/1.0.0/") for file_info in details["files"]]
+                                                       "root://eospublic.cern.ch//eos/opendata/cms/upload/agc/1.0.0/") for file_info in details["files"]]
                     path_file.write("\n".join(paths))
 
     return output_files
@@ -33,7 +34,7 @@ def get_file_paths(sample, max=N_FILES_MAX_PER_SAMPLE):
     fd = open(f"sample_{sample}_paths.txt")
     filepaths = fd.read().splitlines()
     fd.close()
-    return [f"histograms/histograms_{sample}_"+filepath[46:] for filepath in filepaths][:max]   #fro previous one it was 38
+    return [f"histograms/histograms_{sample}_"+filepath[38:] for filepath in filepaths][:max]   #fro previous one it was 38
 
 samples = extract_samples_from_json("nanoaod_inputs.json")
 for sample in samples:
@@ -50,7 +51,7 @@ rule all:
 
 rule process_sample_ttbar_nominal_one_file:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -81,7 +82,7 @@ rule process_sample_ttbar_nominal:
 
 rule process_sample_ttbar_scaledown_one_file:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -110,7 +111,7 @@ rule process_sample_ttbar_scaledown:
 
 rule process_sample_ttbar_scaleup_one_file:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -140,7 +141,7 @@ rule process_sample_ttbar_scaleup:
 
 rule process_sample_ttbar_PS_var_one_file:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -170,7 +171,7 @@ rule process_sample_ttbar_PS_var:
 
 rule process_sample_ttbar_ME_var_one_file:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -200,7 +201,7 @@ rule process_sample_ttbar_ME_var:
 
 rule process_sample_single_top_s_chan__nominal_one_file:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -231,7 +232,7 @@ rule process_sample_single_top_s_chan__nominal:
 
 rule process_sample_single_top_t_chan__nominal_one_file:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -261,7 +262,7 @@ rule process_sample_single_top_t_chan__nominal:
 
 rule process_sample_single_top_tW__nominal_one_file:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -291,7 +292,7 @@ rule process_sample_single_top_tW__nominal:
 
 rule process_sample_wjets_nominal_one_file:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -320,7 +321,7 @@ rule process_sample_wjets_nominal:
 
 rule merged_histograms:
     container:
-        "povstenandrii/ttbarfileprocessing:20240228"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     input:
