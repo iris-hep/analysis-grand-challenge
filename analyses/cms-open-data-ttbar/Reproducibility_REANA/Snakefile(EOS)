@@ -1,6 +1,5 @@
 N_FILES_MAX_PER_SAMPLE = -1
 download_sleep = 10
-#url_prefix = "https://eospublichttp.cern.ch//eos/opendata" , https://eospublichttp.cern.ch//eos/opendata/cms/upload/agc/1.0.0/
 url_prefix = "root://eospublic.cern.ch//eos/opendata"
 
 import glob
@@ -34,12 +33,12 @@ def get_file_paths(sample, max=N_FILES_MAX_PER_SAMPLE):
     fd = open(f"sample_{sample}_paths.txt")
     filepaths = fd.read().splitlines()
     fd.close()
-    return [f"histograms/histograms_{sample}_"+filepath[38:] for filepath in filepaths][:max]   #fro previous one it was 38
+    return [f"histograms/histograms_{sample}_"+filepath[38:] for filepath in filepaths][:max] 
 
 samples = extract_samples_from_json("nanoaod_inputs.json")
 for sample in samples:
     paths = get_file_paths(sample, N_FILES_MAX_PER_SAMPLE)
-    #print(f"Sample: {sample}, Paths: {paths}")
+
 
 
 
