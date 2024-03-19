@@ -1,18 +1,11 @@
-max_files_per_sample = 100
+N_FILES_MAX_PER_SAMPLE = -1
 download_sleep = 10
-url_prefix = "https://xrootd-local.unl.edu:1094//"
+url_prefix = "root://eospublic.cern.ch//eos/opendata"
 
 import glob
-def get_samples():
-    "Return list of the samples."
-    samples = []
-    fd = open(f"samples.txt")
-    samples = fd.read().splitlines()
-    fd.close()
-    return samples
-
 import json
 import os
+
 
 def extract_samples_from_json(json_file):
     output_files = []
@@ -25,13 +18,14 @@ def extract_samples_from_json(json_file):
                 sample_name = f"{sample}__{condition}"
                 output_files.append(sample_name)
                 with open(f"sample_{sample_name}_paths.txt", "w") as path_file:
-                    paths = [file_info["path"] for file_info in details["files"]]
+                    paths = [file_info["path"].replace("https://xrootd-local.unl.edu:1094//store/user/AGC/nanoAOD",
+                                                       "root://eospublic.cern.ch//eos/opendata/cms/upload/agc/1.0.0/") for file_info in details["files"]]
                     path_file.write("\n".join(paths))
 
     return output_files
 
 
-def get_file_paths(sample, max=max_files_per_sample):
+def get_file_paths(sample, max=N_FILES_MAX_PER_SAMPLE):
     "Return list of at most MAX file paths for the given SAMPLE."
     import json
     import os
@@ -39,12 +33,12 @@ def get_file_paths(sample, max=max_files_per_sample):
     fd = open(f"sample_{sample}_paths.txt")
     filepaths = fd.read().splitlines()
     fd.close()
-    return [f"histograms/histograms_{sample}_"+filepath[35:] for filepath in filepaths][:max]
+    return [f"histograms/histograms_{sample}_"+filepath[38:] for filepath in filepaths][:max] 
 
 samples = extract_samples_from_json("nanoaod_inputs.json")
 for sample in samples:
-    paths = get_file_paths(sample, max_files_per_sample)
-    #print(f"Sample: {sample}, Paths: {paths}")
+    paths = get_file_paths(sample, N_FILES_MAX_PER_SAMPLE)
+
 
 
 
@@ -56,7 +50,7 @@ rule all:
 
 rule process_sample_ttbar_nominal_one_file:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -87,7 +81,7 @@ rule process_sample_ttbar_nominal:
 
 rule process_sample_ttbar_scaledown_one_file:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -116,7 +110,7 @@ rule process_sample_ttbar_scaledown:
 
 rule process_sample_ttbar_scaleup_one_file:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -146,7 +140,7 @@ rule process_sample_ttbar_scaleup:
 
 rule process_sample_ttbar_PS_var_one_file:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -176,7 +170,7 @@ rule process_sample_ttbar_PS_var:
 
 rule process_sample_ttbar_ME_var_one_file:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -206,7 +200,7 @@ rule process_sample_ttbar_ME_var:
 
 rule process_sample_single_top_s_chan__nominal_one_file:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -237,7 +231,7 @@ rule process_sample_single_top_s_chan__nominal:
 
 rule process_sample_single_top_t_chan__nominal_one_file:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -267,7 +261,7 @@ rule process_sample_single_top_t_chan__nominal:
 
 rule process_sample_single_top_tW__nominal_one_file:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -297,7 +291,7 @@ rule process_sample_single_top_tW__nominal:
 
 rule process_sample_wjets_nominal_one_file:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     output:
@@ -326,7 +320,7 @@ rule process_sample_wjets_nominal:
 
 rule merged_histograms:
     container:
-        "povstenandrii/papermill:20231102a"
+        "povstenandrii/ttbarkerberos:20240311"
     resources:
         kubernetes_memory_limit="1850Mi"
     input:
@@ -348,3 +342,4 @@ rule merged_histograms:
         "/bin/bash -l && source fix-env.sh && papermill final_merging.ipynb sample_merged.ipynb -p merged_step {params.merged_step} -k python3"
 
     
+
