@@ -1,4 +1,5 @@
 from hepdata_lib import Submission, Table, Variable, Uncertainty
+import hist.intervals
 
 def create_hep_data_table(index, model, model_prediction):
     submission = Submission()
@@ -16,17 +17,29 @@ def create_hep_data_table(index, model, model_prediction):
 
     independent_variables = []
     dependent_variables = []
+    independent_variables_ml = []
+    dependent_variables_ml = []
+
     for key in output.keys():
         columns = key.split()
-        independent_variables.append(f"{columns[0]} {columns[1]} {columns[-1]}")
-        dependent_variables.append(' '.join(columns[2:-1]))
+        if f'4j{index}b' in key:
+            independent_variables.append(f"{columns[0]} {columns[1]} {columns[-1]}")
+            dependent_variables.append(' '.join(columns[2:-1]))
+        elif f'Feature{index}' in key:
+            independent_variables_ml.append(f"{columns[0]} {columns[-1]}")
+            dependent_variables_ml.append(' '.join(columns[1:-1]))
 
-    table = Table(f"4j{index}b Figure")
+    table_name = ""
+    if independent_variables:
+        table_name = f"4j{index}b Figure"
+    elif independent_variables_ml:
+        table_name = f"Feature{index} Figure"
+
+    table = Table(table_name)
 
     var = Variable("sample", is_independent=True, is_binned=False, units="should be some units for the samples??")
-    var.values = sorted(set(value for value in independent_variables if f'4j{index}b' in value), key=independent_variables.index)
+    var.values = sorted(set(independent_variables + independent_variables_ml), key=lambda x: independent_variables.index(x) if x in independent_variables else independent_variables_ml.index(x))
     table.add_variable(var)
-
     for i, info in enumerate(model.config.samples):
         data_var = Variable(model.config.samples[i], is_independent=False, is_binned=False, units="Number of jets")
         data_var.values = model_prediction.model_yields[index-1][i]
@@ -38,8 +51,3 @@ def create_hep_data_table(index, model, model_prediction):
         table.add_variable(data_var)
 
     return table
-
-
-
-
-
