@@ -195,4 +195,7 @@ config = {
             "Quark vs Gluon likelihood discriminator of the $b_{top-lep}$ Jet",
         ],
     },
+    "preservation": {
+        "HEP_DATA": False
+    }
 }
