@@ -1,46 +1,33 @@
-# ---
-# jupyter:
-#   jupytext:
-#     formats: ipynb,py:percent
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.15.2
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
+#!/usr/bin/env python
+# coding: utf-8
 
-# %% [markdown]
 # # CMS Open Data $t\bar{t}$: from data delivery to statistical inference
-#
+# 
 # We are using [2015 CMS Open Data](https://cms.cern/news/first-cms-open-data-lhc-run-2-released) in this demonstration to showcase an analysis pipeline.
 # It features data delivery and processing, histogram construction and visualization, as well as statistical inference.
-#
+# 
 # This notebook was developed in the context of the [IRIS-HEP AGC tools 2022 workshop](https://indico.cern.ch/e/agc-tools-2).
 # This work was supported by the U.S. National Science Foundation (NSF) Cooperative Agreement OAC-1836650 (IRIS-HEP).
-#
+# 
 # This is a **technical demonstration**.
 # We are including the relevant workflow aspects that physicists need in their work, but we are not focusing on making every piece of the demonstration physically meaningful.
 # This concerns in particular systematic uncertainties: we capture the workflow, but the actual implementations are more complex in practice.
 # If you are interested in the physics side of analyzing top pair production, check out the latest results from [ATLAS](https://twiki.cern.ch/twiki/bin/view/AtlasPublic/TopPublicResults) and [CMS](https://cms-results.web.cern.ch/cms-results/public-results/preliminary-results/)!
 # If you would like to see more technical demonstrations, also check out an [ATLAS Open Data example](https://indico.cern.ch/event/1076231/contributions/4560405/) demonstrated previously.
-#
+# 
 # This notebook implements most of the analysis pipeline shown in the following picture, using the tools also mentioned there:
 # ![ecosystem visualization](utils/ecosystem.png)
 
-# %% [markdown]
 # ### Data pipelines
-#
+# 
 # There are two possible pipelines: one with `ServiceX` enabled, and one using only `coffea` for processing.
 # ![processing pipelines](utils/processing_pipelines.png)
 
-# %% [markdown]
 # ### Imports: setting up our environment
 
-# %%
+# In[1]:
+
+
 import logging
 import time
 
@@ -61,15 +48,14 @@ import utils  # contains code for bookkeeping and cosmetics, as well as some boi
 
 logging.getLogger("cabinetry").setLevel(logging.INFO)
 
-# %% [markdown]
 # ### Configuration: number of files and data delivery path
-#
+# 
 # The number of files per sample set here determines the size of the dataset we are processing. There are 9 samples being used here, all part of the 2015 CMS Open Data release.
-#
+# 
 # These samples were originally published in miniAOD format, but for the purposes of this demonstration were pre-converted into nanoAOD format. More details about the inputs can be found [here](https://github.com/iris-hep/analysis-grand-challenge/tree/main/datasets/cms-open-data-2015).
-#
+# 
 # The table below summarizes the amount of data processed depending on the `N_FILES_MAX_PER_SAMPLE` setting.
-#
+# 
 # | setting | number of files | total size | number of events |
 # | --- | --- | --- | --- |
 # | `1` | 9 | 22.9 GB | 10,455,719 |
@@ -81,10 +67,12 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 # | `100` | 395 | 960 GB | 470,397,795 |
 # | `200` | 595 | 1.40 TB | 705,273,291 |
 # | `-1` | 787 | 1.78 TB | 940,160,174 |
-#
+# 
 # The input files are all in the 1–3 GB range.
 
-# %%
+# In[2]:
+
+
 ### GLOBAL CONFIGURATION
 # input files per process, set to e.g. 10 (smaller number = faster)
 N_FILES_MAX_PER_SAMPLE = 5
@@ -103,21 +91,21 @@ USE_INFERENCE = True
 # enable inference using NVIDIA Triton server
 USE_TRITON = False
 
-
-# %% [markdown]
 # ### Defining our `coffea` Processor
-#
+# 
 # The processor includes a lot of the physics analysis details:
 # - event filtering and the calculation of observables,
 # - event weighting,
 # - calculating systematic uncertainties at the event and object level,
 # - filling all the information into histograms that get aggregated and ultimately returned to us by `coffea`.
-#
+# 
 # #### Machine Learning Task
-#
+# 
 # During the processing step, machine learning is used to calculate one of the variables used for this analysis. The models used are trained separately in the `jetassignment_training.ipynb` notebook. Jets in the events are assigned to labels corresponding with their parent partons using a boosted decision tree (BDT). More information about the model and training can be found within that notebook.
 
-# %%
+# In[3]:
+
+
 class TtbarAnalysis(processor.ProcessorABC):
     def __init__(self, use_inference, use_triton):
 
@@ -361,12 +349,13 @@ class TtbarAnalysis(processor.ProcessorABC):
     def postprocess(self, accumulator):
         return accumulator
 
-# %% [markdown]
 # ### "Fileset" construction and metadata
-#
+# 
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
-# %%
+# In[4]:
+
+
 fileset = utils.file_input.construct_fileset(
     N_FILES_MAX_PER_SAMPLE,
     use_xcache=False,
@@ -379,13 +368,13 @@ print(f"processes in fileset: {list(fileset.keys())}")
 print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files'][0]}, ...],")
 print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 
-
-# %% [markdown]
 # ### ServiceX-specific functionality: query setup
-#
+# 
 # Define the func_adl query to be used for the purpose of extracting columns and filtering.
 
-# %%
+# In[5]:
+
+
 def get_query(source):
     """Query for event / column selection: >=4j >=1b, ==1 lep with pT>30 GeV + additional cuts,
     return relevant columns
@@ -465,13 +454,13 @@ def get_query(source):
                                        "Jet_jetId": h.Jet_jetId,
                                       })
 
-
-# %% [markdown]
 # ### Caching the queried datasets with `ServiceX`
-#
+# 
 # Using the queries created with `func_adl`, we are using `ServiceX` to read the CMS Open Data files to build cached files with only the specific event information as dictated by the query.
 
-# %%
+# In[6]:
+
+
 if USE_SERVICEX:
     try:
         from func_adl_servicex import ServiceXSourceUpROOT
@@ -500,14 +489,15 @@ if USE_SERVICEX:
     for process in fileset.keys():
         fileset[process]["files"] = [f.url for f in files_per_process[process]]
 
-# %% [markdown]
 # ### Execute the data delivery pipeline
-#
+# 
 # What happens here depends on the flag `USE_SERVICEX`. If set to true, the processor is run on the data previously gathered by ServiceX, then will gather output histograms.
-#
+# 
 # When `USE_SERVICEX` is false, the input files need to be processed during this step as well.
 
-# %%
+# In[7]:
+
+
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 if USE_DASK:
     cloudpickle.register_pickle_by_value(utils) # serialize methods and objects in utils so that they can be accessed within the coffea processor
@@ -545,17 +535,20 @@ exec_time = time.monotonic() - t0
 
 print(f"\nexecution took {exec_time:.2f} seconds")
 
-# %%
+# In[8]:
+
+
 # track metrics
 utils.metrics.track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_MAX_PER_SAMPLE, USE_INFERENCE, USE_TRITON)
 
-# %% [markdown]
 # ### Inspecting the produced histograms
-#
+# 
 # Let's have a look at the data we obtained.
 # We built histograms in two phase space regions, for multiple physics processes and systematic variations.
 
-# %%
+# In[9]:
+
+
 import utils.plotting  # noqa: E402
 
 utils.plotting.set_style()
@@ -565,22 +558,25 @@ plt.legend(frameon=False)
 plt.title("$\geq$ 4 jets, 1 b-tag")
 plt.xlabel("$H_T$ [GeV]");
 
-# %%
+# In[10]:
+
+
 all_histograms["hist_dict"]["4j2b"][:, :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1,edgecolor="grey")
 plt.legend(frameon=False)
 plt.title("$\geq$ 4 jets, $\geq$ 2 b-tags")
 plt.xlabel("$m_{bjj}$ [GeV]");
 
-# %% [markdown]
 # Our top reconstruction approach ($bjj$ system with largest $p_T$) has worked!
-#
+# 
 # Let's also have a look at some systematic variations:
 # - b-tagging, which we implemented as jet-kinematic dependent event weights,
 # - jet energy variations, which vary jet kinematics, resulting in acceptance effects and observable changes.
-#
+# 
 # We are making of [UHI](https://uhi.readthedocs.io/) here to re-bin.
 
-# %%
+# In[11]:
+
+
 # b-tagging variations
 all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), "ttbar", "nominal"].plot(label="nominal", linewidth=2)
 all_histograms["hist_dict"]["4j1b"][120j::hist.rebin(2), "ttbar", "btag_var_0_up"].plot(label="NP 1", linewidth=2)
@@ -591,7 +587,9 @@ plt.legend(frameon=False)
 plt.xlabel("$H_T$ [GeV]")
 plt.title("b-tagging variations");
 
-# %%
+# In[12]:
+
+
 # jet energy scale variations
 all_histograms["hist_dict"]["4j2b"][:, "ttbar", "nominal"].plot(label="nominal", linewidth=2)
 all_histograms["hist_dict"]["4j2b"][:, "ttbar", "pt_scale_up"].plot(label="scale up", linewidth=2)
@@ -600,7 +598,9 @@ plt.legend(frameon=False)
 plt.xlabel("$m_{bjj}$ [Gev]")
 plt.title("Jet energy variations");
 
-# %%
+# In[13]:
+
+
 # ML inference variables
 if USE_INFERENCE:
     fig, axs = plt.subplots(10,2,figsize=(14,40))
@@ -621,29 +621,31 @@ if USE_INFERENCE:
         axs[row, column].legend(frameon=False)
     fig.show()
 
-# %% [markdown]
 # ### Save histograms to disk
-#
+# 
 # We'll save everything to disk for subsequent usage.
 # This also builds pseudo-data by combining events from the various simulation setups we have processed.
 
-# %%
+# In[14]:
+
+
 utils.file_output.save_histograms(all_histograms['hist_dict'], "histograms.root")
 
 if USE_INFERENCE:
     utils.file_output.save_histograms(all_histograms['ml_hist_dict'], "histograms_ml.root", add_offset=True)
 
-# %% [markdown]
 # ### Statistical inference
-#
+# 
 # We are going to perform a re-binning for the statistical inference.
 # This is planned to be conveniently provided via cabinetry (see [cabinetry#412](https://github.com/scikit-hep/cabinetry/issues/412), but in the meantime we can achieve this via [template building overrides](https://cabinetry.readthedocs.io/en/latest/advanced.html#overrides-for-template-building).
 # The implementation is provided in a function in `utils/`.
-#
+# 
 # A statistical model has been defined in `config.yml`, ready to be used with our output.
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
-# %%
+# In[15]:
+
+
 import utils.rebinning  # noqa: E402
 
 cabinetry_config = cabinetry.configuration.load("cabinetry_config.yml")
@@ -655,16 +657,18 @@ cabinetry.templates.postprocess(cabinetry_config)  # optional post-processing (e
 ws = cabinetry.workspace.build(cabinetry_config)
 cabinetry.workspace.save(ws, "workspace.json")
 
-# %% [markdown]
 # We can inspect the workspace with `pyhf`, or use `pyhf` to perform inference.
 
-# %%
-# !pyhf inspect workspace.json | head -n 20
+# In[16]:
 
-# %% [markdown]
+
+!pyhf inspect workspace.json | head -n 20
+
 # Let's try out what we built: the next cell will perform a maximum likelihood fit of our statistical model to the pseudodata we built.
 
-# %%
+# In[17]:
+
+
 model, data = cabinetry.model_utils.model_and_data(ws)
 fit_results = cabinetry.fit.fit(model, data)
 
@@ -672,29 +676,32 @@ cabinetry.visualize.pulls(
     fit_results, exclude="ttbar_norm", close_figure=True, save_figure=False
 )
 
-# %% [markdown]
 # For this pseudodata, what is the resulting ttbar cross-section divided by the Standard Model prediction?
 
-# %%
+# In[18]:
+
+
 poi_index = model.config.poi_index
 print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {fit_results.uncertainty[poi_index]:.3f}")
 
-# %% [markdown]
 # Let's also visualize the model before and after the fit, in both the regions we are using.
 # The binning here corresponds to the binning used for the fit.
 
-# %%
+# In[19]:
+
+
 model_prediction = cabinetry.model_utils.prediction(model)
 model_prediction_postfit = cabinetry.model_utils.prediction(model, fit_results=fit_results)
 figs = cabinetry.visualize.data_mc(model_prediction, data, close_figure=True, config=cabinetry_config)
 # below method reimplements this visualization in a grid view
 utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data, cabinetry_config)
 
-# %% [markdown]
 # ### ML Validation
 # We can further validate our results by applying the above fit to different ML observables and checking for good agreement.
 
-# %%
+# In[20]:
+
+
 # load the ml workspace (uses the ml observable instead of previous method)
 if USE_INFERENCE:
     config_ml = cabinetry.configuration.load("cabinetry_config_ml.yml")
@@ -710,35 +717,52 @@ if USE_INFERENCE:
 
     cabinetry.workspace.save(ws_pruned, "workspace_ml.json")
 
-# %%
+# In[21]:
+
+
 if USE_INFERENCE:
     model_ml, data_ml = cabinetry.model_utils.model_and_data(ws_pruned)
 
-# %% [markdown]
 # We have a channel for each ML observable:
 
-# %%
-# !pyhf inspect workspace_ml.json | head -n 20
+# In[22]:
 
-# %%
+
+!pyhf inspect workspace_ml.json | head -n 20
+
+# In[23]:
+
+
 # obtain model prediction before and after fit
 if USE_INFERENCE:
-    model_prediction = cabinetry.model_utils.prediction(model_ml)
+    model_prediction_ml = cabinetry.model_utils.prediction(model_ml)
     fit_results_mod = cabinetry.model_utils.match_fit_results(model_ml, fit_results)
     model_prediction_postfit = cabinetry.model_utils.prediction(model_ml, fit_results=fit_results_mod)
 
-# %%
-if USE_INFERENCE:
-    utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
+# In[24]:
 
-# %% [markdown]
+
+if USE_INFERENCE:
+    utils.plotting.plot_data_mc(model_prediction_ml, model_prediction_postfit, data_ml, config_ml)
+
+# In[ ]:
+
+
+if utils.config["preservation"]["HEP_DATA"] == True:
+    import utils.hepdata
+    #Submission of model prediction
+    utils.hepdata.submission_hep_data(model, model_prediction, "hepdata_model")
+    #Submission of model_ml prediction
+    utils.hepdata.submission_hep_data(model_ml, model_prediction_ml,"hepdata_model_ml")
+    
+
 # ### What is next?
-#
+# 
 # Our next goals for this pipeline demonstration are:
 # - making this analysis even **more feature-complete**,
 # - **addressing performance bottlenecks** revealed by this demonstrator,
 # - **collaborating** with you!
-#
+# 
 # Please do not hesitate to get in touch if you would like to join the effort, or are interested in re-implementing (pieces of) the pipeline with different tools!
-#
+# 
 # Our mailing list is analysis-grand-challenge@iris-hep.org, sign up via the [Google group](https://groups.google.com/a/iris-hep.org/g/analysis-grand-challenge).
