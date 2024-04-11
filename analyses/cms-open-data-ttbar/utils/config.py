@@ -27,8 +27,8 @@ config = {
         "AF_NAME": "coffea_casa",
         # currently has no effect
         "SYSTEMATICS": "all",
-        # does not do anything, only used for metric gathering (set to 2 for distributed coffea-casa)
-        "CORES_PER_WORKER": 2,
+        # does not do anything, only used for metric gathering (set to 1 for distributed coffea-casa)
+        "CORES_PER_WORKER": 1,
         # scaling for local setups with FuturesExecutor
         "NUM_CORES": 4,
         # only I/O, all other processing disabled
