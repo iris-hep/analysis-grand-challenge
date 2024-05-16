@@ -1,0 +1,6 @@
+This is the running Analysis Grang Challenge using REANA
+REANA is a reproducible analysis platform for 
+For this you firstly need to  install reana virtual environment
+Further install reana-client 
+you can execute the ttbar analysis.ipynb using this command
+Now you can check your repository.

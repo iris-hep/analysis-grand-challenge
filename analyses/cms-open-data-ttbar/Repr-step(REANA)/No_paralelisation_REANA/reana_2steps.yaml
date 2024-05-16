@@ -1,0 +1,41 @@
+version: 0.6.0
+inputs:
+  files:
+    - ttbar_analysis_pipeline.py   
+    - ttbar_analysis_pipeline.ipynb 
+    - validate_histograms.py
+    - cabinetry_config_ml.yml
+    - GetIOBranches.py
+    - cabinetry_config.yml
+    - nanoaod_inputs.json
+    - nanoaod_branch_rations.json
+    - fix-env.sh
+    - first_step.py
+    - second_step.py
+    - corrections.json
+ 
+  directories:
+    - models
+    - reference
+    - utils
+  parameters:
+    notebook: ttbar_analysis_pipeline.ipynb
+    value1: True
+    value2: False a
+workflow:
+  type: serial #since everything in reana.yaml file the serial should be the workflow engine
+  specification:
+    steps:
+      - name: Histogram stage
+        environment: 'povstenandrii/papermill:20231102a'  
+        commands:
+        - /bin/bash -l && source fix-env.sh && papermill ${notebook} -p RUN_HISTOGRAMS ${value1} -p RUN_STAT ${value2} output1.ipynb
+      - name: Statistical Inference
+        environment: 'povstenandrii/papermill:20231102a'  
+        commands: 
+        - /bin/bash -l && source fix-env.sh && papermill ${notebook} -p RUN_HISTOGRAMS ${value2} -p RUN_STAT ${value1} output2.ipynb
+outputs:
+  files:
+      # you can't get rid of cash files, but you can find them using the search bar 
+    - histograms.root
+# outputs reana download

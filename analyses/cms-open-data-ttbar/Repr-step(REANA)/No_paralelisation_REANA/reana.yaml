@@ -1,0 +1,30 @@
+version: 0.6.0
+inputs:
+  files:
+    - ttbar_analysis_pipeline.py
+    - ttbar_analysis_pipeline.ipynb
+    - validate_histograms.py
+    - cabinetry_config_ml.yml
+    - GetIOBranches.py
+    - cabinetry_config.yml
+    - nanoaod_inputs.json
+    - nanoaod_branch_rations.json
+    - fix-env.sh
+    - corrections.json
+
+  directories:
+    - models
+    - reference
+    - utils
+workflow:
+  type: serial #since everything in reana.yaml file the serial should be the workflow engine
+  specification:
+    steps:
+      - name: demoanalyzer 
+        environment: 'hub.opensciencegrid.org/iris-hep/analysis-systems-base:latest'  
+        commands:
+        - /bin/bash -l && source fix-env.sh && python ttbar_analysis_pipeline.py
+outputs:
+  files:
+    - merged_histograms.root
+

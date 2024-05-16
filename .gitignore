@@ -33,3 +33,30 @@ analyses/cms-open-data-ttbar/metrics
 
 # dask
 dask-worker-space/
+analyses/cms-open-data-ttbar/first_option.py
+analyses/cms-open-data-ttbar/reana_higgs_tautau.yaml
+analyses/cms-open-data-ttbar/reana_samples.yaml
+analyses/cms-open-data-ttbar/Sample_execution.py
+analyses/cms-open-data-ttbar/out.ipynb
+analyses/cms-open-data-ttbar/.snakemake/log/2023-11-13T230445.475964.snakemake.log
+analyses/cms-open-data-ttbar/samples.py
+analyses/cms-open-data-ttbar/uproot.py
+.bash_history
+.cache/matplotlib/fontlist-v330.json
+.ipython/profile_default/startup/README
+analyses/cms-open-data-ttbar/loops.py
+.DS_Store
+analyses/cms-open-data-ttbar/ca-certificates/cerngridca.crt
+analyses/cms-open-data-ttbar/ca-certificates/cernroot.crt
+HEPData_cabinetry/.DS_Store
+analyses/cms-open-data-ttbar/Dockerfile_root_certificates
+.DS_Store
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_single_top_s_chan__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_single_top_t_chan__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_single_top_tW__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__ME_var_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__PS_var_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__scaledown_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_wjets__nominal_paths.txt
+analyses/cms-open-data-ttbar/Reproducibility_REANA/sample_ttbar__scaleup_paths.txt

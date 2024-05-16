@@ -1,0 +1,23 @@
+version: 0.8.0
+inputs:
+  files:
+    - ttbar_analysis_reana.ipynb 
+    - nanoaod_inputs.json
+    - fix-env.sh
+    - corrections.json
+    - Snakefile
+    - file_merging.ipynb
+    - final_merging.ipynb
+    - prepare_workspace.py
+
+  directories:
+    - histograms
+    - utils
+workflow:
+  type: snakemake
+  resources:
+    kerberos: true
+  file: Snakefile
+outputs:
+  files:
+    - histograms_merged.root
