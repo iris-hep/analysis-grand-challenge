@@ -1,6 +1,16 @@
 from hepdata_lib import Submission, Table, Variable, Uncertainty
 import hist.intervals
 
+def submission_hep_data(model, model_prediction, path):
+    submission = Submission()
+    for i in range(1, len(model.config.channels) +1):
+        table = create_hep_data_table(i, model, model_prediction)
+        submission.add_table(table)    
+        submission.add_additional_resource("Workspace file", "workspace.json", copy_file=True) 
+        submission.create_files(path, remove_old=True)
+    
+    
+
 def create_hep_data_table(index, model, model_prediction):
     submission = Submission()
     output = {}
@@ -27,7 +37,7 @@ def create_hep_data_table(index, model, model_prediction):
             dependent_variables.append(' '.join(columns[2:-1]))
         elif f'Feature{index}' in key:
             independent_variables_ml.append(f"{columns[0]} {columns[-1]}")
-            dependent_variables_ml.append(' '.join(columns[1:-1]))
+            dependent_variables_ml.append(' '.join(columns[1:-1])) 
 
     table_name = ""
     if independent_variables:
