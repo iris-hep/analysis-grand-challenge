@@ -2,30 +2,22 @@ version: 0.8.0
 inputs:
   files:
     - ttbar_analysis_reana.ipynb 
-    - cabinetry_config_ml.yml
-    - cabinetry_config.yml
     - nanoaod_inputs.json
     - fix-env.sh
     - corrections.json
-    - Snakefile(EOS)
+    - Snakefile
     - file_merging.ipynb
     - final_merging.ipynb
     - prepare_workspace.py
-    - entrypoint.sh
-    - Snakefile1
 
   directories:
     - histograms
-    - models
-    - reference
     - utils
-    - report
-    - files
 workflow:
   type: snakemake
   resources:
     kerberos: true
-  file: Snakefile(EOS)
+  file: Snakefile
 outputs:
   files:
     - histograms_merged.root
