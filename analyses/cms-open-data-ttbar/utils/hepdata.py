@@ -11,6 +11,8 @@ def submission_hep_data(model, model_prediction, path):
     
     
 
+
+
 def create_hep_data_table(index, model, model_prediction):
     submission = Submission()
     output = {}
@@ -38,6 +40,7 @@ def create_hep_data_table(index, model, model_prediction):
         elif f'Feature{index}' in key:
             independent_variables_ml.append(f"{columns[0]} {columns[-1]}")
             dependent_variables_ml.append(' '.join(columns[1:-1])) 
+
 
     table_name = ""
     if independent_variables:
