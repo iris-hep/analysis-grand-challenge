@@ -25,7 +25,7 @@
 
 # ### Imports: setting up our environment
 
-# In[1]:
+
 
 
 import logging
@@ -70,7 +70,7 @@ logging.getLogger("cabinetry").setLevel(logging.INFO)
 # 
 # The input files are all in the 1–3 GB range.
 
-# In[2]:
+
 
 
 ### GLOBAL CONFIGURATION
@@ -103,7 +103,7 @@ USE_TRITON = False
 # 
 # During the processing step, machine learning is used to calculate one of the variables used for this analysis. The models used are trained separately in the `jetassignment_training.ipynb` notebook. Jets in the events are assigned to labels corresponding with their parent partons using a boosted decision tree (BDT). More information about the model and training can be found within that notebook.
 
-# In[3]:
+
 
 
 class TtbarAnalysis(processor.ProcessorABC):
@@ -353,7 +353,7 @@ class TtbarAnalysis(processor.ProcessorABC):
 # 
 # Here, we gather all the required information about the files we want to process: paths to the files and asociated metadata.
 
-# In[4]:
+
 
 
 fileset = utils.file_input.construct_fileset(
@@ -372,7 +372,7 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 # 
 # Define the func_adl query to be used for the purpose of extracting columns and filtering.
 
-# In[5]:
+
 
 
 def get_query(source):
@@ -458,7 +458,7 @@ def get_query(source):
 # 
 # Using the queries created with `func_adl`, we are using `ServiceX` to read the CMS Open Data files to build cached files with only the specific event information as dictated by the query.
 
-# In[6]:
+
 
 
 if USE_SERVICEX:
@@ -495,7 +495,7 @@ if USE_SERVICEX:
 # 
 # When `USE_SERVICEX` is false, the input files need to be processed during this step as well.
 
-# In[7]:
+
 
 
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
@@ -535,7 +535,7 @@ exec_time = time.monotonic() - t0
 
 print(f"\nexecution took {exec_time:.2f} seconds")
 
-# In[8]:
+
 
 
 # track metrics
@@ -546,7 +546,7 @@ utils.metrics.track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX,
 # Let's have a look at the data we obtained.
 # We built histograms in two phase space regions, for multiple physics processes and systematic variations.
 
-# In[9]:
+
 
 
 import utils.plotting  # noqa: E402
@@ -558,7 +558,7 @@ plt.legend(frameon=False)
 plt.title("$\geq$ 4 jets, 1 b-tag")
 plt.xlabel("$H_T$ [GeV]");
 
-# In[10]:
+
 
 
 all_histograms["hist_dict"]["4j2b"][:, :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1,edgecolor="grey")
@@ -574,7 +574,7 @@ plt.xlabel("$m_{bjj}$ [GeV]");
 # 
 # We are making of [UHI](https://uhi.readthedocs.io/) here to re-bin.
 
-# In[11]:
+
 
 
 # b-tagging variations
@@ -587,7 +587,7 @@ plt.legend(frameon=False)
 plt.xlabel("$H_T$ [GeV]")
 plt.title("b-tagging variations");
 
-# In[12]:
+
 
 
 # jet energy scale variations
@@ -598,7 +598,7 @@ plt.legend(frameon=False)
 plt.xlabel("$m_{bjj}$ [Gev]")
 plt.title("Jet energy variations");
 
-# In[13]:
+
 
 
 # ML inference variables
@@ -626,7 +626,7 @@ if USE_INFERENCE:
 # We'll save everything to disk for subsequent usage.
 # This also builds pseudo-data by combining events from the various simulation setups we have processed.
 
-# In[14]:
+
 
 
 utils.file_output.save_histograms(all_histograms['hist_dict'], "histograms.root")
@@ -643,7 +643,7 @@ if USE_INFERENCE:
 # A statistical model has been defined in `config.yml`, ready to be used with our output.
 # We will use `cabinetry` to combine all histograms into a `pyhf` workspace and fit the resulting statistical model to the pseudodata we built.
 
-# In[15]:
+
 
 
 import utils.rebinning  # noqa: E402
@@ -659,14 +659,14 @@ cabinetry.workspace.save(ws, "workspace.json")
 
 # We can inspect the workspace with `pyhf`, or use `pyhf` to perform inference.
 
-# In[16]:
+
 
 
 !pyhf inspect workspace.json | head -n 20
 
 # Let's try out what we built: the next cell will perform a maximum likelihood fit of our statistical model to the pseudodata we built.
 
-# In[17]:
+
 
 
 model, data = cabinetry.model_utils.model_and_data(ws)
@@ -678,7 +678,7 @@ cabinetry.visualize.pulls(
 
 # For this pseudodata, what is the resulting ttbar cross-section divided by the Standard Model prediction?
 
-# In[18]:
+
 
 
 poi_index = model.config.poi_index
@@ -687,7 +687,7 @@ print(f"\nfit result for ttbar_norm: {fit_results.bestfit[poi_index]:.3f} +/- {f
 # Let's also visualize the model before and after the fit, in both the regions we are using.
 # The binning here corresponds to the binning used for the fit.
 
-# In[19]:
+
 
 
 model_prediction = cabinetry.model_utils.prediction(model)
@@ -699,7 +699,7 @@ utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data, ca
 # ### ML Validation
 # We can further validate our results by applying the above fit to different ML observables and checking for good agreement.
 
-# In[20]:
+
 
 
 # load the ml workspace (uses the ml observable instead of previous method)
@@ -717,7 +717,7 @@ if USE_INFERENCE:
 
     cabinetry.workspace.save(ws_pruned, "workspace_ml.json")
 
-# In[21]:
+
 
 
 if USE_INFERENCE:
@@ -725,27 +725,26 @@ if USE_INFERENCE:
 
 # We have a channel for each ML observable:
 
-# In[22]:
 
 
 !pyhf inspect workspace_ml.json | head -n 20
 
-# In[23]:
+
 
 
 # obtain model prediction before and after fit
 if USE_INFERENCE:
-    model_prediction_ml = cabinetry.model_utils.prediction(model_ml)
+    model_prediction = cabinetry.model_utils.prediction(model_ml)
     fit_results_mod = cabinetry.model_utils.match_fit_results(model_ml, fit_results)
     model_prediction_postfit = cabinetry.model_utils.prediction(model_ml, fit_results=fit_results_mod)
 
-# In[24]:
+
 
 
 if USE_INFERENCE:
-    utils.plotting.plot_data_mc(model_prediction_ml, model_prediction_postfit, data_ml, config_ml)
+    utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
 
-# In[ ]:
+
 
 
 if utils.config["preservation"]["HEP_DATA"] == True:
@@ -754,7 +753,6 @@ if utils.config["preservation"]["HEP_DATA"] == True:
     utils.hepdata.submission_hep_data(model, model_prediction, "hepdata_model")
     #Submission of model_ml prediction
     utils.hepdata.submission_hep_data(model_ml, model_prediction_ml,"hepdata_model_ml")
-    
 
 # ### What is next?
 # 
