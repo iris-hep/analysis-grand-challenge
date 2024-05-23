@@ -59,10 +59,6 @@ To submit the created histograms to HEP data,, you'll need to install the necess
 ``` console
 pip install hepdata_lib hepdata-cli
 ```
-and the root (for current version of it is mandatory)
-```console 
- mamba install -c conda-forge root htcondor=10.8 -y
-```
 Next, modify the notebook to enable the submission in one run. You'll need to create a zip archive of your data for uploading.
 
 ```python
