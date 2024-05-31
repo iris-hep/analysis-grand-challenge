@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.15.2
+#       jupytext_version: 1.16.2
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -730,6 +730,14 @@ if USE_INFERENCE:
 # %%
 if USE_INFERENCE:
     utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
+
+# %%
+if utils.config["preservation"]["HEP_DATA"] == True:
+    import utils.hepdata
+    #Submission of model prediction
+    utils.hepdata.submission_hep_data(model, model_prediction, "hepdata_model")
+    #Submission of model_ml prediction
+    utils.hepdata.submission_hep_data(model_ml, model_prediction_ml,"hepdata_model_ml")
 
 # %% [markdown]
 # ### What is next?
