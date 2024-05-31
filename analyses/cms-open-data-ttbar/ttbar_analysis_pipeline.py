@@ -723,13 +723,13 @@ if USE_INFERENCE:
 # %%
 # obtain model prediction before and after fit
 if USE_INFERENCE:
-    model_prediction = cabinetry.model_utils.prediction(model_ml)
+    model_prediction_ml = cabinetry.model_utils.prediction(model_ml)
     fit_results_mod = cabinetry.model_utils.match_fit_results(model_ml, fit_results)
-    model_prediction_postfit = cabinetry.model_utils.prediction(model_ml, fit_results=fit_results_mod)
+    model_prediction_postfit_ml = cabinetry.model_utils.prediction(model_ml, fit_results=fit_results_mod)
 
 # %%
 if USE_INFERENCE:
-    utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
+    utils.plotting.plot_data_mc(model_prediction_ml, model_prediction_postfit_ml, data_ml, config_ml)
 
 # %%
 if utils.config["preservation"]["HEP_DATA"] == True:
