@@ -1,5 +1,4 @@
 from hepdata_lib import Submission, Table, Variable, Uncertainty
-import hist.intervals
 
 def submission_hep_data(model, model_prediction, path):
     submission = Submission()
@@ -12,7 +11,6 @@ def submission_hep_data(model, model_prediction, path):
     
 
 def create_hep_data_table(index, model, model_prediction):
-    submission = Submission()
     output = {}
 
     for i_chan, channel in enumerate(model.config.channels):
