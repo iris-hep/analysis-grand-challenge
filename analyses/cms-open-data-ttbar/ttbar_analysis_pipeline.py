@@ -732,7 +732,7 @@ if USE_INFERENCE:
     utils.plotting.plot_data_mc(model_prediction_ml, model_prediction_postfit_ml, data_ml, config_ml)
 
 # %%
-if utils.config["preservation"]["HEP_DATA"] == True:
+if utils.config["preservation"]["HEP_DATA"] is True:
     import utils.hepdata
     #Submission of model prediction
     utils.hepdata.submission_hep_data(model, model_prediction, "hepdata_model")
