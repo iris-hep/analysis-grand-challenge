@@ -41,6 +41,6 @@ def get_client(af="coffea_casa"):
 def get_triton_client(triton_url):
     
     import tritonclient.grpc as grpcclient
-    triton_client = grpcclient.InferenceServerClient(url=triton_url)
+    triton_client = grpcclient.InferenceServerClient(url=triton_url, ssl=True)
     
     return triton_client
