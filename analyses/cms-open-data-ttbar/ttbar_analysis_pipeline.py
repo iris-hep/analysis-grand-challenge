@@ -735,9 +735,9 @@ if USE_INFERENCE:
 if utils.config["preservation"]["HEP_DATA"] is True:
     import utils.hepdata
     #Submission of model prediction
-    utils.hepdata.submission_hep_data(model, model_prediction, "hepdata_model")
+    utils.hepdata.submission_hep_data(model, model_prediction, "hepdata_model", cabinetry_config)
     #Submission of model_ml prediction
-    utils.hepdata.submission_hep_data(model_ml, model_prediction_ml,"hepdata_model_ml")
+    utils.hepdata.submission_hep_data(model_ml, model_prediction_ml,"hepdata_model_ml", config_ml)
 
 # %% [markdown]
 # ### What is next?

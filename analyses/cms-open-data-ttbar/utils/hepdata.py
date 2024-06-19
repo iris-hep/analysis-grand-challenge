@@ -1,16 +1,18 @@
 from hepdata_lib import Submission, Table, Variable, Uncertainty
+import hist.intervals
 
-def submission_hep_data(model, model_prediction, path):
+def submission_hep_data(model, model_prediction, path, config):
     submission = Submission()
-    for i in range(1, len(model.config.channels) +1):
-        table = create_hep_data_table(i, model, model_prediction)
-        submission.add_table(table)    
-        submission.add_additional_resource("Workspace file", "workspace.json", copy_file=True) 
-        submission.create_files(path, remove_old=True)
-    
-    
+    for i in range(1, len(model.config.channels) + 1):
+        table = create_hep_data_table_with_config(i, model, model_prediction, config)
+        submission.add_table(table)
+    submission.add_additional_resource("Workspace file", "workspace.json", copy_file=True)
+    submission.create_files(path, remove_old=True)
 
-def create_hep_data_table(index, model, model_prediction):
+def create_hep_data_table_with_config(index, model, model_prediction, config):
+    return create_hep_data_table(index, model, model_prediction, config)
+
+def create_hep_data_table(index, model, model_prediction, config):
     output = {}
 
     for i_chan, channel in enumerate(model.config.channels):
@@ -35,7 +37,7 @@ def create_hep_data_table(index, model, model_prediction):
             dependent_variables.append(' '.join(columns[2:-1]))
         elif f'Feature{index}' in key:
             independent_variables_ml.append(f"{columns[0]} {columns[-1]}")
-            dependent_variables_ml.append(' '.join(columns[1:-1])) 
+            dependent_variables_ml.append(' '.join(columns[1:-1]))
 
     table_name = ""
     if independent_variables:
@@ -45,15 +47,19 @@ def create_hep_data_table(index, model, model_prediction):
 
     table = Table(table_name)
 
-    var = Variable("sample", is_independent=True, is_binned=False, units="should be some units for the samples??")
-    var.values = sorted(set(independent_variables + independent_variables_ml), key=lambda x: independent_variables.index(x) if x in independent_variables else independent_variables_ml.index(x))
+    # Create a single variable for the region corresponding to the feature index
+    region = config['Regions'][index - 1]
+    var = Variable(f"Region {index}", is_independent=True, is_binned=False, units=region['Variable'])
+    var.values = [f"Feature{index} bin{k_bin}" for k_bin in range(len(model_prediction.model_yields[0][0]))]
     table.add_variable(var)
-    for i, info in enumerate(model.config.samples):
-        data_var = Variable(model.config.samples[i], is_independent=False, is_binned=False, units="Number of jets")
-        data_var.values = model_prediction.model_yields[index-1][i]
+
+    # Add dependent variables and uncertainties
+    for i, sample in enumerate(model.config.samples):
+        data_var = Variable(sample, is_independent=False, is_binned=False, units="Number of jets")
+        data_var.values = model_prediction.model_yields[index - 1][i]
 
         unc = Uncertainty("A symmetric error", is_symmetric=True)
-        unc.values = model_prediction.total_stdev_model_bins[index-1][i]
+        unc.values = model_prediction.total_stdev_model_bins[index - 1][i]
 
         data_var.add_uncertainty(unc)
         table.add_variable(data_var)
