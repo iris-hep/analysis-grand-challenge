@@ -98,9 +98,7 @@ rule merging_histograms:
         "final_merging.ipynb"
     output:
         "histograms_merged.root"
-    params:
-        merged_step = "Yes"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill final_merging.ipynb sample_merged.ipynb -p merged_step {params.merged_step} -k python3"
+        "/bin/bash -l && source fix-env.sh && papermill final_merging.ipynb result_notebook.ipynb -k python3"
 
     
