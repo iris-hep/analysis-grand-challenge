@@ -2,8 +2,6 @@ import logging
 import time
 
 import awkward as ak
-import cabinetry
-import cloudpickle
 import correctionlib
 from coffea import processor
 from coffea.nanoevents import NanoAODSchema
@@ -14,7 +12,6 @@ import copy
 import hist
 import matplotlib.pyplot as plt
 import numpy as np
-import pyhf
 
 import utils  # contains code for bookkeeping and cosmetics, as well as some boilerplate
 
