@@ -1,7 +1,6 @@
 import glob
 import hist
 import uproot
-import matplotlib.pyplot as plt
 
 all_histograms = {}
 for fname in glob.glob(f"histograms/histograms_{sample_name}_*/**/*.root", recursive=True):
