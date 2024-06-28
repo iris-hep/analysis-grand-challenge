@@ -196,6 +196,6 @@ config = {
         ],
     },
     "preservation": {
-        "HEP_DATA": False
+        "HEPData": False
     }
 }

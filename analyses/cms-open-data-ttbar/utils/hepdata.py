@@ -1,5 +1,4 @@
 from hepdata_lib import Submission, Table, Variable, Uncertainty
-import hist.intervals
 
 def submission_hep_data(model, model_prediction, path, config):
     submission = Submission()
