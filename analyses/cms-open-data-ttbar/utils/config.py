@@ -18,7 +18,7 @@ config = {
         # read files from public EOS (thanks to the CMS DPOA team!)
         # note that they are likely only available temporarily
         # and not part of an official CMS Open Data release
-        "INPUT_FROM_EOS": False,
+        "INPUT_FROM_EOS": True,
         # prefix for URIs for ATLAS-style xcache use
         # e.g. "root://xcache.af.uchicago.edu//" for UChicago
         "XCACHE_ATLAS_PREFIX": None,
@@ -195,4 +195,7 @@ config = {
             "Quark vs Gluon likelihood discriminator of the $b_{top-lep}$ Jet",
         ],
     },
+    "preservation": {
+        "HEP_DATA": False
+    }
 }
