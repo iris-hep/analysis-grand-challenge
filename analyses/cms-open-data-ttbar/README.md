@@ -18,6 +18,7 @@ This directory is focused on running the CMS Open Data $t\bar{t}$ analysis throu
 | models/                       | Contains models used for ML inference task (when `USE_TRITON = False`)                                                                          |
 | utils/                        | Contains code for bookkeeping and cosmetics, as well as some boilerplate. Also contains images used in notebooks.                               |
 | utils/config.py               | This is a general config file to handle different options for running the analysis.                               |
+| utils/hepdata.py              | This is the .py file with function which would create a tables which would be submitted and stored into the [HEP_DATA website](https://www.hepdata.net) (use `HEP_DATA = True`)     |
 
 #### Instructions for paired notebook
 
@@ -51,3 +52,36 @@ argument is the appropriate reference file for the number of files per process a
 For full usage help see the output of `python validate_histograms.py --help`.
 
 `validate_histograms.py` can also be used to create new references by passing the `--dump-json` option.
+
+#### HEP data creation and submision.
+For proper submission, you need to modify the `submission.yaml` with proper explanation of variables and your table.
+To submit the created histograms to HEP data,, you'll need to install the necessary packages and make some modifications to `ttbar_analysis_pipeline.ipynb` notebook.
+``` console
+pip install hepdata_lib hepdata-cli
+```
+Next, modify the notebook to enable the submission in one run. You'll need to create a zip archive of your data for uploading.
+
+```python
+import shutil
+folder_path = "hepdata_model" #name of the folder which was created wiht hepdata syntax
+zip_filename = "hepdata_model.zip"
+temp_folder = "temp_folder"
+# Create a temporary folder without unwanted files
+shutil.copytree(folder_path, temp_folder, ignore=shutil.ignore_patterns('.ipynb_checkpoints'))
+# Create the archive from the temporary folder
+shutil.make_archive(zip_filename, 'zip', temp_folder)
+# Remove the temporary folder
+shutil.rmtree(temp_folder)
+```
+
+```python
+from getpass import getpass
+import os
+# Get the password securely
+password = getpass("Enter your password: ")
+
+command = f"hepdata-cli upload '/home/cms-jovyan/analysis-grand-challenge/analyses/cms-open-data-ttbar/hepdata_model.zip.zip' -e yourname.yoursurname@cern.ch"
+os.system(f'echo {password} | {command}') #insert your passport in the actived window
+```
+If the submission is successful, you'll see your uploaded data in the provided link.
+
