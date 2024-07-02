@@ -27,7 +27,18 @@ def get_client(af="coffea_casa"):
         cluster.scale(50)
         
         client = cluster.get_client()
-        
+
+    elif af == "purdue-af":
+        from dask_gateway import Gateway
+        gateway = Gateway(
+            "http://dask-gateway-k8s.geddes.rcac.purdue.edu/",
+            proxy_address="traefik-dask-gateway-k8s.cms.geddes.rcac.purdue.edu:8786",
+        )
+        clusters = gateway.list_clusters()
+        cluster = gateway.connect(clusters[0].name)
+        cluster.scale(10)        
+        client = cluster.get_client()
+
     elif af == "local":
         from dask.distributed import Client
 
