@@ -2,8 +2,9 @@ config = {
     "global": {
         # ServiceX: ignore cache with repeated queries
         "SERVICEX_IGNORE_CACHE": False,
-        # analysis facility: set to "coffea_casa" for coffea-casa environments, "EAF" for FNAL, "local" for local setups
-        "AF": "purdue-af",
+        # analysis facility: set to "coffea_casa" for coffea-casa environments,
+        # "EAF" for FNAL, "purdue-af" for Purdue Analysis Facility, "local" for local setups
+        "AF": "coffea_casa",
         # number of bins for standard histograms in processor
         "NUM_BINS": 25,
         # lower end of standard histograms in processor
