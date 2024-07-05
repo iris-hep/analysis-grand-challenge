@@ -1,14 +1,14 @@
 version: 0.8.0
 inputs:
   files:
-    - /REANA/ttbar_analysis_reana.ipynb 
-    - /REANA.nanoaod_inputs.json
-    - fix-env.sh
+    - Reana/ttbar_analysis_reana.ipynb 
+    - nanoaod_inputs.json
+    - Reana/fix-env.sh
     - corrections.json
-    - Snakefile
-    - file_merging.ipynb
-    - final_merging.ipynb
-    - prepare_workspace.py
+    - Reana/Snakefile
+    - Reana/file_merging.ipynb
+    - Reana/final_merging.ipynb
+    - Reana/prepare_workspace.py
 
   directories:
     - histograms

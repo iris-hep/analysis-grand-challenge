@@ -49,27 +49,6 @@ We are using the modified verison of the ``analysis-systems-base`` [Docker image
 
 In our case, the Dockerfile creates a conda virtual environment with all necessary packages for running the AGC analysis.
 
-```console
-$ less environment/Dockerfile
-```
-Let's go inside the environment and build it
-```console
-$ cd environment/
-```
-
-We can build our AGC environment image and give it a name
-`docker.io/reanahub/reana-demo-agc-cms-ttbar-coffea`:
-
-```console
-$ docker build -t docker.io/reanahub/reana-demo-agc-cms-ttbar-coffea .
-```
-
-We can push the image to the DockerHub image registry:
-
-```console
-$ docker push docker.io/reanahub/reana-demo-agc-cms-ttbar-coffea
-```
-
 ### 3. Kerberos authentication
 Some data are located at the eos/public so in order to process the big amount of files, user should be authenticated with Kerberos.
 In our case we achieve it by setting up:
@@ -161,8 +140,9 @@ $ pip install reana-client
 $ # connect to some REANA cloud instance
 $ export REANA_SERVER_URL=https://reana.cern.ch/
 $ export REANA_ACCESS_TOKEN=XXXXXXX
+$ # Navigate to the `cms-open-data-ttbar` and select the path to the reana.yaml file which is inside the `Reana` folder
 $ # run AGC workflow
-$ reana-client run -w reana-agc-cms-ttbar-coffea
+$ reana-client run -file Reana/reana.yaml -w reana-agc-cms-ttbar-coffea
 $ # ... should be finished in around 6 minutes if you select all files in the Snakefile
 $ reana-client status
 $ # list workspace files
