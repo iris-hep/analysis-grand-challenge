@@ -1,8 +1,8 @@
 version: 0.8.0
 inputs:
   files:
-    - ttbar_analysis_reana.ipynb 
-    - nanoaod_inputs.json
+    - /REANA/ttbar_analysis_reana.ipynb 
+    - /REANA.nanoaod_inputs.json
     - fix-env.sh
     - corrections.json
     - Snakefile
