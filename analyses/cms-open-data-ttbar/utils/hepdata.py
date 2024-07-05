@@ -1,6 +1,6 @@
 from hepdata_lib import Submission, Table, Variable, Uncertainty
 
-def submission_hep_data(model, model_prediction, path, config):
+def preparing_hep_data_format(model, model_prediction, path, config):
     submission = Submission()
     for i in range(1, len(model.config.channels) + 1):
         table = create_hep_data_table_with_config(i, model, model_prediction, config)
