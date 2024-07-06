@@ -1,0 +1,1 @@
+export PATH="/opt/micromamba/envs/analysis-systems/bin/:$PATH"
