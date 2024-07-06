@@ -53,13 +53,13 @@ rule process_sample_one_file_in_sample:
     resources:
         kubernetes_memory_limit="3700Mi"
     input:
-        "ttbar_analysis_reana.ipynb"
+        "Reana/ttbar_analysis_reana.ipynb"
     output:
         "histograms/histograms_{sample}__{condition}__{filename}"
     params:
         sample_name = '{sample}__{condition}'
     shell:
-        "/bin/bash -l && source fix-env.sh && python prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill ttbar_analysis_reana.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
+        "/bin/bash -l && source Reana/fix-env.sh && python Reana/prepare_workspace.py sample_{params.sample_name}_{wildcards.filename} && papermill Reana/ttbar_analysis_reana.ipynb sample_{params.sample_name}_{wildcards.filename}_out.ipynb -p sample_name {params.sample_name} -p filename {url_prefix}{wildcards.filename} -k python3"
 
 rule process_sample:
     container:
@@ -67,14 +67,14 @@ rule process_sample:
     resources:
         kubernetes_memory_limit="1850Mi"
     input:
-        "file_merging.ipynb",
+        "Reana/file_merging.ipynb",
         get_file_paths
     output:
         "everything_merged_{sample}__{condition}.root"
     params:
         sample_name = '{sample}__{condition}'
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill file_merging.ipynb merged_{params.sample_name}.ipynb -p sample_name {params.sample_name} -k python3"
+        "/bin/bash -l && source Reana/fix-env.sh && papermill Reana/file_merging.ipynb merged_{params.sample_name}.ipynb -p sample_name {params.sample_name} -k python3"
 
 rule merging_histograms:
     container:
@@ -91,10 +91,10 @@ rule merging_histograms:
         "everything_merged_single_top_t_chan__nominal.root",
         "everything_merged_single_top_tW__nominal.root",
         "everything_merged_wjets__nominal.root",
-        "final_merging.ipynb"
+        "Reana/final_merging.ipynb"
     output:
         "histograms_merged.root"
     shell:
-        "/bin/bash -l && source fix-env.sh && papermill final_merging.ipynb result_notebook.ipynb -k python3"
+        "/bin/bash -l && source Reana/fix-env.sh && papermill Reana/final_merging.ipynb result_notebook.ipynb -k python3"
 
     
