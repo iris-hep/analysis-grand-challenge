@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.15.2
+#       jupytext_version: 1.16.2
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -723,13 +723,21 @@ if USE_INFERENCE:
 # %%
 # obtain model prediction before and after fit
 if USE_INFERENCE:
-    model_prediction = cabinetry.model_utils.prediction(model_ml)
+    model_prediction_ml = cabinetry.model_utils.prediction(model_ml)
     fit_results_mod = cabinetry.model_utils.match_fit_results(model_ml, fit_results)
-    model_prediction_postfit = cabinetry.model_utils.prediction(model_ml, fit_results=fit_results_mod)
+    model_prediction_postfit_ml = cabinetry.model_utils.prediction(model_ml, fit_results=fit_results_mod)
 
 # %%
 if USE_INFERENCE:
-    utils.plotting.plot_data_mc(model_prediction, model_prediction_postfit, data_ml, config_ml)
+    utils.plotting.plot_data_mc(model_prediction_ml, model_prediction_postfit_ml, data_ml, config_ml)
+
+# %%
+if utils.config["preservation"]["HEPData"] is True:
+    import utils.hepdata
+    #Submission of model prediction
+    utils.hepdata.submission_hep_data(model, model_prediction, "hepdata_model", cabinetry_config)
+    #Submission of model_ml prediction
+    utils.hepdata.submission_hep_data(model_ml, model_prediction_ml,"hepdata_model_ml", config_ml)
 
 # %% [markdown]
 # ### What is next?
