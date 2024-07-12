@@ -81,7 +81,7 @@ import os
 password = getpass("Enter your password: ")
 
 command = f"hepdata-cli upload '/home/cms-jovyan/analysis-grand-challenge/analyses/cms-open-data-ttbar/hepdata_model.zip.zip' -e yourname.yoursurname@cern.ch"
-os.system(f'echo {password} | {command}') #insert your passport in the actived window
+os.system(f'echo {password} | {command}') #insert your password in the active window
 ```
 If the submission is successful, you'll see your uploaded data in the provided link.
 
