@@ -55,7 +55,7 @@ For full usage help see the output of `python validate_histograms.py --help`.
 
 #### HEP data creation and submision.
 For proper submission, you need to modify the `submission.yaml` with proper explanation of variables and your table.
-To submit the created histograms to HEP data,, you'll need to install the necessary packages and make some modifications to `ttbar_analysis_pipeline.ipynb` notebook.
+To submit the created histograms to HEP data, you'll need to install the necessary packages and make some modifications to the `ttbar_analysis_pipeline.ipynb` notebook.
 ``` console
 pip install hepdata_lib hepdata-cli
 ```
