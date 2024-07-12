@@ -18,7 +18,7 @@ This directory is focused on running the CMS Open Data $t\bar{t}$ analysis throu
 | models/                       | Contains models used for ML inference task (when `USE_TRITON = False`)                                                                          |
 | utils/                        | Contains code for bookkeeping and cosmetics, as well as some boilerplate. Also contains images used in notebooks.                               |
 | utils/config.py               | This is a general config file to handle different options for running the analysis.                               |
-| utils/hepdata.py              | This is the .py file with function which would create a tables which would be submitted and stored into the [HEP_DATA website](https://www.hepdata.net) (use `HEP_DATA = True`)     |
+| utils/hepdata.py              | Function to create tables for submission to the [HEP_DATA website](https://www.hepdata.net) (use `HEP_DATA = True`)     |
 
 #### Instructions for paired notebook
 
