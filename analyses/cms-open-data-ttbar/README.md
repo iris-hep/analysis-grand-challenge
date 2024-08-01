@@ -18,7 +18,7 @@ This directory is focused on running the CMS Open Data $t\bar{t}$ analysis throu
 | models/                       | Contains models used for ML inference task (when `USE_TRITON = False`)                                                                          |
 | utils/                        | Contains code for bookkeeping and cosmetics, as well as some boilerplate. Also contains images used in notebooks.                               |
 | utils/config.py               | This is a general config file to handle different options for running the analysis.                               |
-| utils/hepdata.py              | This is the .py file with function which would create a tables which would be submitted and stored into the [HEP_DATA website](https://www.hepdata.net) (use `HEP_DATA = True`)     |
+| utils/hepdata.py              | Function to create tables for submission to the [HEP_DATA website](https://www.hepdata.net) (use `HEP_DATA = True`)     |
 
 #### Instructions for paired notebook
 
@@ -55,7 +55,7 @@ For full usage help see the output of `python validate_histograms.py --help`.
 
 #### HEP data creation and submision.
 For proper submission, you need to modify the `submission.yaml` with proper explanation of variables and your table.
-To submit the created histograms to HEP data,, you'll need to install the necessary packages and make some modifications to `ttbar_analysis_pipeline.ipynb` notebook.
+To submit the created histograms to HEP data, you'll need to install the necessary packages and make some modifications to the `ttbar_analysis_pipeline.ipynb` notebook.
 ``` console
 pip install hepdata_lib hepdata-cli
 ```
@@ -81,7 +81,7 @@ import os
 password = getpass("Enter your password: ")
 
 command = f"hepdata-cli upload '/home/cms-jovyan/analysis-grand-challenge/analyses/cms-open-data-ttbar/hepdata_model.zip.zip' -e yourname.yoursurname@cern.ch"
-os.system(f'echo {password} | {command}') #insert your passport in the actived window
+os.system(f'echo {password} | {command}') #insert your password in the active window
 ```
 If the submission is successful, you'll see your uploaded data in the provided link.
 
