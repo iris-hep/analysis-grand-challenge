@@ -47,18 +47,20 @@ def create_hep_data_table(index, model, model_prediction, config):
     table = Table(table_name)
 
     # Create a single variable for the region corresponding to the feature index
-    region = config['Regions'][index - 1]
-    var = Variable(f"Region {index}", is_independent=True, is_binned=False, units=region['Variable'])
-    var.values = [f"Feature{index} bin{k_bin}" for k_bin in range(len(model_prediction.model_yields[0][0]))]
+    formatted_values = [(config['Regions'][index]['Binning'][i-1], config['Regions'][index]['Binning'][i]) for i in range(1, len(config['Regions'][index]['Binning']))]
+    var = Variable(config['Regions'][index]['Variable'].split('[')[0], is_independent=True, is_binned=True, units=config['Regions'][index]['Variable'].partition('[')[2].partition(']')[0] or " ")
+    var.values = formatted_values
     table.add_variable(var)
 
-    # Add dependent variables and uncertainties
     for i, sample in enumerate(model.config.samples):
         data_var = Variable(sample, is_independent=False, is_binned=False, units="Number of jets")
-        data_var.values = model_prediction.model_yields[index - 1][i]
+        model_yields = model_prediction.model_yields[index - 1][i]
+        total_stdev = model_prediction.total_stdev_model_bins[index - 1][i]
+
+        data_var.values = model_yields
 
         unc = Uncertainty("A symmetric error", is_symmetric=True)
-        unc.values = model_prediction.total_stdev_model_bins[index - 1][i]
+        unc.values = total_stdev
 
         data_var.add_uncertainty(unc)
         table.add_variable(data_var)
