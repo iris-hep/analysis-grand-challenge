@@ -35,5 +35,5 @@ def jet_pt_resolution(pt,phi):
     #Make the standard deviation 0.05
     vals = 0.05 * vals
     #Make the mean 1
-    vals += 1
-    return vals
+    rtn = vals + 1
+    return rtn
