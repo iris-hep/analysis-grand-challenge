@@ -51,3 +51,13 @@ def track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_M
     #print(f"event rate per worker (full execution time divided by NUM_CORES={NUM_CORES}): {metrics['entries'] / NUM_CORES / exec_time / 1_000:.2f} kHz")
     print(f"event rate per worker (pure processtime): {metrics['entries'] / metrics['processtime'] / 1_000:.2f} kHz")
     print(f"amount of data read: {metrics['bytesread']/1000**2:.2f} MB (note that this can be buggy: https://github.com/CoffeaTeam/coffea/issues/717)")
+
+def read_reports(reports):
+    for dset in reports.keys():
+        print(f"Errors in dataset {dset}:")
+        print("-------------------------------------")
+        for rep in reports[dset]:
+            if rep.message:
+                print(f"{rep.args[0]}: {rep.args[2]} to {rep.args[3]}")
+                print(rep.message)
+                print('')
