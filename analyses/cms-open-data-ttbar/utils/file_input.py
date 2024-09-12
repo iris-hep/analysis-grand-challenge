@@ -5,15 +5,6 @@ from pathlib import Path
 import tqdm
 import urllib
 
-
-try:
-    from servicex import ServiceXDataset
-except ImportError:
-    # if servicex is not available, ServiceXDatasetGroup cannot be used
-    # this is fine for worker nodes: only needed where main notebook is executed
-    pass
-
-
 # If local_data_cache is a writable path, this function will download any missing file into it and
 # then return file paths corresponding to these local copies.
 def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", local_data_cache=None, input_from_eos=False, xcache_atlas_prefix=None):
@@ -119,43 +110,3 @@ def download_file(url, out_file):
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with tqdm.tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=out_path.name) as t:
         urllib.request.urlretrieve(url, out_path.absolute(), reporthook=tqdm_urlretrieve_hook(t))
-
-
-class ServiceXDatasetGroup():
-    def __init__(self, fileset, backend_name="uproot", ignore_cache=False):
-        self.fileset = fileset
-
-        # create list of files (& associated processes)
-        filelist = []
-        for i, process in enumerate(fileset):
-            filelist += [[filename, process] for filename in fileset[process]["files"]]
-
-        filelist = np.array(filelist)
-        self.filelist = filelist
-        self.ds = ServiceXDataset(filelist[:,0].tolist(), backend_name=backend_name, ignore_cache=ignore_cache)
-
-    def get_data_rootfiles_uri(self, query, as_signed_url=True, title="Untitled"):
-
-        all_files = np.array(self.ds.get_data_rootfiles_uri(query, as_signed_url=as_signed_url, title=title))
-        try:
-            # default matching for when ServiceX doesn't abbreviate names
-            parent_file_urls = np.array([f.file for f in all_files])
-
-            # order is not retained after transform, so we can match files to their parent files using the filename
-            # (replacing / with : to mitigate servicex filename convention )
-            parent_key = np.array([np.where(parent_file_urls==self.filelist[i][0].replace("/",":"))[0][0]
-                                   for i in range(len(self.filelist))])
-        except IndexError:
-            # fallback solution that relies splitting via the port (name only changes before that)
-            # probably not very stable and general! this may fail - please report back if you observe that happening
-            # TODO: find something more stable
-            parent_file_urls = np.asarray([f.replace(":", "/").split("1094//")[-1] for f in np.array([f.file for f in all_files])])
-            parent_key = np.array([np.where(parent_file_urls==self.filelist[i][0].split("1094//")[-1])[0][0]
-                                   for i in range(len(self.filelist))])
-
-        files_per_process = {}
-        for i, process in enumerate(self.fileset):
-            # update files for each process
-            files_per_process.update({process: all_files[parent_key[self.filelist[:,1]==process]]})
-
-        return files_per_process
