@@ -47,7 +47,7 @@ fonttools==4.53.1
 fqdn==1.5.1
 frozenlist==1.4.1
 fsspec==2024.9.0
-func-adl==3.3.1
+func-adl==3.3.3
 func-adl-servicex==2.2
 google-auth==2.17.1
 h11==0.14.0
