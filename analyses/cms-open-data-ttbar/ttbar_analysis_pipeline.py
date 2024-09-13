@@ -95,7 +95,7 @@ USE_DASK = True
 # enable ServiceX, specify options
 USE_SERVICEX = True
 USE_SERVICEX_UPROOT_RAW = True # set False to use func_adl instead
-USE_SERVICEX_DOWNLOAD = True # set False to use remote data access
+USE_SERVICEX_DOWNLOAD = False # set False to use remote data access
 
 ### ML-INFERENCE SETTINGS
 
@@ -396,7 +396,8 @@ def get_query(source):
     return relevant columns
     *NOTE* jet pT cut is set lower to account for systematic variations to jet pT
     """
-    cuts = source.Where(lambda e: {"pt": e.Electron_pt,
+    cuts = source.FromTree("Events")\
+                        .Where(lambda e: {"pt": e.Electron_pt,
                                "eta": e.Electron_eta,
                                "cutBased": e.Electron_cutBased,
                                "sip3d": e.Electron_sip3d,}.Zip()\
