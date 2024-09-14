@@ -22,14 +22,11 @@ import time
 
 import awkward as ak
 import cabinetry
-from func_adl import ObjectStream
-from func_adl_servicex import ServiceXSourceUpROOT
 import hist
 import mplhep
 import numpy as np
 import pyhf
 import uproot
-from servicex import ServiceXDataset
 
 from coffea import processor
 from coffea.nanoevents.schemas.base import BaseSchema
@@ -53,6 +50,9 @@ NUM_CORES = 4
 
 # ServiceX behavior: ignore cache with repeated queries
 IGNORE_CACHE = False
+
+# ServiceX behavior: choose query language
+USE_SERVICEX_UPROOT_RAW = True
 
 # %% [markdown]
 # ## Introduction
@@ -147,12 +147,14 @@ num_bins = 34
 # <span style="color:darkgreen">**Systematic uncertainty added:**</span> scale factor variation, applied already at event selection stage. Imagine that this could be a calculation that requires a lot of different variables which are no longer needed downstream afterwards, so it makes sense to do it here.
 
 # %%
-def get_lepton_query(source: ObjectStream) -> ObjectStream:
-    """Performs event selection: require events with exactly four leptons.
+def get_lepton_query():
+    """Performs event selection with func_adl transformer: require events with exactly four leptons.
     Also select all columns needed further downstream for processing &
     histogram filling.
     """
-    return source.Where(lambda event: event.lep_n == 4).Select(
+    from servicex import query as q
+    return q.FuncADL_Uproot().FromTree('mini')\
+        .Where(lambda event: event.lep_n == 4).Select(
         lambda e: {
             "lep_pt": e.lep_pt,
             "lep_eta": e.lep_eta,
@@ -179,6 +181,20 @@ def get_lepton_query(source: ObjectStream) -> ObjectStream:
         }
     )
 
+def get_lepton_query_uproot_raw():
+    """Performs event selection with uproot-raw transformer: require events with exactly four leptons.
+    Also select all columns needed further downstream for processing &
+    histogram filling.
+    """
+    from servicex import query as q
+    return q.UprootRaw([{'treename': 'mini',
+                         'expressions': ['lep_pt', 'lep_eta', 'lep_phi', 'lep_energy', 'lep_charge', 
+                                         'lep_typeid', 'mcWeight', 'scaleFactor', 'scaleFactorUP', 'scaleFactorDOWN'],
+                         'aliases': { 'lep_typeid': 'lep_type', 'lep_energy': 'lep_E',
+                                      'scaleFactor': 'scaleFactor_ELE*scaleFactor_MUON*scaleFactor_LepTRIGGER*scaleFactor_PILEUP',
+                                      'scaleFactorUP': 'scaleFactor*1.1',
+                                      'scaleFactorDOWN': 'scaleFactor*0.9' }
+                        }])
 
 # %% [markdown]
 # # Caching the queried datasets with `ServiceX`
@@ -186,16 +202,14 @@ def get_lepton_query(source: ObjectStream) -> ObjectStream:
 # Using the queries created with `func_adl`, we are using `ServiceX` to read the ATLAS Open Data files to build cached files with only the specific event information as dictated by the query.
 
 # %%
-# dummy dataset on which to generate the query
-dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "mini", backend_name="uproot")
-
-# tell low-level infrastructure not to contact ServiceX yet, only to
-# return the qastle string it would have sent
-dummy_ds.return_qastle = True
+import servicex
 
 # create the query
-lepton_query = get_lepton_query(dummy_ds)
-query = lepton_query.value()
+if USE_SERVICEX_UPROOT_RAW:
+    query = get_lepton_query_uproot_raw()
+else:
+    query = get_lepton_query()
+
 
 # now we query the files and create a fileset dictionary containing the
 # URLs pointing to the queried files
@@ -204,13 +218,15 @@ t0 = time.time()
 
 fileset = {}
 
-for ds_name in input_files.keys():
-    ds = ServiceXDataset(input_files[ds_name], backend_name="uproot", ignore_cache=IGNORE_CACHE)
-    files = ds.get_data_rootfiles_uri(query, as_signed_url=True, title=ds_name)
+bundle = { 'General': { 'Delivery': 'URLs' },
+           'Sample': [ { 'Name': ds_name,
+                          'Query': query,
+                          'Dataset': servicex.dataset.FileList(input_files[ds_name]),
+                          'IgnoreLocalCache': IGNORE_CACHE } for ds_name in input_files.keys() ]
+           }
 
-    fileset[ds_name] = {"files": [f.url for f in files],
-                        "metadata": {"dataset_name": ds_name}
-                       }
+results = servicex.deliver(bundle)
+fileset = { _: {"files": results[_], "metadata": {"dataset_name": _}} for _ in results }
 
 print(f"execution took {time.time() - t0:.2f} seconds")
 
@@ -383,7 +399,8 @@ t0 = time.time()
 executor = processor.FuturesExecutor(workers=NUM_CORES)
 run = processor.Runner(executor=executor, savemetrics=True, metadata_cache={},
                        chunksize=CHUNKSIZE, schema=BaseSchema)
-all_histograms, metrics = run(fileset, "servicex", processor_instance=HZZAnalysis())
+# The trees returned by ServiceX will have different names depending on the query language used
+all_histograms, metrics = run(fileset, "mini" if USE_SERVICEX_UPROOT_RAW else "servicex", processor_instance=HZZAnalysis())
 
 print(f"execution took {time.time() - t0:.2f} seconds")
 
