@@ -52,15 +52,28 @@ We believe that the AGC can be useful in various contexts:
 * realistic environment to prototype analysis workflows,
 * functionality, integration & performance test for analysis facilities.
 
-We are very interested in seeing (parts of) the AGC implemented in different ways!
-Besides the implementation in this repository, have a look at
-
-* a ROOT RDataFrame-based implementation: `root-project/analysis-grand-challenge <https://github.com/root-project/analysis-grand-challenge>`_
-* a pure Julia implementation: `Moelf/LHC_AGC.jl <https://github.com/Moelf/LHC_AGC.jl>`_
-* a columnflow implementation: `columnflow/agc_cms_ttbar <https://github.com/columnflow/agc_cms_ttbar>`_
-
+We are very interested in seeing (parts of) the AGC implemented in different ways.
 Please get in touch if you have investigated other approaches you would like to share!
 There is no need to implement the full analysis task — it splits into pieces (for example the production of histograms) that can also be tackled individually.
+
+AGC implementations and related projects
+---------------------------------------------------------------
+
+Besides the implementation in this repository, have a look at the following implementations as well:
+
+* ROOT RDataFrame-based implementation: `root-project/analysis-grand-challenge <https://github.com/root-project/analysis-grand-challenge>`_
+* pure Julia implementation: `Moelf/LHC_AGC.jl <https://github.com/Moelf/LHC_AGC.jl>`_
+* columnflow implementation: `columnflow/agc_cms_ttbar <https://github.com/columnflow/agc_cms_ttbar>`_
+
+Additional related projects are listed below.
+Are we missing some things in this list?
+Please get in touch!
+
+- AGC on REANA with Snakemake: `iris-hep/agc-reana <https://github.com/iris-hep/agc-reana>`_
+- small demo of AGC with `dask-awkward` and `coffea` 2024: `iris-hep/calver-coffea-agc-demo <https://github.com/iris-hep/calver-coffea-agc-demo/>`_
+- columnar analysis with ATLAS PHYSLITE Open Data: `iris-hep/agc-physlite <https://github.com/iris-hep/agc-physlite>`_
+- exploring automatic differentiation for physics analysis: `iris-hep/agc-autodiff <https://github.com/iris-hep/agc-autodiff>`_
+- AGC data processing with RNTuple files: `iris-hep/agc-rntuple <https://github.com/iris-hep/agc-rntuple>`_
 
 More details: what is being investigated in the AGC context
 ---------------------------------------------------------------

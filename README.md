@@ -62,6 +62,7 @@ Additional related projects are listed below.
 Are we missing some things in this list?
 Please get in touch!
 
+- AGC on REANA with Snakemake: [iris-hep/agc-reana](https://github.com/iris-hep/agc-reana)
 - small demo of AGC with `dask-awkward` and `coffea` 2024: [iris-hep/calver-coffea-agc-demo](https://github.com/iris-hep/calver-coffea-agc-demo/)
 - columnar analysis with ATLAS PHYSLITE Open Data: [iris-hep/agc-physlite](https://github.com/iris-hep/agc-physlite/)
 - exploring automatic differentiation for physics analysis: [iris-hep/agc-autodiff](https://github.com/iris-hep/agc-autodiff/)
