@@ -33,3 +33,5 @@ jobs:
         with:
           fetch-depth: 0
       - uses: jpetrucciani/ruff-check@main
+        with:
+          flags: '--exclude *ipynb'
