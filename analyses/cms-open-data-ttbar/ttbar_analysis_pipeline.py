@@ -93,7 +93,7 @@ N_FILES_MAX_PER_SAMPLE = 5
 USE_DASK = True
 
 # enable ServiceX, specify options
-USE_SERVICEX = True
+USE_SERVICEX = False
 USE_SERVICEX_UPROOT_RAW = True # set False to use func_adl instead
 USE_SERVICEX_DOWNLOAD = False # set False to use remote data access
 
@@ -501,7 +501,7 @@ def get_uproot_raw_query():
                       'Muon_mass',
                       'event',
         ]
-    return query.UprootRaw({'treename': 'Events', 'cut': cut, 'filter_name': branch_filter})
+    return query.UprootRaw({'treename': {'Events': 'servicex'}, 'cut': cut, 'filter_name': branch_filter})
 
 # %% [markdown]
 # ### Caching the queried datasets with `ServiceX`
@@ -557,9 +557,8 @@ run = processor.Runner(
     metadata_cache={},
     chunksize=utils.config["benchmarking"]["CHUNKSIZE"])
 
-if USE_SERVICEX and not USE_SERVICEX_UPROOT_RAW:
+if USE_SERVICEX:
     treename = "servicex"
-
 else:
     treename = "Events"
 
