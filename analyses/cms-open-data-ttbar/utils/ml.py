@@ -1,6 +1,5 @@
 import awkward as ak
 import numpy as np
-from xgboost import XGBClassifier
 from .config import config
 import vector
 
@@ -11,6 +10,7 @@ model_odd = None
 
 
 def load_models():
+    from xgboost import XGBClassifier
     global model_even
     model_even = XGBClassifier()
     model_even.load_model(config["ml"]["XGBOOST_MODEL_PATH_EVEN"])
