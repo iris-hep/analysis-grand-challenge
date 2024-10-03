@@ -33,10 +33,10 @@ from coffea.nanoevents.schemas.base import BaseSchema
 import utils
 from utils import infofile  # contains cross-section information
 
+import servicex
+
 import vector
 vector.register_awkward()
-
-import servicex
 
 utils.clean_up()  # delete output from previous runs of notebook (optional)
 utils.set_logging()  # configure logging output

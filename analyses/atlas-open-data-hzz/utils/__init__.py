@@ -2,7 +2,6 @@ import logging
 import os
 import shutil
 
-from func_adl import ObjectStream
 import matplotlib.pyplot as plt
 import numpy as np
 

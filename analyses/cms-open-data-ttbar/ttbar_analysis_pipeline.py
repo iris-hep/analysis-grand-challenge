@@ -199,7 +199,8 @@ class TtbarAnalysis(processor.ProcessorABC):
             if self.use_triton:
                 triton_client = utils.clients.get_triton_client(utils.config["ml"]["TRITON_URL"])
             else:
-                if utils.ml.model_even is None: utils.ml.load_models()
+                if utils.ml.model_even is None:
+                    utils.ml.load_models()
 
 
         #### systematics
