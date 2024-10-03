@@ -2,11 +2,9 @@ import logging
 import os
 import shutil
 
-from coffea.processor import servicex
 from func_adl import ObjectStream
 import matplotlib.pyplot as plt
 import numpy as np
-from servicex.servicex import ServiceXDataset
 
 
 def clean_up():
@@ -61,11 +59,3 @@ def save_figure(figname: str):
 
     for filetype in ["pdf", "png"]:
         fig.savefig(f"figures/{figname}.{filetype}")
-
-
-def make_datasource(fileset:dict, name: str, query: ObjectStream):
-    """Creates a ServiceX datasource for a particular ATLAS Open data file."""
-    datasets = [ServiceXDataset(fileset[name], backend_name="uproot")]
-    return servicex.DataSource(
-        query=query, metadata={"dataset_category": name}, datasets=datasets
-    )

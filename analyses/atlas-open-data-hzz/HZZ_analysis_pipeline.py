@@ -36,6 +36,8 @@ from utils import infofile  # contains cross-section information
 import vector
 vector.register_awkward()
 
+import servicex
+
 utils.clean_up()  # delete output from previous runs of notebook (optional)
 utils.set_logging()  # configure logging output
 
@@ -202,8 +204,6 @@ def get_lepton_query_uproot_raw():
 # Using the queries created with `func_adl`, we are using `ServiceX` to read the ATLAS Open Data files to build cached files with only the specific event information as dictated by the query.
 
 # %%
-import servicex
-
 # create the query
 if USE_SERVICEX_UPROOT_RAW:
     query = get_lepton_query_uproot_raw()
