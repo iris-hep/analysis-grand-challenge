@@ -1,0 +1,82 @@
+[project]
+authors = ["IRIS-HEP"]
+channels = ["conda-forge"]
+description = "Environments for the Analysis Grand Challenge analyses"
+name = "analysis-grand-challenge"
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+version = "1.4.0"
+
+[tasks]
+
+[dependencies]
+python = ">=3.7"
+pixi-kernel = ">=0.5.1"
+ipykernel = ">=6.29.5"
+pre-commit = ">=4.0.1"
+jupytext = ">=1.16.4"
+ipywidgets = ">=8.1.5"
+pip = ">=24.3.1"
+uv = ">=0.4.27"
+
+[feature.latest.dependencies]
+cabinetry = ">=0.6.0"
+scikit-learn = ">=1.0"
+xgboost = ">=1.0"
+coffea = ">=2024.9.0"
+
+# servicex requires aiofile which requires caio which does not have macOS
+# compatible conda-forge releases
+[feature.latest.target.linux-64.dependencies]
+servicex = ">=3.0.0"
+
+[feature.latest.target.osx-64.pypi-dependencies]
+servicex = ">=3.0.0"
+
+[feature.latest.target.osx-arm64.pypi-dependencies]
+servicex = ">=3.0.0"
+
+[feature.cms-open-data-ttbar.tasks]
+# Note: This is global as using '--user'
+install-ipykernel = """
+python -m ipykernel install --user --name="cms-open-data-ttbar" --display-name="cms-open-data-ttbar"
+"""
+
+[feature.cms-open-data-ttbar.dependencies]
+cabinetry = ">=0.6.0"
+scikit-learn = ">=1.0"
+
+# coffea-casa restrictions
+coffea = ">=0.7.22, <1.0"
+# SemVer coffea requires setuptools<71
+setuptools = ">=70, <71"
+# older vector required to be compatible with awkward
+vector = ">=0.8.5, <1.2.0"
+xgboost = ">=1.0, <1.8"
+dask = "2023.11.0.*"
+cloudpickle = "3.0.0.*"
+
+# coffea-casa precautions: exactly match scheduler environment
+python = "3.9.18.*"
+pandas = "2.1.2.*"
+lz4 = "4.3.2.*"
+msgpack-python = "1.0.6.*"
+toolz = "0.12.0.*"
+tornado = "6.3.3.*"
+
+[feature.cms-open-data-ttbar.pypi-dependencies]
+servicex = ">=3.0.0"
+func-adl-servicex = ">=2.2, <3"
+tcut-to-qastle = ">=0.7, <0.8"
+
+[feature.local.dependencies]
+notebook = ">=7.2.2"
+jupyterlab = ">=4.2.5"
+
+[feature.local.tasks]
+start = "jupyter lab"
+
+[environments]
+latest = ["latest"]
+cms-open-data-ttbar = ["cms-open-data-ttbar"]
+local-latest = ["latest", "local"]
+local-cms-open-data-ttbar = ["cms-open-data-ttbar", "local"]
