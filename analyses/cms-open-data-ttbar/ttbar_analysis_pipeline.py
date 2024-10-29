@@ -92,8 +92,10 @@ N_FILES_MAX_PER_SAMPLE = 5
 # enable Dask
 USE_DASK = True
 
-# enable ServiceX
+# enable ServiceX, specify options
 USE_SERVICEX = False
+USE_SERVICEX_UPROOT_RAW = True # set False to use func_adl instead
+USE_SERVICEX_DOWNLOAD = False # set False to use remote data access
 
 ### ML-INFERENCE SETTINGS
 
@@ -192,9 +194,13 @@ class TtbarAnalysis(processor.ProcessorABC):
         else:
             xsec_weight = 1
 
-        # setup triton gRPC client
-        if self.use_inference and self.use_triton:
-            triton_client = utils.clients.get_triton_client(utils.config["ml"]["TRITON_URL"])
+        # setup triton gRPC client or xgboost
+        if self.use_inference:
+            if self.use_triton:
+                triton_client = utils.clients.get_triton_client(utils.config["ml"]["TRITON_URL"])
+            else:
+                if utils.ml.model_even is None:
+                    utils.ml.load_models()
 
 
         #### systematics
@@ -383,7 +389,7 @@ print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 # %% [markdown]
 # ### ServiceX-specific functionality: query setup
 #
-# Define the func_adl query to be used for the purpose of extracting columns and filtering.
+# Use one of two query languages (func_adl and uproot-raw) to define the query to be used for the purpose of extracting columns and filtering.
 
 # %%
 def get_query(source):
@@ -391,7 +397,8 @@ def get_query(source):
     return relevant columns
     *NOTE* jet pT cut is set lower to account for systematic variations to jet pT
     """
-    cuts = source.Where(lambda e: {"pt": e.Electron_pt,
+    cuts = source.FromTree("Events")\
+                        .Where(lambda e: {"pt": e.Electron_pt,
                                "eta": e.Electron_eta,
                                "cutBased": e.Electron_cutBased,
                                "sip3d": e.Electron_sip3d,}.Zip()\
@@ -465,6 +472,37 @@ def get_query(source):
                                        "Jet_jetId": h.Jet_jetId,
                                       })
 
+def get_uproot_raw_query():
+    cut = '((count_nonzero((Electron_pt > 30) & (abs(Electron_eta) < 2.1) & (Electron_cutBased == 4) & (Electron_sip3d < 4), axis=1)' \
+          '+ count_nonzero((Muon_pt > 30) & (abs(Muon_eta) < 2.1) & (Muon_tightId) & (Muon_pfRelIso04_all < 0.15), axis=1)) == 1)' \
+          '& (count_nonzero((Jet_pt > 25) & (abs(Jet_eta) < 2.4) & (Jet_jetId == 6), axis=1) >= 4)' \
+          '& (count_nonzero((Jet_pt > 25) & (abs(Jet_eta) < 2.4) & (Jet_jetId == 6) & (Jet_btagCSVV2 > 0.5), axis=1) >= 1)'
+    branch_filter =  ['Electron_pt',
+                      'Electron_eta',
+                      'Electron_cutBased',
+                      'Electron_sip3d',
+                      'Muon_pt',
+                      'Muon_eta',
+                      'Muon_tightId',
+                      'Muon_sip3d',
+                      'Muon_pfRelIso04_all',
+                      'Jet_mass',
+                      'Jet_pt',
+                      'Jet_eta',
+                      'Jet_phi',
+                      'Jet_qgl',
+                      'Jet_btagCSVV2',
+                      'Jet_jetId',
+                     ]
+    if USE_INFERENCE:
+        branch_filter += [
+                      'Electron_phi',
+                      'Electron_mass',
+                      'Muon_phi',
+                      'Muon_mass',
+                      'event',
+        ]
+    return query.UprootRaw({'treename': {'Events': 'servicex'}, 'cut': cut, 'filter_name': branch_filter})
 
 # %% [markdown]
 # ### Caching the queried datasets with `ServiceX`
@@ -473,32 +511,30 @@ def get_query(source):
 
 # %%
 if USE_SERVICEX:
-    try:
-        from func_adl_servicex import ServiceXSourceUpROOT
-    except ImportError:
-        print("cannot import func_adl_servicex, which is a required dependency when using ServiceX")
-        raise
-
+    from servicex import deliver, query, dataset
     # dummy dataset on which to generate the query
-    dummy_ds = ServiceXSourceUpROOT("cernopendata://dummy", "Events", backend_name="uproot")
-
-    # tell low-level infrastructure not to contact ServiceX yet, only to
-    # return the qastle string it would have sent
-    dummy_ds.return_qastle = True
-
-    # create the query
-    query = get_query(dummy_ds).value()
+    if USE_SERVICEX_UPROOT_RAW:
+        hl_query = get_uproot_raw_query()
+    else:
+        hl_query = get_query(query.FuncADL_Uproot())
 
     # now we query the files using a wrapper around ServiceXDataset to transform all processes at once
     t0 = time.time()
-    ds = utils.file_input.ServiceXDatasetGroup(fileset, backend_name="uproot", ignore_cache=utils.config["global"]["SERVICEX_IGNORE_CACHE"])
-    files_per_process = ds.get_data_rootfiles_uri(query, as_signed_url=True, title="CMS ttbar")
+
+    bundle = { 'Sample': [ { 'Name': _[0], 'Dataset': dataset.FileList(_[1]['files']),
+                            'Query': hl_query,
+                            'IgnoreLocalCache': utils.config["global"]["SERVICEX_IGNORE_CACHE"]
+                           } 
+                           for _ in fileset.items() ]  }
+    if not USE_SERVICEX_DOWNLOAD:
+        bundle['General'] = { 'Delivery': 'URLs' }
+    files_per_process = deliver(bundle)
 
     print(f"ServiceX data delivery took {time.time() - t0:.2f} seconds")
 
     # update fileset to point to ServiceX-transformed files
     for process in fileset.keys():
-        fileset[process]["files"] = [f.url for f in files_per_process[process]]
+        fileset[process]["files"] = files_per_process[process]
 
 # %% [markdown]
 # ### Execute the data delivery pipeline
@@ -524,12 +560,11 @@ run = processor.Runner(
 
 if USE_SERVICEX:
     treename = "servicex"
-
 else:
     treename = "Events"
 
-# load local models if not using Triton and models are not yet loaded
-if USE_INFERENCE and not USE_TRITON and utils.ml.model_even is None and utils.ml.model_odd is None:
+# load local models if not using Triton or FuturesExecutor and models are not yet loaded
+if USE_INFERENCE and not USE_TRITON and USE_DASK and utils.ml.model_even is None and utils.ml.model_odd is None:
     utils.ml.load_models()
 
 filemeta = run.preprocess(fileset, treename=treename)  # pre-processing

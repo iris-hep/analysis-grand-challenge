@@ -2,6 +2,8 @@ config = {
     "global": {
         # ServiceX: ignore cache with repeated queries
         "SERVICEX_IGNORE_CACHE": False,
+        # ServiceX: set False to use remote data access
+        "USE_SERVICEX_DOWNLOAD": False,
         # analysis facility: set to "coffea_casa" for coffea-casa environments,
         # "EAF" for FNAL, "purdue-af" for Purdue Analysis Facility, "local" for local setups
         "AF": "coffea_casa",
