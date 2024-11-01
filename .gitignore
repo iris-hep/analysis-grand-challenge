@@ -33,3 +33,7 @@ analyses/cms-open-data-ttbar/metrics
 
 # dask
 dask-worker-space/
+
+# pixi environments
+.pixi
+*.egg-info
