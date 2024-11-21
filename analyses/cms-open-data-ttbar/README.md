@@ -20,11 +20,57 @@ This directory is focused on running the CMS Open Data $t\bar{t}$ analysis throu
 | utils/config.py               | This is a general config file to handle different options for running the analysis.                               |
 | utils/hepdata.py              | Function to create tables for submission to the [HEP_DATA website](https://www.hepdata.net) (use `HEP_DATA = True`)     |
 
+#### Setting up the environment
+
+##### On Coffea-casa
+
+1. Install [`pixi`](https://pixi.sh/latest/#installation).
+2. From the top level of the entire repository run
+
+```
+pixi run --environment cms-open-data-ttbar install-ipykernel
+```
+
+This will install all of the software and create an `ipykernel` that the Coffea-casa Jupyter Lab instance will be able to see.
+
+3. In the Coffea-casa Jupyter Lab browser, navigate and open up the `analyses/cms-open-data-ttbar/ttbar_analysis_pipeline.ipynb`.
+4. Change the kernel of the notebook to be `cms-open-data-ttbar`.
+
+##### On a local machine
+
+To get a local Python environment that has all the software required for the analysis:
+
+1. Install [`pixi`](https://pixi.sh/latest/#installation) on your machine.
+2. Update `analyses/cms-open-data-ttbar/utils/config.py` to use `"local"` for the `"AF"` key.
+
+```
+sed -i 's/"AF": "coffea_casa"/"AF": "local"/g' analyses/cms-open-data-ttbar/utils/config.py  # Linux
+```
+```
+sed -i '' 's/"AF": "coffea_casa"/"AF": "local"/g' analyses/cms-open-data-ttbar/utils/config.py  # macOS
+```
+3. From the top level of the entire repository run
+
+```
+pixi run --environment local-cms-open-data-ttbar start
+```
+
+This will install all of the software and launch a Jupyter lab session.
+You can then use the file navigator and terminal in Jupyter lab to navigate to this directory to run the analysis.
+
+**Note**: Given the size of the files, when running locally you will probably want to set the `USE_SERVICEX` global configuration variable in the `analyses/cms-open-data-ttbar/ttbar_analysis_pipeline.ipynb` notebook to `True`
+
+```python
+USE_SERVICEX = True
+```
+
+This requires you to have a ServiceX configuration file on your machine.
+
 #### Instructions for paired notebook
 
 If you only care about running the `ttbar_analysis_pipeline.ipynb` notebook, you can completely ignore the `ttbar_analysis_pipeline.py` file.
 
-This notebook (`ttbar_analysis_pipeline.ipynb`) is paired to the file `ttbar_analysis_pipeline.py` via Jupytext (https://jupytext.readthedocs.io/en/latest/). Using `git diff` with this file instead of the `.ipynb` file is much simpler, as you don't have to deal with notebook metadata or output images. However, in order for the notebook output to be preserved, the notebook still needs to be version controlled. It is ideal to run `git diff` with the option `-- . ':(exclude)*.ipynb'`, so that `.ipynb` files are ignored. 
+This notebook (`ttbar_analysis_pipeline.ipynb`) is paired to the file `ttbar_analysis_pipeline.py` via Jupytext (https://jupytext.readthedocs.io/en/latest/). Using `git diff` with this file instead of the `.ipynb` file is much simpler, as you don't have to deal with notebook metadata or output images. However, in order for the notebook output to be preserved, the notebook still needs to be version controlled. It is ideal to run `git diff` with the option `-- . ':(exclude)*.ipynb'`, so that `.ipynb` files are ignored.
 
 The `.py` file can also be run as a Python script.
 
