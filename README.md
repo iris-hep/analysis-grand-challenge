@@ -28,7 +28,7 @@ In addition to this, `analyses/atlas-open-data-hzz` contains a smaller scale $H\
 
 ## More information & references
 
-The [AGC website](https://agc.readthedocs.io/en/latest/?badge=latest) contains more information about the AGC.
+The [AGC website](https://agc.readthedocs.io/) contains more information about the AGC.
 
 The project has been described in a few conference proceedings.
 If you make use of the AGC in your research, please consider citing the project.
@@ -41,8 +41,8 @@ We recommend citing the 2022 ICHEP proceedings when referring to the project mor
 
 Additional information is available in a series of AGC-focused workshops:
 
-- [IRIS-HEP AGC Tools 2021 Workshop, Nov 3–4 2021](https://indico.cern.ch/e/agc-tools-workshop)
-- [IRIS-HEP AGC Tools 2022 Workshop, April 25–26 2022](https://indico.cern.ch/e/agc-tools-2)
+- [IRIS-HEP AGC Tools 2021 Workshop, Nov 3-4 2021](https://indico.cern.ch/e/agc-tools-workshop)
+- [IRIS-HEP AGC Tools 2022 Workshop, April 25-26 2022](https://indico.cern.ch/e/agc-tools-2)
 - [IRIS-HEP AGC workshop 2023, May 3-5 2023](https://indico.cern.ch/e/agc-workshop-2023)
 - [IRIS-HEP AGC Demonstration 2023, Sep 14 2023](https://indico.cern.ch/e/agc-demonstration)
 
