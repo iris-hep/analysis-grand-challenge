@@ -26,13 +26,27 @@ The physics analysis task is a $t\bar{t}$ cross-section measurement with 2015 CM
 The current reference implementation can be found in `analyses/cms-open-data-ttbar`.
 In addition to this, `analyses/atlas-open-data-hzz` contains a smaller scale $H\rightarrow ZZ^*$ analysis based on ATLAS Open Data.
 
-See [this talk given at ICHEP 2022](https://agenda.infn.it/event/28874/contributions/169204/attachments/94615/129603/20220709_AGC_ICHEP.pdf) for some more information about the AGC.
-Additional information is available in two workshops focused on the AGC:
+## More information & references
+
+The [AGC website](https://agc.readthedocs.io/en/latest/?badge=latest) contains more information about the AGC.
+
+The project has been described in a few conference proceedings.
+If you make use of the AGC in your research, please consider citing the project.
+We recommend citing the 2022 ICHEP proceedings when referring to the project more generally and the other other publications as relevant to the specific context.
+
+- **ICHEP 2022 proceedings** with a general introduction: [DOI: 10.22323/1.414.0235](https://doi.org/10.22323/1.414.0235), [INSPIRE](https://inspirehep.net/literature/2598292)
+- **ACAT 2022 proceedings** with first performance measurements: IOP Conference Series publication forthcoming, [arXiv:2304.05214 [hep-ex]](https://arxiv.org/abs/2304.05214), [INSPIRE](https://inspirehep.net/literature/2650460)
+- **CHEP 2023 procedings** with an overview: [DOI: 10.1051/epjconf/202429506016](https://doi.org/10.1051/epjconf/202429506016), [INSPIRE](https://inspirehep.net/literature/2743608)
+- **CHEP 2023 procedings** focused on ML task: [DOI: 10.1051/epjconf/202429508011](https://doi.org/10.1051/epjconf/202429508011), [INSPIRE](https://inspirehep.net/literature/2743013)
+
+Additional information is available in a series of AGC-focused workshops:
 
 - [IRIS-HEP AGC Tools 2021 Workshop, Nov 3–4 2021](https://indico.cern.ch/e/agc-tools-workshop)
 - [IRIS-HEP AGC Tools 2022 Workshop, April 25–26 2022](https://indico.cern.ch/e/agc-tools-2)
+- [IRIS-HEP AGC workshop 2023, May 3-5 2023](https://indico.cern.ch/e/agc-workshop-2023)
+- [IRIS-HEP AGC Demonstration 2023, Sep 14 2023](https://indico.cern.ch/e/agc-demonstration)
 
-We also have a [dedicated webpage](https://iris-hep.org/grand-challenges.html) and a [website for documentation](https://agc.readthedocs.io/en/latest/?badge=latest).
+We also have a [dedicated IRIS-HEP webpage](https://iris-hep.org/grand-challenges.html).
 
 ## AGC and IRIS-HEP
 
@@ -79,4 +93,4 @@ Histogramming and summary statistics: Closely tied to the event selection, histo
 
 ## Acknowledgements
 
-This work was supported by the U.S. National Science Foundation (NSF) cooperative agreement [OAC-1836650 (IRIS-HEP)](https://nsf.gov/awardsearch/showAward?AWD_ID=1836650).
+This work was supported by the U.S. National Science Foundation (NSF) cooperative agreements [OAC-1836650](https://nsf.gov/awardsearch/showAward?AWD_ID=1836650) and [PHY-2323298](https://nsf.gov/awardsearch/showAward?AWD_ID=2323298) (IRIS-HEP).
