@@ -30,13 +30,28 @@ The physics analysis task is a :math:`t\bar{t}` cross-section measurement with 2
 The current reference implementation can be found in `analyses/cms-open-data-ttbar <https://github.com/iris-hep/analysis-grand-challenge/tree/main/analyses/cms-open-data-ttbar>`_.
 In addition to this, `analyses/atlas-open-data-hzz <https://github.com/iris-hep/analysis-grand-challenge/tree/main/analyses/atlas-open-data-hzz>`_ contains a smaller scale :math:`H\rightarrow ZZ^*` analysis based on ATLAS Open Data.
 
-See `this talk given at ICHEP 2022 <https://agenda.infn.it/event/28874/contributions/169204/attachments/94615/129603/20220709_AGC_ICHEP.pdf>`_ for some more information about the AGC.
-Additional information is available in two workshops focused on the AGC:
+More information & references
+---------------------------------------------------------------
 
-- `IRIS-HEP AGC Tools 2021 Workshop, Nov 3–4 2021 <https://indico.cern.ch/e/agc-tools-workshop>`_
-- `IRIS-HEP AGC Tools 2022 Workshop, April 25–26 2022 <https://indico.cern.ch/e/agc-tools-2>`_
+The `AGC website <https://agc.readthedocs.io/>`_ contains more information about the AGC.
 
-We also have a `dedicated webpage <https://iris-hep.org/grand-challenges.html>`_.
+The project has been described in a few conference proceedings.
+If you make use of the AGC in your research, please consider citing the project.
+We recommend citing the 2022 ICHEP proceedings when referring to the project more generally and the other other publications as relevant to the specific context.
+
+- **ICHEP 2022 proceedings** with a general introduction: `DOI: 10.22323/1.414.0235 <https://doi.org/10.22323/1.414.0235>`_, `INSPIRE <https://inspirehep.net/literature/2598292>`_
+- **ACAT 2022 proceedings** with first performance measurements: IOP Conference Series publication forthcoming, `arXiv:2304.05214 [hep-ex] <https://arxiv.org/abs/2304.05214>`_, `INSPIRE <https://inspirehep.net/literature/2650460>`_
+- **CHEP 2023 procedings** with an overview: `DOI: 10.1051/epjconf/202429506016 <https://doi.org/10.1051/epjconf/202429506016>`_, `INSPIRE <https://inspirehep.net/literature/2743608>`_
+- **CHEP 2023 procedings** focused on ML task: `DOI: 10.1051/epjconf/202429508011 <https://doi.org/10.1051/epjconf/202429508011>`_, `INSPIRE <https://inspirehep.net/literature/2743013>`_
+
+Additional information is available in a series of AGC-focused workshops:
+
+- `IRIS-HEP AGC Tools 2021 Workshop, Nov 3-4 2021 <https://indico.cern.ch/e/agc-tools-workshop>`_
+- `IRIS-HEP AGC Tools 2022 Workshop, April 25-26 2022 <https://indico.cern.ch/e/agc-tools-2>`_
+- `IRIS-HEP AGC workshop 2023, May 3-5 2023 <https://indico.cern.ch/e/agc-workshop-2023>`_
+- `IRIS-HEP AGC Demonstration 2023, Sep 14 2023 <https://indico.cern.ch/e/agc-demonstration>`_
+
+We also have a `dedicated IRIS-HEP webpage <https://iris-hep.org/grand-challenges.html>`_.
 
 AGC and IRIS-HEP
 ---------------------------------------------------------------
@@ -88,7 +103,8 @@ More details: what is being investigated in the AGC context
 Acknowledgements
 ---------------------------------------------------------------
 
-This work was supported by the U.S. National Science Foundation (NSF) cooperative agreement `OAC-1836650 (IRIS-HEP) <https://nsf.gov/awardsearch/showAward?AWD_ID=1836650>`_.
+This work was supported by the U.S. National Science Foundation (NSF) cooperative agreements `OAC-1836650 <https://nsf.gov/awardsearch/showAward?AWD_ID=1836650>`_ and `PHY-2323298 <https://nsf.gov/awardsearch/showAward?AWD_ID=2323298>`_ (IRIS-HEP).
+
 
 .. toctree::
    :maxdepth: 2
@@ -109,7 +125,7 @@ This work was supported by the U.S. National Science Foundation (NSF) cooperativ
    :glob:
 
    atlas-open-data-hzz/HZZ_analysis_pipeline
-   
+
 
 
 Search
