@@ -23,16 +23,6 @@ cabinetry = ">=0.6.0"
 scikit-learn = ">=1.0"
 xgboost = ">=1.0"
 coffea = ">=2024.9.0"
-
-# servicex requires aiofile which requires caio which does not have macOS
-# compatible conda-forge releases
-[feature.latest.target.linux-64.dependencies]
-servicex = ">=3.0.0"
-
-[feature.latest.target.osx-64.pypi-dependencies]
-servicex = ">=3.0.0"
-
-[feature.latest.target.osx-arm64.pypi-dependencies]
 servicex = ">=3.0.0"
 
 [feature.cms-open-data-ttbar.tasks]
@@ -44,6 +34,7 @@ python -m ipykernel install --user --name="cms-open-data-ttbar" --display-name="
 [feature.cms-open-data-ttbar.dependencies]
 cabinetry = ">=0.6.0"
 scikit-learn = ">=1.0"
+servicex = ">=3.0.0"
 
 # coffea-casa restrictions
 coffea = ">=0.7.22, <1.0"
@@ -64,7 +55,6 @@ toolz = "0.12.0.*"
 tornado = "6.3.3.*"
 
 [feature.cms-open-data-ttbar.pypi-dependencies]
-servicex = ">=3.0.0"
 func-adl-servicex = ">=2.2, <3"
 tcut-to-qastle = ">=0.7, <0.8"
 
