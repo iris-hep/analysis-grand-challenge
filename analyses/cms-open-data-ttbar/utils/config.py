@@ -5,7 +5,7 @@ config = {
         # ServiceX: set False to use remote data access
         "USE_SERVICEX_DOWNLOAD": False,
         # analysis facility: set to "coffea_casa" for coffea-casa environments,
-        # "EAF" for FNAL, "purdue-af" for Purdue Analysis Facility, "local" for local setups
+        # "EAF" for FNAL, "purdue-af" for Purdue Analysis Facility, "reana" for REANA, "local" for local setups
         "AF": "coffea_casa",
         # number of bins for standard histograms in processor
         "NUM_BINS": 25,

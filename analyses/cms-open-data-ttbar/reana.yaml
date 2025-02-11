@@ -1,0 +1,30 @@
+inputs:
+  files:
+    - ttbar_analysis_pipeline.py
+    - nanoaod_inputs.json
+    - cabinetry_config.yml
+    - cabinetry_config_ml.yml
+    - corrections.json
+  directories:
+    - histograms
+    - utils
+    - models
+    - reference
+workflow:
+  type: serial
+  resources:
+    dask:
+      image: registry.cern.ch/docker.io/alputer/agc-dask:1.0.0
+      number_of_workers: 20
+      single_worker_memory: 2Gi
+      single_worker_threads: 1
+  specification:
+    steps:
+      - name: agc
+        environment: registry.cern.ch/docker.io/alputer/agc-dask:1.0.0
+        commands:
+          - python3 ttbar_analysis_pipeline.py
+outputs:
+  files:
+    - histograms.root
+    - workspace.json
