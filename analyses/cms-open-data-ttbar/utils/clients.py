@@ -39,6 +39,13 @@ def get_client(af="coffea_casa"):
         cluster.scale(10)        
         client = cluster.get_client()
 
+    elif af == "reana":
+        import os
+        from dask.distributed import Client
+
+        DASK_SCHEDULER_URI = os.getenv("DASK_SCHEDULER_URI")
+        client = Client(DASK_SCHEDULER_URI)
+
     elif af == "local":
         from dask.distributed import Client
 
