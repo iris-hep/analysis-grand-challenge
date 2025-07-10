@@ -1,8 +1,18 @@
 import json
+import numpy as np
 import os
 from pathlib import Path
 import tqdm
 import urllib
+
+
+try:
+    from servicex import ServiceXDataset
+except ImportError:
+    # if servicex is not available, ServiceXDatasetGroup cannot be used
+    # this is fine for worker nodes: only needed where main notebook is executed
+    pass
+
 
 # If local_data_cache is a writable path, this function will download any missing file into it and
 # then return file paths corresponding to these local copies.
@@ -39,6 +49,15 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", loca
         "data": None
     }
 
+    # nicer labels for plots
+    process_labels = {
+        "ttbar": r"$t\bar{t}$",
+        "single_top_s_chan": r"$s$-channel single top",
+        "single_top_t_chan": r"$t$-channel single top",
+        "single_top_tW": r"$tW$",
+        "wjets": r"$W$+jets"
+    }
+
     # list of files
     with open("nanoaod_inputs.json") as f:
         file_info = json.load(f)
@@ -56,7 +75,7 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", loca
 
             file_paths = [f["path"] for f in file_list]
             if use_xcache:
-                file_paths = [f.replace("https://xrootd-local.unl.edu:1094", "root://red-xcache1.unl.edu") for f in file_paths]
+                file_paths = [f.replace("https://xrootd-local.unl.edu:1094", "root://xcache") for f in file_paths]
             elif af_name == "ssl-dev":
                 # point to local files on /data
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094//store/user/AGC", "/data/alheld/AGC/datasets") for f in file_paths]
@@ -75,37 +94,9 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, af_name="", loca
                         download_file(remote, local)
                 file_paths = local_paths
             nevts_total = sum([f["nevts"] for f in file_list])
-            metadata = {"process": process, "variation": variation, "nevts": nevts_total, "xsec": xsec_info[process]}
+            metadata = {"process": process, "variation": variation, "nevts": nevts_total, "xsec": xsec_info[process], "process_label": process_labels[process]}
+            # coffea now wants file list entries as dict instead of list with format {path_1: treename, path_2: treename}
+            file_paths = dict(zip(file_paths, ["Events"]*len(file_paths)))
             fileset.update({f"{process}__{variation}": {"files": file_paths, "metadata": metadata}})
 
     return fileset
-
-
-def tqdm_urlretrieve_hook(t):
-    """From https://github.com/tqdm/tqdm/blob/master/examples/tqdm_wget.py ."""
-    last_b = [0]
-
-    def update_to(b=1, bsize=1, tsize=None):
-        """
-        b  : int, optional
-            Number of blocks transferred so far [default: 1].
-        bsize  : int, optional
-            Size of each block (in tqdm units) [default: 1].
-        tsize  : int, optional
-            Total size (in tqdm units). If [default: None] or -1,
-            remains unchanged.
-        """
-        if tsize not in (None, -1):
-            t.total = tsize
-        displayed = t.update((b - last_b[0]) * bsize)
-        last_b[0] = b
-        return displayed
-
-    return update_to
-
-
-def download_file(url, out_file):
-    out_path = Path(out_file)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    with tqdm.tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc=out_path.name) as t:
-        urllib.request.urlretrieve(url, out_path.absolute(), reporthook=tqdm_urlretrieve_hook(t))

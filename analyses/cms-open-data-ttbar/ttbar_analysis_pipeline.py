@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.2
+#       jupytext_version: 1.17.2
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -95,7 +95,6 @@ USE_DASK = True
 # enable ServiceX, specify options
 USE_SERVICEX = False
 USE_SERVICEX_UPROOT_RAW = True # set False to use func_adl instead
-USE_SERVICEX_DOWNLOAD = False # set False to use remote data access
 
 ### ML-INFERENCE SETTINGS
 
@@ -382,7 +381,7 @@ fileset = utils.file_input.construct_fileset(
 )
 
 print(f"processes in fileset: {list(fileset.keys())}")
-print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files'][0]}, ...],")
+print(f"\nexample of information in fileset:\n{{\n  'files': [{fileset['ttbar__nominal']['files']}, ...],")
 print(f"  'metadata': {fileset['ttbar__nominal']['metadata']}\n}}")
 
 
@@ -398,7 +397,7 @@ def get_query(source):
     *NOTE* jet pT cut is set lower to account for systematic variations to jet pT
     """
     cuts = source.FromTree("Events")\
-                        .Where(lambda e: {"pt": e.Electron_pt,
+                 .Where(lambda e: {"pt": e.Electron_pt,
                                "eta": e.Electron_eta,
                                "cutBased": e.Electron_cutBased,
                                "sip3d": e.Electron_sip3d,}.Zip()\
@@ -504,10 +503,11 @@ def get_uproot_raw_query():
         ]
     return query.UprootRaw({'treename': {'Events': 'servicex'}, 'cut': cut, 'filter_name': branch_filter})
 
+
 # %% [markdown]
 # ### Caching the queried datasets with `ServiceX`
 #
-# Using the queries created with `func_adl`, we are using `ServiceX` to read the CMS Open Data files to build cached files with only the specific event information as dictated by the query.
+# Using the queries created with `func_adl` or `uproot-raw`, we are using `ServiceX` to read the CMS Open Data files to build cached files with only the specific event information as dictated by the query.
 
 # %%
 if USE_SERVICEX:
@@ -524,16 +524,16 @@ if USE_SERVICEX:
     bundle = { 'Sample': [ { 'Name': _[0], 'Dataset': dataset.FileList(_[1]['files']),
                             'Query': hl_query,
                             'IgnoreLocalCache': utils.config["global"]["SERVICEX_IGNORE_CACHE"]
-                           } 
-                           for _ in fileset.items() ]  }
-    if not USE_SERVICEX_DOWNLOAD:
+                           }
+                           for _ in fileset.items() ] }
+    if not utils.config["global"]["USE_SERVICEX_DOWNLOAD"]:
         bundle['General'] = { 'Delivery': 'URLs' }
     files_per_process = deliver(bundle)
 
     print(f"ServiceX data delivery took {time.time() - t0:.2f} seconds")
 
     # update fileset to point to ServiceX-transformed files
-    for process in fileset.keys():
+    for process in files_per_process.keys():
         fileset[process]["files"] = files_per_process[process]
 
 # %% [markdown]
@@ -571,18 +571,15 @@ filemeta = run.preprocess(fileset, treename=treename)  # pre-processing
 
 t0 = time.monotonic()
 # processing
-all_histograms, metrics = run(
-    fileset,
-    treename,
-    processor_instance=TtbarAnalysis(USE_INFERENCE, USE_TRITON)
-)
+all_histograms, metrics = run(fileset, processor_instance=TtbarAnalysis(USE_INFERENCE, USE_TRITON))
 exec_time = time.monotonic() - t0
 
 print(f"\nexecution took {exec_time:.2f} seconds")
 
 # %%
 # track metrics
-utils.metrics.track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_MAX_PER_SAMPLE, USE_INFERENCE, USE_TRITON)
+# for now doesnt work with coffea with virual arrays
+#utils.metrics.track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_MAX_PER_SAMPLE, USE_INFERENCE, USE_TRITON)
 
 # %% [markdown]
 # ### Inspecting the produced histograms
@@ -770,9 +767,9 @@ if USE_INFERENCE:
 if utils.config["preservation"]["HEPData"] is True:
     import utils.hepdata
     #Submission of model prediction
-    utils.hepdata.submission_hep_data(model, model_prediction, "hepdata_model", cabinetry_config)
+    utils.hepdata.preparing_hep_data_format(model, model_prediction, "hepdata_model", cabinetry_config)
     #Submission of model_ml prediction
-    utils.hepdata.submission_hep_data(model_ml, model_prediction_ml,"hepdata_model_ml", config_ml)
+    utils.hepdata.preparing_hep_data_format(model_ml, model_prediction_ml,"hepdata_model_ml", config_ml)
 
 # %% [markdown]
 # ### What is next?
@@ -785,3 +782,7 @@ if utils.config["preservation"]["HEPData"] is True:
 # Please do not hesitate to get in touch if you would like to join the effort, or are interested in re-implementing (pieces of) the pipeline with different tools!
 #
 # Our mailing list is analysis-grand-challenge@iris-hep.org, sign up via the [Google group](https://groups.google.com/a/iris-hep.org/g/analysis-grand-challenge).
+
+# %%
+
+# %%

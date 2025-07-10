@@ -6,13 +6,13 @@ from .config import config
 
 def track_metrics(metrics, fileset, exec_time, USE_DASK, USE_SERVICEX, N_FILES_MAX_PER_SAMPLE, USE_INFERENCE, USE_TRITON):
 
-    file_name = fileset["ttbar__nominal"]["files"][0]
+    file_name = fileset["ttbar__nominal"]["files"]
     if file_name.startswith("/data"):
         dataset_source = "/data"
     elif "xcache.af.uchicago.edu" in file_name:
         dataset_source = "xcache.af.uchicago.edu"
     elif "red-xcache1.unl.edu" in file_name:
-        dataset_source = "red-xcache1.unl.edu"
+        dataset_source = "xcache"
     elif "eospublic" in file_name:
         dataset_source = "EOS"
     elif "xrootd-local.unl.edu" in file_name:
