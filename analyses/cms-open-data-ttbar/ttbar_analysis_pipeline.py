@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.2
+#       jupytext_version: 1.19.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -477,6 +477,9 @@ def get_uproot_raw_query():
           '+ count_nonzero((Muon_pt > 30) & (abs(Muon_eta) < 2.1) & (Muon_tightId) & (Muon_pfRelIso04_all < 0.15), axis=1)) == 1)' \
           '& (count_nonzero((Jet_pt > 25) & (abs(Jet_eta) < 2.4) & (Jet_jetId == 6), axis=1) >= 4)' \
           '& (count_nonzero((Jet_pt > 25) & (abs(Jet_eta) < 2.4) & (Jet_jetId == 6) & (Jet_btagCSVV2 > 0.5), axis=1) >= 1)'
+    
+    """
+    # For NanoAOD in calver coffea we should not drop branches due to strictness of coffea NanoAOD schema (!)
     branch_filter =  ['Electron_pt',
                       'Electron_eta',
                       'Electron_cutBased',
@@ -502,7 +505,8 @@ def get_uproot_raw_query():
                       'Muon_mass',
                       'event',
         ]
-    return query.UprootRaw({'treename': {'Events': 'servicex'}, 'cut': cut, 'filter_name': branch_filter})
+    """
+    return query.UprootRaw({'treename': {'Events': 'servicex'}, 'cut': cut })
 
 # %% [markdown]
 # ### Caching the queried datasets with `ServiceX`
@@ -545,11 +549,24 @@ if USE_SERVICEX:
 
 # %%
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
+
+if USE_TRITON:
+    from dask.distributed import PipInstall
+    plugin = PipInstall(packages=["tritonclient[all]"])
+    client=utils.clients.get_client(af=utils.config["global"]["AF"])
+    client.register_plugin(plugin)
+
 if USE_DASK:
     cloudpickle.register_pickle_by_value(utils) # serialize methods and objects in utils so that they can be accessed within the coffea processor
     executor = processor.DaskExecutor(client=utils.clients.get_client(af=utils.config["global"]["AF"]))
 else:
     executor = processor.FuturesExecutor(workers=utils.config["benchmarking"]["NUM_CORES"])
+
+if USE_SERVICEX:
+    treename = "servicex"
+    uproot_options = {"encoded": True}
+else:
+    treename = "Events"
 
 run = processor.Runner(
     executor=executor,
@@ -558,24 +575,21 @@ run = processor.Runner(
     metadata_cache={},
     chunksize=utils.config["benchmarking"]["CHUNKSIZE"])
 
-if USE_SERVICEX:
-    treename = "servicex"
-else:
-    treename = "Events"
-
 # load local models if not using Triton or FuturesExecutor and models are not yet loaded
 if USE_INFERENCE and not USE_TRITON and USE_DASK and utils.ml.model_even is None and utils.ml.model_odd is None:
     utils.ml.load_models()
 
-filemeta = run.preprocess(fileset, treename=treename)  # pre-processing
+filemeta = run.preprocess(fileset, treename=treename, uproot_options=uproot_options,)  # pre-processing
 
 t0 = time.monotonic()
 # processing
 all_histograms, metrics = run(
     fileset,
-    treename,
-    processor_instance=TtbarAnalysis(USE_INFERENCE, USE_TRITON)
+    processor_instance=TtbarAnalysis(USE_INFERENCE, USE_TRITON),
+    uproot_options=uproot_options,
+    treename=treename
 )
+
 exec_time = time.monotonic() - t0
 
 print(f"\nexecution took {exec_time:.2f} seconds")

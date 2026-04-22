@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.1
+#       jupytext_version: 1.19.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -74,10 +74,10 @@ USE_DASK_ML = True
 
 # enable MLFlow logging (to store metrics and models of hyperparameter optimization trials)
 # if using MLFlow, be sure to add credentials in config_training.py before running code
-USE_MLFLOW = True
+USE_MLFLOW = False
 
 # enable MLFlow model logging/registering
-MODEL_LOGGING = True
+MODEL_LOGGING = False
 MODEL_REGISTERING = False
 
 # number of events to use for training (more results in higher efficiency, but slower to train)
@@ -196,7 +196,10 @@ if USE_DASK_PROCESSING:
 else:
     executor = processor.FuturesExecutor(workers=utils.config_training["benchmarking"]["NUM_CORES"])
     
-run = processor.Runner(executor=executor, schema=NanoAODSchema, savemetrics=True, metadata_cache={}, 
+run = processor.Runner(executor=executor,
+                       schema=NanoAODSchema,
+                       savemetrics=True,
+                       metadata_cache={}, 
                        chunksize=utils.config_training["benchmarking"]["CHUNKSIZE"])
 
 # preprocess
@@ -204,8 +207,8 @@ filemeta = run.preprocess(fileset, treename="Events")
 
 # process
 output, metrics = run(fileset, 
-                      "Events", 
-                      processor_instance = JetClassifier())
+                      processor_instance = JetClassifier(),
+                      treename="Events")
 
 # %%
 # grab features and labels and convert to np array
@@ -531,60 +534,76 @@ def initialize_mlflow():
 def run_training(features, labels, samples, evaluation_matrix, 
                  N_EVENTS_TRAIN, USE_DASK_ML, USE_MLFLOW, MODEL_LOGGING):
     
-    if USE_MLFLOW:
-        # set mlflowclient
-        mlflowclient = MlflowClient()
-    else: 
-        mlflowclient = None
-        
-    if USE_DASK_ML:
-        start_time = time.time() 
+    mlflowclient = MlflowClient() if USE_MLFLOW else None
 
-        # initialize mlflow and set up dask client
+    start_time = time.time()
+
+    if USE_DASK_ML:
         client = utils.clients.get_client(utils.config_training["global"]["AF"])
         if USE_MLFLOW:
             client.run(initialize_mlflow)
 
-        # set up training on dask
-        futures = client.map(fit_model,
-                             samples, 
-                             features=features[:N_EVENTS_TRAIN*12], 
-                             labels=labels[:N_EVENTS_TRAIN*12],
-                             evaluation_matrix=evaluation_matrix,
-                             n_folds=utils.config_training["ml"]["N_FOLD"],
-                             mlflowclient=mlflowclient,
-                             use_mlflow=USE_MLFLOW,
-                             log_models=MODEL_LOGGING) 
+        # Scatter large arrays to workers before mapping.
+        # Passing large numpy arrays inline as client.map **kwargs embeds them
+        # in every task in the graph, which triggers a sorting bug in the Dask
+        # scheduler (distributed 2025.3.1). Scattering first avoids this.
+        features_f = client.scatter(features[:N_EVENTS_TRAIN * 12], broadcast=True)
+        labels_f   = client.scatter(labels[:N_EVENTS_TRAIN * 12],   broadcast=True)
+        eval_mat_f = client.scatter(evaluation_matrix,               broadcast=True)
 
-        # run training
-        res = client.gather(futures)
-        time_elapsed = time.time() - start_time
+        fit_kwargs = dict(
+            features=features_f,
+            labels=labels_f,
+            evaluation_matrix=eval_mat_f,
+            n_folds=utils.config_training["ml"]["N_FOLD"],
+            mlflowclient=mlflowclient,
+            use_mlflow=USE_MLFLOW,
+            log_models=MODEL_LOGGING,
+        )
 
-    else:
-        start_time = time.time() 
+        futures = client.map(fit_model, samples, **fit_kwargs)
+
         res = []
-        for i in range(len(samples)):
+        for i, future in enumerate(futures):
+            try:
+                res.append(future.result())
+            except Exception as e:
+                import traceback
+                print(f"Future {i} (sample={samples[i]}) failed:")
+                traceback.print_exc()
+                res.append(None)
+    else:
+        fit_kwargs = dict(
+            features=features[:N_EVENTS_TRAIN * 12],
+            labels=labels[:N_EVENTS_TRAIN * 12],
+            evaluation_matrix=evaluation_matrix,
+            n_folds=utils.config_training["ml"]["N_FOLD"],
+            mlflowclient=mlflowclient,
+            use_mlflow=USE_MLFLOW,
+            log_models=MODEL_LOGGING,
+        )
+        res = []
+        for i, sample in enumerate(samples):
             print("_____________________________________________________________")
-            print("Sample #", i)
-            print("Hyperparameter sample: ", samples[i])
-            res.append(fit_model(samples[i], 
-                                 features=features[:N_EVENTS_TRAIN*12],
-                                 labels=labels[:N_EVENTS_TRAIN*12], 
-                                 evaluation_matrix=evaluation_matrix,
-                                 n_folds=utils.config_training["ml"]["N_FOLD"],
-                                 mlflowclient=mlflowclient,
-                                 use_mlflow=USE_MLFLOW,
-                                 log_models=MODEL_LOGGING))
-            print("Score: ", res[-1]["score"])
-        time_elapsed = time.time() - start_time
+            print(f"Sample #{i} | Hyperparameters: {sample}")
+            result = fit_model(sample, **fit_kwargs)
+            res.append(result)
+            print(f"Score: {result['score'] if result is not None else 'FAILED'}")
 
-    print("Hyperparameter optimization took time = ", time_elapsed)
-    print()
+    time_elapsed = time.time() - start_time
+    print(f"Hyperparameter optimization took {time_elapsed:.2f}s")
 
-    scores = [res[i]["score"] for i in range(len(res))]
-    best_parameters_even = samples_even[np.argmax(scores)]
-    print("best_parameters_even = ", best_parameters_even)
-    
+    # Filter out failed futures
+    valid_res = [(i, r) for i, r in enumerate(res) if r is not None]
+    if not valid_res:
+        raise RuntimeError("All fit_model calls failed — check errors above")
+
+    valid_indices, valid_results = zip(*valid_res)
+    scores = [r["score"] for r in valid_results]
+    best_idx = valid_indices[np.argmax(scores)]
+    best_parameters = samples[best_idx]
+    print(f"Best parameters: {best_parameters}")
+
     return res
 
 
@@ -683,6 +702,33 @@ for path, subdirs, files in os.walk("reconstruction_bdt_xgb"):
 # The server may need to be restarted in order to load the model.
 
 # %%
+import boto3
+import os
+from pathlib import Path
+
+s3 = boto3.client(
+    "s3",
+    endpoint_url=f"http://{os.environ['TRITON_BUCKET_HOST']}",
+    aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+    aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+)
+
+def upload_directory(local_path: str, bucket: str, s3_prefix: str = ""):
+    local = Path(local_path)
+
+    for file_path in local.rglob("*"):
+        if file_path.is_file():
+            s3_key = f"{s3_prefix}/{file_path.relative_to(local)}".lstrip("/")
+            print(f"Uploading {file_path} -> s3://{bucket}/{s3_key}")
+            s3.upload_file(str(file_path), bucket, s3_key)
+
+upload_directory(
+    local_path="reconstruction_bdt_xgb",
+    bucket=os.environ["TRITON_BUCKET_NAME"],
+    s3_prefix="reconstruction_bdt_xgb",
+)
+
+# %%
 # optional: remove model directory after uploading to triton
 # # !rm -r reconstruction_bdt_xgb
 
@@ -698,11 +744,15 @@ val_predicted_prob = best_model_even.predict_proba(features_odd)[:, 1]
 
 # %%
 # calculate performance metrics
-train_accuracy = accuracy_score(labels_even, train_predicted).round(3)
-train_precision = precision_score(labels_even, train_predicted).round(3)
-train_recall = recall_score(labels_even, train_predicted).round(3)
-train_f1 = f1_score(labels_even, train_predicted).round(3)
-train_aucroc = roc_auc_score(labels_even, train_predicted_prob).round(3)
+# binarize labels: 1 = correct combination, 0 = wrong/partial
+labels_even_bin = (labels_even == 1).astype(int)
+labels_odd_bin  = (labels_odd  == 1).astype(int)
+
+train_accuracy = round(accuracy_score(labels_even_bin, train_predicted), 3)
+train_precision = round(precision_score(labels_even_bin, train_predicted), 3)
+train_recall = round(recall_score(labels_even_bin, train_predicted), 3)
+train_f1 = round(f1_score(labels_even_bin, train_predicted), 3)
+train_aucroc = round(roc_auc_score(labels_even_bin, train_predicted_prob), 3)
 print("Training Accuracy = ", train_accuracy)
 print("Training Precision = ", train_precision)
 print("Training Recall = ", train_recall)
@@ -710,16 +760,17 @@ print("Training f1 = ", train_f1)
 print("Training AUC = ", train_aucroc)
 print()
 
-val_accuracy = accuracy_score(labels_odd, val_predicted).round(3)
-val_precision = precision_score(labels_odd, val_predicted).round(3)
-val_recall = recall_score(labels_odd, val_predicted).round(3)
-val_f1 = f1_score(labels_odd, val_predicted).round(3)
-val_aucroc = roc_auc_score(labels_odd, val_predicted_prob).round(3)
+val_accuracy = round(accuracy_score(labels_odd_bin, val_predicted), 3)
+val_precision = round(precision_score(labels_odd_bin, val_predicted), 3)
+val_recall = round(recall_score(labels_odd_bin, val_predicted), 3)
+val_f1 = round(f1_score(labels_odd_bin, val_predicted), 3)
+val_aucroc = round(roc_auc_score(labels_odd_bin, val_predicted_prob), 3)
 print("Validation Accuracy = ", val_accuracy)
 print("Validation Precision = ", val_precision)
 print("Validation Recall = ", val_recall)
 print("Validation f1 = ", val_f1)
 print("Validation AUC = ", val_aucroc)
+
 
 # %%
 # calculate jet score (how many jets are correctly assigned per event)
