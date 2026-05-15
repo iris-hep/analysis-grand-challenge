@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.1
+#       jupytext_version: 1.19.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -218,7 +218,7 @@ t0 = time.time()
 
 fileset = {}
 
-bundle = { 'General': { 'Delivery': 'URLs' },
+bundle = { 'General': { 'Delivery': 'LocalCache' },
            'Sample': [ { 'Name': ds_name,
                           'Query': query,
                           'Dataset': servicex.dataset.FileList(input_files[ds_name]),
@@ -311,7 +311,7 @@ class HZZAnalysis(processor.ProcessorABC):
             bin_edge_low,
             bin_edge_high,
             name="mllll",
-            label="$\mathrm{m_{4l}}$ [GeV]",
+            label=r"$\mathrm{m_{4l}}$ [GeV]",
         ).Weight()  # using weighted storage here for plotting later, but not needed
 
         # three histogram axes for MC: m4l, category, and variation (nominal and
@@ -322,7 +322,7 @@ class HZZAnalysis(processor.ProcessorABC):
                 bin_edge_low,
                 bin_edge_high,
                 name="mllll",
-                label="$\mathrm{m_{4l}}$ [GeV]",
+                label=r"$\mathrm{m_{4l}}$ [GeV]",
             )
             .StrCat([k for k in fileset.keys() if k != "Data"], name="dataset")
             .StrCat(
@@ -394,14 +394,21 @@ class HZZAnalysis(processor.ProcessorABC):
 # Run the processor on data previously gathered by ServiceX, then gather output histograms.
 
 # %%
-t0 = time.time()
-
+#Define the runner 
 executor = processor.FuturesExecutor(workers=NUM_CORES)
 run = processor.Runner(executor=executor, savemetrics=True, metadata_cache={},
                        chunksize=CHUNKSIZE, schema=BaseSchema)
-# The trees returned by ServiceX will have different names depending on the query language used
-all_histograms, metrics = run(fileset, "mini" if USE_SERVICEX_UPROOT_RAW else "servicex", processor_instance=HZZAnalysis())
 
+# %%
+# The trees returned by ServiceX will hve different names depending on the query language used
+tree_name = "mini" if USE_SERVICEX_UPROOT_RAW else "servicex"
+#Run 
+t0 = time.time()
+all_histograms, metrics = run(
+    fileset=fileset,
+    treename=tree_name,
+    processor_instance=HZZAnalysis(),
+)
 print(f"execution took {time.time() - t0:.2f} seconds")
 
 # %% [markdown]
