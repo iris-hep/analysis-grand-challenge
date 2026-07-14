@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.2
+#       jupytext_version: 1.19.1
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -44,6 +44,7 @@
 import logging
 import time
 
+import uproot
 import awkward as ak
 import cabinetry
 import cloudpickle
@@ -58,6 +59,10 @@ import numpy as np
 import pyhf
 
 import utils  # contains code for bookkeeping and cosmetics, as well as some boilerplate
+
+import awkward
+import vector
+vector.register_awkward()
 
 logging.getLogger("cabinetry").setLevel(logging.INFO)
 
@@ -245,6 +250,11 @@ class TtbarAnalysis(processor.ProcessorABC):
             muons = muons[muon_reqs]
             jets = jets[jet_reqs]
 
+            # Avoid using NanoAOD mixins
+            # later "additions" of jets require a charge branch to be present
+            # Make lorentz vectors manually
+            jets = awkward.zip({field:jets[field] for field in jets.fields}, with_name="Momentum4D")
+
             if self.use_inference:
                 even = (events.event%2==0)  # whether events are even/odd
 
@@ -429,6 +439,14 @@ def get_query(source):
                                             and jet.pt > 25
                                             and abs(jet.eta) < 2.4)
                                             and jet.jetId == 6).Count() >= 1)
+    # Electrons, Muons, Jets etc inherit indirectly from the Candidate Mixin that requires the 
+    # presence of the (pt, eta, phi) AND the charge field
+    # https://github.com/scikit-hep/coffea/blob/master/src/coffea/nanoevents/methods/candidate.py#L55
+    # Avoid involvement of charge in lorentzvector calculations in the processor
+
+    # Event IDs must not be dropped: ["run", "luminosityBlock", "event"]
+    # https://github.com/scikit-hep/coffea/blob/master/src/coffea/nanoevents/schemas/nanoaod.py#L47
+    
     selection = cuts.Select(lambda h: {"Electron_pt": h.Electron_pt,
                                        "Electron_eta": h.Electron_eta,
                                        "Electron_phi": h.Electron_phi,
@@ -449,6 +467,8 @@ def get_query(source):
                                        "Jet_qgl": h.Jet_qgl,
                                        "Jet_btagCSVV2": h.Jet_btagCSVV2,
                                        "Jet_jetId": h.Jet_jetId,
+                                       "run":h.run,
+                                       "luminosityBlock":h.luminosityBlock,
                                        "event": h.event,
                                       })
     if USE_INFERENCE:
@@ -470,6 +490,9 @@ def get_query(source):
                                        "Jet_phi": h.Jet_phi,
                                        "Jet_btagCSVV2": h.Jet_btagCSVV2,
                                        "Jet_jetId": h.Jet_jetId,
+                                       "run":h.run,
+                                       "luminosityBlock":h.luminosityBlock,
+                                       "event": h.event,
                                       })
 
 def get_uproot_raw_query():
@@ -477,6 +500,9 @@ def get_uproot_raw_query():
           '+ count_nonzero((Muon_pt > 30) & (abs(Muon_eta) < 2.1) & (Muon_tightId) & (Muon_pfRelIso04_all < 0.15), axis=1)) == 1)' \
           '& (count_nonzero((Jet_pt > 25) & (abs(Jet_eta) < 2.4) & (Jet_jetId == 6), axis=1) >= 4)' \
           '& (count_nonzero((Jet_pt > 25) & (abs(Jet_eta) < 2.4) & (Jet_jetId == 6) & (Jet_btagCSVV2 > 0.5), axis=1) >= 1)'
+    
+    """
+    # For NanoAOD in calver coffea we should not drop branches due to strictness of coffea NanoAOD schema (!)
     branch_filter =  ['Electron_pt',
                       'Electron_eta',
                       'Electron_cutBased',
@@ -493,6 +519,9 @@ def get_uproot_raw_query():
                       'Jet_qgl',
                       'Jet_btagCSVV2',
                       'Jet_jetId',
+                      'run',
+                      'luminosityBlock',
+                      'event'
                      ]
     if USE_INFERENCE:
         branch_filter += [
@@ -500,9 +529,12 @@ def get_uproot_raw_query():
                       'Electron_mass',
                       'Muon_phi',
                       'Muon_mass',
+                      'run',
+                      'luminosityBlock',
                       'event',
         ]
-    return query.UprootRaw({'treename': {'Events': 'servicex'}, 'cut': cut, 'filter_name': branch_filter})
+    """
+    return query.UprootRaw({'treename': {'Events': 'servicex'}, 'cut': cut })
 
 # %% [markdown]
 # ### Caching the queried datasets with `ServiceX`
@@ -545,11 +577,25 @@ if USE_SERVICEX:
 
 # %%
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
+
+if USE_TRITON:
+    from dask.distributed import PipInstall
+    plugin = PipInstall(packages=["tritonclient[all]"])
+    client=utils.clients.get_client(af=utils.config["global"]["AF"])
+    client.register_plugin(plugin)
+
 if USE_DASK:
     cloudpickle.register_pickle_by_value(utils) # serialize methods and objects in utils so that they can be accessed within the coffea processor
     executor = processor.DaskExecutor(client=utils.clients.get_client(af=utils.config["global"]["AF"]))
 else:
     executor = processor.FuturesExecutor(workers=utils.config["benchmarking"]["NUM_CORES"])
+
+uproot_options = None
+if USE_SERVICEX:
+    treename = "servicex"
+    uproot_options = {"encoded": True}
+else:
+    treename = "Events"
 
 run = processor.Runner(
     executor=executor,
@@ -558,24 +604,21 @@ run = processor.Runner(
     metadata_cache={},
     chunksize=utils.config["benchmarking"]["CHUNKSIZE"])
 
-if USE_SERVICEX:
-    treename = "servicex"
-else:
-    treename = "Events"
-
 # load local models if not using Triton or FuturesExecutor and models are not yet loaded
 if USE_INFERENCE and not USE_TRITON and USE_DASK and utils.ml.model_even is None and utils.ml.model_odd is None:
     utils.ml.load_models()
 
-filemeta = run.preprocess(fileset, treename=treename)  # pre-processing
+filemeta = run.preprocess(fileset, treename=treename, uproot_options=uproot_options,)  # pre-processing
 
 t0 = time.monotonic()
 # processing
 all_histograms, metrics = run(
     fileset,
-    treename,
-    processor_instance=TtbarAnalysis(USE_INFERENCE, USE_TRITON)
+    processor_instance=TtbarAnalysis(USE_INFERENCE, USE_TRITON),
+    uproot_options=uproot_options,
+    treename=treename
 )
+
 exec_time = time.monotonic() - t0
 
 print(f"\nexecution took {exec_time:.2f} seconds")
@@ -668,8 +711,129 @@ utils.file_output.save_histograms(all_histograms['hist_dict'], "histograms.root"
 if USE_INFERENCE:
     utils.file_output.save_histograms(all_histograms['ml_hist_dict'], "histograms_ml.root", add_offset=True)
 
+# %%
+# Save the histograms in a way that it is compatible with the Combine template and Datacard
+
+####### A few things changed:
+# Done i) Rebin histograms before saving into the root files
+# Done ii) Rename all _up/_down to Up/Down
+# Done iii) Rename all scaleup/scaleDown to scaleUp/scaleDown
+# Done iv) Rename pseudodata -> data_obs (Probably unnecessary?)
+# Done v) Copy the symmetric histograms to save both Up and Down variation separately
+# Done vi) Save the histogram in root files that are named appropriately with respect to the datacard being used
+
+
+# Derived from cabinetry_config.yml
+to_symmetrize = {
+    "_ME_var":("_ME_varUp","_ME_varDown"),
+    "_PS_var":("_PS_varUp","_PS_varDown"),
+    "_pt_scale_up":("_pt_scaleUp","_pt_scaleDown"),
+    "_pt_res_up":("_pt_resUp","_pt_resDown")
+}
+
+# To perform histogram arithmetic on weighted histograms
+def hist_sub(h1, h2):
+    """Return h1 - h2 for weighted histograms."""
+    out = copy.deepcopy(h1)
+
+    v1 = h1.view(flow=True)
+    v2 = h2.view(flow=True)
+    vo = out.view(flow=True)
+
+    vo.value[...] = v1.value - v2.value
+    vo.variance[...] = v1.variance + v2.variance
+
+    return out
+
+
+def hist_add(h1, h2):
+    """Return h1 + h2 for weighted histograms."""
+    out = copy.deepcopy(h1)
+
+    v1 = h1.view(flow=True)
+    v2 = h2.view(flow=True)
+    vo = out.view(flow=True)
+
+    vo.value[...] = v1.value + v2.value
+    vo.variance[...] = v1.variance + v2.variance
+
+    return out
+
+
+def hist_abs(h):
+    """Return |h| for weighted histograms."""
+    out = copy.deepcopy(h)
+
+    vo = out.view(flow=True)
+    vo.value[...] = np.abs(vo.value)
+    # variances unchanged
+
+    return out
+
+def save_histograms_individual_channel(histogram, filename, add_offset=False):
+    with uproot.recreate(filename) as f:
+        # save all available histograms to disk
+        # optionally add minimal offset to avoid completely empty bins
+        # (useful for the ML validation variables that would need binning adjustment
+        # to avoid those)
+        if add_offset:
+            histogram += 1e-6
+            # reference count for empty histogram with floating point math tolerance
+            empty_hist_yield = histogram.axes[0].size*(1e-6)*1.01
+        else:
+            empty_hist_yield = 0
+
+        for sample in histogram.axes[1]:
+            for variation in histogram[:, sample, :].axes[1]:
+                variation_string = "" if variation == "nominal" else f"_{variation}"
+                new_variation_string = variation_string
+                if "_up" in variation_string:
+                    new_variation_string = variation_string.replace('_up','Up')
+                elif "_down" in variation_string:
+                    new_variation_string = variation_string.replace('_down','Down')
+                elif "scaleup" in variation_string:
+                    new_variation_string = variation_string.replace('scaleup','scaleUp')
+                elif "scaledown" in variation_string:
+                    new_variation_string = variation_string.replace('scaledown','scaleDown')
+
+                current_1d_hist = histogram[:, sample, variation]
+                if sum(current_1d_hist.values()) > empty_hist_yield:
+                    # only save histograms containing events
+                    # many combinations are not used (e.g. ME var for W+jets)
+                    if variation_string in to_symmetrize.keys():
+                        nominal_hist = histogram[:, sample, "nominal"]
+                        up_string = to_symmetrize[variation_string][0]
+                        down_string = to_symmetrize[variation_string][1]
+                        up_hist = hist_add(nominal_hist,hist_abs(hist_sub(nominal_hist, current_1d_hist)))
+                        down_hist = hist_sub(nominal_hist,hist_abs(hist_sub(nominal_hist, current_1d_hist)))
+                        f[f"{sample}{up_string}"] = up_hist
+                        f[f"{sample}{down_string}"] = down_hist
+                    else:
+                        f[f"{sample}{new_variation_string}"] = current_1d_hist
+
+        # add pseudodata histogram if all inputs to it are available
+        if (
+            sum(histogram[:, "ttbar", "ME_var"].values()) > empty_hist_yield
+            and sum(histogram[:, "ttbar", "PS_var"].values()) > empty_hist_yield
+            and sum(histogram[:, "wjets", "nominal"].values()) > empty_hist_yield
+        ):
+            f["data_obs"] = (
+                histogram[:, "ttbar", "ME_var"] + histogram[:, "ttbar", "PS_var"]
+            ) / 2 + histogram[:, "wjets", "nominal"]
+
+
+# Save rebinned versions for use in combine; otherwise rebinning could be done with cabinetry
+rebinned_dict = {
+    ch: h[110j::hist.rebin(2), :,:]
+    for ch, h in all_histograms['hist_dict'].items()
+}
+
+channels = ['4j1b','4j2b']
+for channel in channels:
+    save_histograms_individual_channel(rebinned_dict[channel], f"all_histograms_fps4_bin{channel}.root")
+
 # %% [markdown]
-# ### Statistical inference
+# ### Statistical inference with Cabinetry and pyhf
 #
 # We are going to perform a re-binning for the statistical inference.
 # This is planned to be conveniently provided via cabinetry (see [cabinetry#412](https://github.com/scikit-hep/cabinetry/issues/412), but in the meantime we can achieve this via [template building overrides](https://cabinetry.readthedocs.io/en/latest/advanced.html#overrides-for-template-building).
