@@ -567,6 +567,7 @@ if USE_SERVICEX:
     uproot_options = {"encoded": True}
 else:
     treename = "Events"
+    uproot_options = {}
 
 run = processor.Runner(
     executor=executor,
