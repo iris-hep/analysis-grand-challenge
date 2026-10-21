@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.1
+#       jupytext_version: 1.19.6
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -550,6 +550,10 @@ if USE_SERVICEX:
 # %%
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 
+from dask.distributed import PipInstall
+client = utils.clients.get_client(af=utils.config["global"]["AF"])
+client.register_plugin(PipInstall(packages=["xgboost"]))
+
 if USE_TRITON:
     from dask.distributed import PipInstall
     plugin = PipInstall(packages=["tritonclient[all]"])
@@ -800,3 +804,5 @@ if utils.config["preservation"]["HEPData"] is True:
 # Please do not hesitate to get in touch if you would like to join the effort, or are interested in re-implementing (pieces of) the pipeline with different tools!
 #
 # Our mailing list is analysis-grand-challenge@iris-hep.org, sign up via the [Google group](https://groups.google.com/a/iris-hep.org/g/analysis-grand-challenge).
+
+# %%
