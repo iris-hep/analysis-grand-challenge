@@ -702,9 +702,9 @@ for path, subdirs, files in os.walk("reconstruction_bdt_xgb"):
 # The server may need to be restarted in order to load the model.
 
 # %%
-import boto3
-import os
-from pathlib import Path
+import boto3  # noqa: E402
+import os  # noqa: E402
+from pathlib import Path  # noqa: E402
 
 s3 = boto3.client(
     "s3",
