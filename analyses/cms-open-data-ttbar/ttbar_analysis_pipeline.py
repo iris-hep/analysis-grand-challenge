@@ -550,9 +550,12 @@ if USE_SERVICEX:
 # %%
 NanoAODSchema.warn_missing_crossrefs = False # silences warnings about branches we will not use here
 
-from dask.distributed import PipInstall
-client = utils.clients.get_client(af=utils.config["global"]["AF"])
-client.register_plugin(PipInstall(packages=["xgboost"]))
+if USE_INFERENCE and not USE_TRITON and USE_DASK:
+    # local xgboost inference runs on the Dask workers, make sure xgboost is available there
+    from dask.distributed import PipInstall
+    plugin = PipInstall(packages=["xgboost"])
+    client=utils.clients.get_client(af=utils.config["global"]["AF"])
+    client.register_plugin(plugin)
 
 if USE_TRITON:
     from dask.distributed import PipInstall
