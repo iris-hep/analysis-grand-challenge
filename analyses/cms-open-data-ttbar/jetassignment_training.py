@@ -551,15 +551,15 @@ def run_training(features, labels, samples, evaluation_matrix,
         labels_f   = client.scatter(labels[:N_EVENTS_TRAIN * 12],   broadcast=True)
         eval_mat_f = client.scatter(evaluation_matrix,               broadcast=True)
 
-        fit_kwargs = dict(
-            features=features_f,
-            labels=labels_f,
-            evaluation_matrix=eval_mat_f,
-            n_folds=utils.config_training["ml"]["N_FOLD"],
-            mlflowclient=mlflowclient,
-            use_mlflow=USE_MLFLOW,
-            log_models=MODEL_LOGGING,
-        )
+        fit_kwargs = {
+            "features": features_f,
+            "labels": labels_f,
+            "evaluation_matrix": eval_mat_f,
+            "n_folds": utils.config_training["ml"]["N_FOLD"],
+            "mlflowclient": mlflowclient,
+            "use_mlflow": USE_MLFLOW,
+            "log_models": MODEL_LOGGING,
+        }
 
         futures = client.map(fit_model, samples, **fit_kwargs)
 
@@ -567,21 +567,21 @@ def run_training(features, labels, samples, evaluation_matrix,
         for i, future in enumerate(futures):
             try:
                 res.append(future.result())
-            except Exception as e:
+            except Exception:  # noqa: BLE001 - report every failed fold, keep going
                 import traceback
                 print(f"Future {i} (sample={samples[i]}) failed:")
                 traceback.print_exc()
                 res.append(None)
     else:
-        fit_kwargs = dict(
-            features=features[:N_EVENTS_TRAIN * 12],
-            labels=labels[:N_EVENTS_TRAIN * 12],
-            evaluation_matrix=evaluation_matrix,
-            n_folds=utils.config_training["ml"]["N_FOLD"],
-            mlflowclient=mlflowclient,
-            use_mlflow=USE_MLFLOW,
-            log_models=MODEL_LOGGING,
-        )
+        fit_kwargs = {
+            "features": features[:N_EVENTS_TRAIN * 12],
+            "labels": labels[:N_EVENTS_TRAIN * 12],
+            "evaluation_matrix": evaluation_matrix,
+            "n_folds": utils.config_training["ml"]["N_FOLD"],
+            "mlflowclient": mlflowclient,
+            "use_mlflow": USE_MLFLOW,
+            "log_models": MODEL_LOGGING,
+        }
         res = []
         for i, sample in enumerate(samples):
             print("_____________________________________________________________")
